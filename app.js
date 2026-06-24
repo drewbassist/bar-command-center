@@ -36,7 +36,14 @@ async function loadData() {
   essaySources = await loadJson("essaySources.json", []);
   mcqSources = await loadJson("mcqSources.json", []);
   flashcardSources = await loadJson("flashcardSources.json", []);
-  studyModes = await loadJson("studyModes.json", []);
+  studyModes = [
+  "Standard Study",
+  "Essay Focus",
+  "MCQ Focus",
+  "Flashcard Focus",
+  "Review Mode",
+  "Mixed Practice"
+];
   studyGoals = await loadJson("studyGoals.json", {});
   studyCycle = await loadJson("studyCycle.json", []);
 
