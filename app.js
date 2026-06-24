@@ -4,6 +4,7 @@ let subjects = [];
 let essaySources = [];
 let mcqSources = [];
 let flashcardSources = [];
+let studyModes = [];
 let studyGoals = {};
 let studyCycle = [];
 
@@ -13,67 +14,6 @@ let flashcards = [];
 let reviews = [];
 let sessionHistory = [];
 let currentSession = 1;
-
-const fallbackSubjects = [
-  { id: "contracts", name: "Contracts" },
-  { id: "torts", name: "Torts" },
-  { id: "criminal-law", name: "Criminal Law" },
-  { id: "evidence", name: "Evidence" },
-  { id: "civil-procedure", name: "Civil Procedure" },
-  { id: "constitutional-law", name: "Constitutional Law" },
-  { id: "real-property", name: "Real Property" },
-  { id: "professional-responsibility", name: "Professional Responsibility" }
-];
-
-const fallbackEssaySources = [
-  "BarEssays",
-  "California Bar Essays",
-  "Basick Essays",
-  "Fleming's",
-  "Quimbee",
-  "Other"
-];
-
-const fallbackMcqSources = [
-  "Finz",
-  "Emanuel",
-  "Strategies & Tactics",
-  "Quimbee",
-  "UWorld",
-  "AdaptiBar",
-  "Other"
-];
-
-const fallbackFlashcardSources = [
-  "Personal Rules",
-  "Quimbee",
-  "Basick",
-  "Critical Pass",
-  "Other"
-];
-
-const studyModes = [
-  "Standard Study",
-  "Essay Focus",
-  "MCQ Focus",
-  "Flashcard Focus",
-  "Review Mode",
-  "Mixed Practice"
-];
-
-const fallbackStudyGoals = {
-  essaysPerDay: 1,
-  mcqsPerDay: 16,
-  flashcardsPerDay: 25
-};
-
-const fallbackStudyCycle = [
-  { day: 1, subjects: ["Contracts", "Torts"] },
-  { day: 2, subjects: ["Criminal Law", "Evidence"] },
-  { day: 3, subjects: ["Contracts", "Evidence"] },
-  { day: 4, subjects: ["Torts", "Criminal Law"] },
-  { day: 5, subjects: ["Mixed Review"] }
-];
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -92,12 +32,13 @@ async function init() {
 }
 
 async function loadData() {
-  subjects = await loadJson("subjects.json", fallbackSubjects);
-  essaySources = await loadJson("essaySources.json", fallbackEssaySources);
-  mcqSources = await loadJson("mcqSources.json", fallbackMcqSources);
-  flashcardSources = await loadJson("flashcardSources.json", fallbackFlashcardSources);
-  studyGoals = await loadJson("studyGoals.json", fallbackStudyGoals);
-  studyCycle = await loadJson("studyCycle.json", fallbackStudyCycle);
+  subjects = await loadJson("subjects.json", []);
+  essaySources = await loadJson("essaySources.json", []);
+  mcqSources = await loadJson("mcqSources.json", []);
+  flashcardSources = await loadJson("flashcardSources.json", []);
+  studyModes = await loadJson("studyModes.json", []);
+  studyGoals = await loadJson("studyGoals.json", {});
+  studyCycle = await loadJson("studyCycle.json", []);
 
   essays = loadLocalData("bcc_essays", await loadJson("essays.json", []));
   mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
@@ -119,20 +60,15 @@ async function loadData() {
 async function loadJson(path, fallback) {
   try {
     const response = await fetch(path);
-    if (!response.ok) return fallback;
 
-    const data = await response.json();
-
-    if (Array.isArray(fallback) && (!Array.isArray(data) || data.length === 0)) {
+    if (!response.ok) {
+      console.warn(`Could not load ${path}`);
       return fallback;
     }
 
-    if (!Array.isArray(fallback) && (!data || Object.keys(data).length === 0)) {
-      return fallback;
-    }
-
-    return data;
+    return await response.json();
   } catch (error) {
+    console.warn(`Error loading ${path}`, error);
     return fallback;
   }
 }
@@ -245,8 +181,15 @@ function setupStudyModeDropdown() {
 
   studyModes.forEach((mode) => {
     const option = document.createElement("option");
-    option.value = mode;
-    option.textContent = mode;
+
+    if (typeof mode === "string") {
+      option.value = mode;
+      option.textContent = mode;
+    } else {
+      option.value = mode.id || mode.value || mode.name || "";
+      option.textContent = mode.name || mode.label || mode.value || mode.id || "";
+    }
+
     dropdown.appendChild(option);
   });
 }
@@ -285,8 +228,15 @@ function populateDropdown(id, items) {
 
   items.forEach((item) => {
     const option = document.createElement("option");
-    option.value = item;
-    option.textContent = item;
+
+    if (typeof item === "string") {
+      option.value = item;
+      option.textContent = item;
+    } else {
+      option.value = item.id || item.value || item.name || "";
+      option.textContent = item.name || item.label || item.value || item.id || "";
+    }
+
     dropdown.appendChild(option);
   });
 }
@@ -408,12 +358,17 @@ function renderAll() {
 function renderPlanner() {
   const sessionInfo = getCurrentSessionInfo();
   const sessionPlan = sessionInfo.sessionPlan;
+  const cycleTotal = studyCycle.length || 0;
 
-  setText("planner-cycle", `Session ${sessionInfo.sessionNumber} of ${studyCycle.length}`);
+  setText("planner-cycle", `Session ${sessionInfo.sessionNumber} of ${cycleTotal}`);
 
   const plannerSubjects = document.getElementById("planner-subjects");
   if (plannerSubjects) {
-    plannerSubjects.innerHTML = `<div class="bcc-mission-subjects">${sessionPlan.subjects.join(" + ")}</div>`;
+    const subjectList = Array.isArray(sessionPlan.subjects) && sessionPlan.subjects.length > 0
+      ? sessionPlan.subjects.join(" + ")
+      : "Unassigned";
+
+    plannerSubjects.innerHTML = `<div class="bcc-mission-subjects">${escapeHtml(subjectList)}</div>`;
   }
 
   setText("dashboard-essays-target", studyGoals.essaysPerDay || 0);
@@ -427,13 +382,18 @@ function renderSessionMap(activeSession) {
   const map = document.getElementById("cycle-map");
   if (!map) return;
 
+  if (studyCycle.length === 0) {
+    map.innerHTML = `<div class="bcc-list-empty">No study cycle loaded.</div>`;
+    return;
+  }
+
   map.innerHTML = studyCycle.map((session) => {
     let className = "bcc-cycle-day";
 
     if (session.day < activeSession) className += " completed";
     if (session.day === activeSession) className += " active";
 
-    return `<div class="${className}">Session ${session.day}</div>`;
+    return `<div class="${className}">Session ${escapeHtml(session.day)}</div>`;
   }).join("");
 }
 
@@ -443,7 +403,7 @@ function getCurrentSessionInfo() {
   if (currentSession < 1) currentSession = 1;
   if (currentSession > cycleLength) currentSession = 1;
 
-  const sessionPlan = studyCycle.find((item) => item.day === currentSession) || {
+  const sessionPlan = studyCycle.find((item) => Number(item.day) === Number(currentSession)) || {
     day: currentSession,
     subjects: ["Unassigned"]
   };
@@ -487,7 +447,7 @@ function renderEssays() {
       <div class="bcc-item">
         <div class="bcc-item-title">${escapeHtml(essay.title || "Untitled Essay")}</div>
         <div class="bcc-item-meta">
-          ${getSubjectName(essay.subject)} · ${escapeHtml(essay.source)} · ${escapeHtml(essay.pageNumber || "No page number")} · ${escapeHtml(essay.questionNumber || "No question number")}
+          ${escapeHtml(getSubjectName(essay.subject))} · ${escapeHtml(essay.source)} · ${escapeHtml(essay.pageNumber || "No page number")} · ${escapeHtml(essay.questionNumber || "No question number")}
         </div>
         <div class="bcc-rating">Rating: ${essay.rating}/10 · Next Review: ${formatDate(getNextReviewDate(essay.id, "essay"))}</div>
         ${essay.notes ? `<div class="bcc-item-notes">${escapeHtml(essay.notes)}</div>` : ""}
@@ -510,7 +470,7 @@ function renderMcqs() {
   list.innerHTML = mcqs.map((mcq) => {
     return `
       <div class="bcc-item">
-        <div class="bcc-item-title">${getSubjectName(mcq.subject)} · MCQ ${escapeHtml(mcq.questionNumber || "")}</div>
+        <div class="bcc-item-title">${escapeHtml(getSubjectName(mcq.subject))} · MCQ ${escapeHtml(mcq.questionNumber || "")}</div>
         <div class="bcc-item-meta">
           ${escapeHtml(mcq.source)} · ${escapeHtml(mcq.pageNumber || "No page number")} · ${mcq.correct ? "Correct" : "Incorrect"}
         </div>
@@ -535,7 +495,7 @@ function renderFlashcards() {
   list.innerHTML = flashcards.map((card) => {
     return `
       <div class="bcc-item">
-        <div class="bcc-item-title">${getSubjectName(card.subject)} · Flashcard ${escapeHtml(card.flashcardNumber || "")}</div>
+        <div class="bcc-item-title">${escapeHtml(getSubjectName(card.subject))} · Flashcard ${escapeHtml(card.flashcardNumber || "")}</div>
         <div class="bcc-item-meta">${escapeHtml(card.source || "No source")}</div>
         <div class="bcc-rating">Rating: ${card.rating}/10 · Next Review: ${formatDate(getNextReviewDate(card.id, "flashcard"))}</div>
         ${card.notes ? `<div class="bcc-item-notes">${escapeHtml(card.notes)}</div>` : ""}
@@ -570,11 +530,11 @@ function renderReviewItem(review) {
     <div class="bcc-item">
       <div class="bcc-item-title">${escapeHtml(title)}</div>
       <div class="bcc-item-meta">
-        ${capitalize(review.itemType)} · ${getSubjectName(review.subject)} · Review ${review.reviewNumber || ""} · Due ${formatDate(review.dueDate)} · ${capitalize(review.status)}
+        ${escapeHtml(capitalize(review.itemType))} · ${escapeHtml(getSubjectName(review.subject))} · Review ${escapeHtml(review.reviewNumber || "")} · Due ${formatDate(review.dueDate)} · ${escapeHtml(capitalize(review.status))}
       </div>
       ${
         review.status === "pending"
-          ? `<button class="bcc-small-button" onclick="completeReview('${review.id}')">Mark Reviewed</button>`
+          ? `<button class="bcc-small-button" onclick="completeReview('${escapeHtml(review.id)}')">Mark Reviewed</button>`
           : ""
       }
     </div>
@@ -671,7 +631,7 @@ function getItemTitle(item, type) {
 
 function getSubjectName(subjectId) {
   const subject = subjects.find((item) => item.id === subjectId);
-  return subject ? subject.name : subjectId;
+  return subject ? subject.name : subjectId || "";
 }
 
 function getValue(id) {
@@ -704,6 +664,7 @@ function formatDate(dateString) {
   if (!dateString) return "";
 
   const date = new Date(dateString + "T00:00:00");
+
   return date.toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
@@ -713,7 +674,7 @@ function formatDate(dateString) {
 
 function capitalize(text) {
   if (!text) return "";
-  return text.charAt(0).toUpperCase() + text.slice(1);
+  return String(text).charAt(0).toUpperCase() + String(text).slice(1);
 }
 
 function escapeHtml(value) {
