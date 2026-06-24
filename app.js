@@ -4,6 +4,7 @@ let subjects = [];
 let essaySources = [];
 let mcqSources = [];
 let flashcardSources = [];
+let studyModes = [];
 let studyGoals = {};
 let studyCycle = [];
 
@@ -21,6 +22,7 @@ async function init() {
 
   setupNavigation();
   setupRatingDropdowns();
+  setupStudyModeDropdowns();
   populateSubjectDropdowns();
   populateSourceDropdowns();
   setupForms();
@@ -34,6 +36,14 @@ async function loadData() {
   essaySources = await loadJson("essaySources.json", []);
   mcqSources = await loadJson("mcqSources.json", []);
   flashcardSources = await loadJson("flashcardSources.json", []);
+  studyModes = await loadJson("studyModes.json", [
+    "Standard Study",
+    "Essay Focus",
+    "MCQ Focus",
+    "Flashcard Focus",
+    "Review Mode"
+  ]);
+
   studyGoals = await loadJson("studyGoals.json", {});
   studyCycle = await loadJson("studyCycle.json", []);
 
@@ -90,12 +100,15 @@ function setupNavigation() {
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
       const target = button.dataset.view;
+      const targetView = document.getElementById(target);
+
+      if (!targetView) return;
 
       buttons.forEach((btn) => btn.classList.remove("active"));
       views.forEach((view) => view.classList.remove("active"));
 
       button.classList.add("active");
-      document.getElementById(target).classList.add("active");
+      targetView.classList.add("active");
     });
   });
 }
@@ -109,6 +122,13 @@ function setupSessionButton() {
 
 function completeCurrentSession() {
   const sessionInfo = getCurrentSessionInfo();
+
+  const alreadyCompletedToday = sessionHistory.some((session) => {
+    return session.sessionNumber === sessionInfo.sessionNumber &&
+      session.completedDate === todayString();
+  });
+
+  if (alreadyCompletedToday) return;
 
   sessionHistory.push({
     id: createId("session"),
@@ -138,6 +158,8 @@ function setupRatingDropdowns() {
   ];
 
   ratingSelects.forEach((select) => {
+    if (!select) return;
+
     select.innerHTML = "";
 
     for (let i = 1; i <= 10; i++) {
@@ -151,6 +173,34 @@ function setupRatingDropdowns() {
   });
 }
 
+function setupStudyModeDropdowns() {
+  const dropdowns = [
+    document.getElementById("study-mode"),
+    document.getElementById("planner-study-mode"),
+    document.getElementById("dashboard-study-mode")
+  ];
+
+  dropdowns.forEach((dropdown) => {
+    if (!dropdown) return;
+
+    dropdown.innerHTML = "";
+
+    studyModes.forEach((mode) => {
+      const option = document.createElement("option");
+
+      if (typeof mode === "string") {
+        option.value = mode;
+        option.textContent = mode;
+      } else {
+        option.value = mode.id || mode.name || "";
+        option.textContent = mode.name || mode.label || mode.id || "";
+      }
+
+      dropdown.appendChild(option);
+    });
+  });
+}
+
 function populateSubjectDropdowns() {
   const dropdowns = [
     document.getElementById("essay-subject"),
@@ -159,6 +209,8 @@ function populateSubjectDropdowns() {
   ];
 
   dropdowns.forEach((dropdown) => {
+    if (!dropdown) return;
+
     dropdown.innerHTML = "";
 
     subjects.forEach((subject) => {
@@ -191,9 +243,13 @@ function populateDropdown(id, items) {
 }
 
 function setupForms() {
-  document.getElementById("essay-form").addEventListener("submit", handleEssaySubmit);
-  document.getElementById("mcq-form").addEventListener("submit", handleMcqSubmit);
-  document.getElementById("flashcard-form").addEventListener("submit", handleFlashcardSubmit);
+  const essayForm = document.getElementById("essay-form");
+  const mcqForm = document.getElementById("mcq-form");
+  const flashcardForm = document.getElementById("flashcard-form");
+
+  if (essayForm) essayForm.addEventListener("submit", handleEssaySubmit);
+  if (mcqForm) mcqForm.addEventListener("submit", handleMcqSubmit);
+  if (flashcardForm) flashcardForm.addEventListener("submit", handleFlashcardSubmit);
 }
 
 function handleEssaySubmit(event) {
@@ -202,6 +258,7 @@ function handleEssaySubmit(event) {
   const essay = {
     id: createId("essay"),
     type: "essay",
+    studyMode: getValue("study-mode"),
     subject: getValue("essay-subject"),
     source: getValue("essay-source"),
     title: getValue("essay-title"),
@@ -226,6 +283,7 @@ function handleMcqSubmit(event) {
   const mcq = {
     id: createId("mcq"),
     type: "mcq",
+    studyMode: getValue("study-mode"),
     subject: getValue("mcq-subject"),
     source: getValue("mcq-source"),
     deck: getValue("mcq-deck"),
@@ -252,6 +310,7 @@ function handleFlashcardSubmit(event) {
   const flashcard = {
     id: createId("flashcard"),
     type: "flashcard",
+    studyMode: getValue("study-mode"),
     subject: getValue("flashcard-subject"),
     source: getValue("flashcard-source"),
     front: getValue("flashcard-front"),
@@ -272,22 +331,19 @@ function handleFlashcardSubmit(event) {
 function resetForm(form) {
   form.reset();
   setupRatingDropdowns();
+  setupStudyModeDropdowns();
   populateSubjectDropdowns();
   populateSourceDropdowns();
 }
 
 function createReviewsForItem(item) {
-  let currentDate = todayString();
-
   reviewIntervals.forEach((interval, index) => {
-    currentDate = addDays(currentDate, interval);
-
     reviews.push({
       id: createId("review"),
       itemId: item.id,
       itemType: item.type,
       subject: item.subject,
-      dueDate: currentDate,
+      dueDate: addDays(todayString(), interval),
       intervalDays: interval,
       reviewNumber: index + 1,
       status: "pending",
@@ -310,21 +366,24 @@ function renderPlanner() {
   const sessionInfo = getCurrentSessionInfo();
   const sessionPlan = sessionInfo.sessionPlan;
 
-  document.getElementById("planner-cycle").textContent =
-    `Session ${sessionInfo.sessionNumber} of ${studyCycle.length}`;
+  setText("planner-cycle", `Session ${sessionInfo.sessionNumber} of ${studyCycle.length || 15}`);
 
-  document.getElementById("planner-subjects").innerHTML =
-    `<div class="bcc-mission-subjects">${sessionPlan.subjects.join(" + ")}</div>`;
+  const plannerSubjects = document.getElementById("planner-subjects");
+  if (plannerSubjects) {
+    plannerSubjects.innerHTML =
+      `<div class="bcc-mission-subjects">${sessionPlan.subjects.join(" + ")}</div>`;
+  }
 
-  document.getElementById("dashboard-essays-target").textContent = studyGoals.essaysPerDay || 0;
-  document.getElementById("dashboard-mcqs-target").textContent = studyGoals.mcqsPerDay || 0;
-  document.getElementById("dashboard-flashcards-target").textContent = studyGoals.flashcardsPerDay || 0;
+  setText("dashboard-essays-target", studyGoals.essaysPerDay || 0);
+  setText("dashboard-mcqs-target", studyGoals.mcqsPerDay || 0);
+  setText("dashboard-flashcards-target", studyGoals.flashcardsPerDay || 0);
 
   renderSessionMap(sessionInfo.sessionNumber);
 }
 
 function renderSessionMap(activeSession) {
   const map = document.getElementById("cycle-map");
+  if (!map) return;
 
   map.innerHTML = studyCycle.map((session) => {
     let className = "bcc-cycle-day";
@@ -365,9 +424,10 @@ function getCurrentSessionInfo() {
 function renderDashboard() {
   const dueReviews = getDueReviews();
 
-  document.getElementById("dashboard-reviews-due").textContent = dueReviews.length;
+  setText("dashboard-reviews-due", dueReviews.length);
 
   const todayList = document.getElementById("today-list");
+  if (!todayList) return;
 
   if (dueReviews.length === 0) {
     todayList.className = "bcc-list-empty";
@@ -381,6 +441,7 @@ function renderDashboard() {
 
 function renderEssays() {
   const list = document.getElementById("essay-list");
+  if (!list) return;
 
   if (essays.length === 0) {
     list.className = "bcc-list-empty";
@@ -396,7 +457,7 @@ function renderEssays() {
         <div class="bcc-item-meta">
           ${getSubjectName(essay.subject)} · ${escapeHtml(essay.source)} · ${escapeHtml(essay.questionNumber || "No question number")}
         </div>
-        <div class="bcc-rating">Rating: ${essay.rating}/10 · Next Review: ${formatDate(essay.nextReview)}</div>
+        <div class="bcc-rating">Rating: ${essay.rating}/10 · Next Review: ${formatDate(getNextReviewDate(essay.id, "essay"))}</div>
         ${essay.notes ? `<div class="bcc-item-notes">${escapeHtml(essay.notes)}</div>` : ""}
       </div>
     `;
@@ -405,6 +466,7 @@ function renderEssays() {
 
 function renderMcqs() {
   const list = document.getElementById("mcq-list");
+  if (!list) return;
 
   if (mcqs.length === 0) {
     list.className = "bcc-list-empty";
@@ -420,7 +482,7 @@ function renderMcqs() {
         <div class="bcc-item-meta">
           ${escapeHtml(mcq.source)} · ${escapeHtml(mcq.deck || "No deck")} · ${mcq.correct ? "Correct" : "Incorrect"}
         </div>
-        <div class="bcc-rating">Rating: ${mcq.rating}/10 · Next Review: ${formatDate(mcq.nextReview)}</div>
+        <div class="bcc-rating">Rating: ${mcq.rating}/10 · Next Review: ${formatDate(getNextReviewDate(mcq.id, "mcq"))}</div>
         ${mcq.rule ? `<div class="bcc-item-notes">Rule: ${escapeHtml(mcq.rule)}</div>` : ""}
         ${mcq.notes ? `<div class="bcc-item-notes">${escapeHtml(mcq.notes)}</div>` : ""}
       </div>
@@ -430,6 +492,7 @@ function renderMcqs() {
 
 function renderFlashcards() {
   const list = document.getElementById("flashcard-list");
+  if (!list) return;
 
   if (flashcards.length === 0) {
     list.className = "bcc-list-empty";
@@ -443,7 +506,7 @@ function renderFlashcards() {
       <div class="bcc-item">
         <div class="bcc-item-title">${escapeHtml(card.front || "Untitled Flashcard")}</div>
         <div class="bcc-item-meta">${getSubjectName(card.subject)} · ${escapeHtml(card.source || "No source")}</div>
-        <div class="bcc-rating">Rating: ${card.rating}/10 · Next Review: ${formatDate(card.nextReview)}</div>
+        <div class="bcc-rating">Rating: ${card.rating}/10 · Next Review: ${formatDate(getNextReviewDate(card.id, "flashcard"))}</div>
         <div class="bcc-item-notes">${escapeHtml(card.back || "")}</div>
       </div>
     `;
@@ -452,6 +515,7 @@ function renderFlashcards() {
 
 function renderReviews() {
   const list = document.getElementById("review-list");
+  if (!list) return;
 
   if (reviews.length === 0) {
     list.className = "bcc-list-empty";
@@ -475,22 +539,40 @@ function renderReviewItem(review) {
     <div class="bcc-item">
       <div class="bcc-item-title">${escapeHtml(title)}</div>
       <div class="bcc-item-meta">
-        ${capitalize(review.itemType)} · ${getSubjectName(review.subject)} · Review ${review.reviewNumber || ""} · Due ${formatDate(review.dueDate)}
+        ${capitalize(review.itemType)} · ${getSubjectName(review.subject)} · Review ${review.reviewNumber || ""} · Due ${formatDate(review.dueDate)} · ${capitalize(review.status)}
       </div>
+      ${
+        review.status === "pending"
+          ? `<button class="bcc-small-button" onclick="completeReview('${review.id}')">Mark Reviewed</button>`
+          : ""
+      }
     </div>
   `;
+}
+
+function completeReview(reviewId) {
+  const review = reviews.find((item) => item.id === reviewId);
+  if (!review) return;
+
+  review.status = "completed";
+  review.completedDate = todayString();
+
+  saveData();
+  renderAll();
 }
 
 function renderStats() {
   const weekCount = countSessionsSince(7);
   const monthCount = countSessionsSince(30);
+  const pendingReviewCount = reviews.filter((review) => review.status === "pending").length;
 
-  document.getElementById("stats-essays").textContent = essays.length;
-  document.getElementById("stats-mcqs").textContent = mcqs.length;
-  document.getElementById("stats-flashcards").textContent = flashcards.length;
-  document.getElementById("stats-reviews").textContent = reviews.length;
+  setText("stats-essays", essays.length);
+  setText("stats-mcqs", mcqs.length);
+  setText("stats-flashcards", flashcards.length);
+  setText("stats-reviews", pendingReviewCount);
 
   const statsSection = document.getElementById("stats");
+  if (!statsSection) return;
 
   let sessionStats = document.getElementById("session-stats-panel");
 
@@ -527,6 +609,18 @@ function getDueReviews() {
   });
 }
 
+function getNextReviewDate(itemId, itemType) {
+  const pendingReviews = reviews
+    .filter((review) => {
+      return review.itemId === itemId &&
+        review.itemType === itemType &&
+        review.status === "pending";
+    })
+    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+  return pendingReviews.length > 0 ? pendingReviews[0].dueDate : "";
+}
+
 function findItem(id, type) {
   if (type === "essay") return essays.find((item) => item.id === id);
   if (type === "mcq") return mcqs.find((item) => item.id === id);
@@ -550,7 +644,14 @@ function getSubjectName(subjectId) {
 }
 
 function getValue(id) {
-  return document.getElementById(id).value.trim();
+  const element = document.getElementById(id);
+  return element ? element.value.trim() : "";
+}
+
+function setText(id, value) {
+  const element = document.getElementById(id);
+  if (!element) return;
+  element.textContent = value;
 }
 
 function createId(prefix) {
@@ -580,6 +681,7 @@ function formatDate(dateString) {
 }
 
 function capitalize(text) {
+  if (!text) return "";
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
