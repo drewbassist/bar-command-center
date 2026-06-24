@@ -1,6 +1,10 @@
 const reviewIntervals = [1, 4, 14, 45, 90, 180, 365];
 
 let subjects = [];
+let essaySources = [];
+let mcqSources = [];
+let flashcardSources = [];
+
 let essays = [];
 let mcqs = [];
 let flashcards = [];
@@ -14,6 +18,7 @@ async function init() {
   setupNavigation();
   setupRatingDropdowns();
   populateSubjectDropdowns();
+  populateSourceDropdowns();
   setupForms();
 
   renderAll();
@@ -21,6 +26,10 @@ async function init() {
 
 async function loadData() {
   subjects = await loadJson("subjects.json", []);
+  essaySources = await loadJson("essaySources.json", []);
+  mcqSources = await loadJson("mcqSources.json", []);
+  flashcardSources = await loadJson("flashcardSources.json", []);
+
   essays = await loadJson("essays.json", []);
   mcqs = await loadJson("mcqs.json", []);
   flashcards = await loadJson("flashcards.json", []);
@@ -94,6 +103,26 @@ function populateSubjectDropdowns() {
   });
 }
 
+function populateSourceDropdowns() {
+  populateDropdown("essay-source", essaySources);
+  populateDropdown("mcq-source", mcqSources);
+  populateDropdown("flashcard-source", flashcardSources);
+}
+
+function populateDropdown(id, items) {
+  const dropdown = document.getElementById(id);
+  if (!dropdown) return;
+
+  dropdown.innerHTML = "";
+
+  items.forEach((item) => {
+    const option = document.createElement("option");
+    option.value = item;
+    option.textContent = item;
+    dropdown.appendChild(option);
+  });
+}
+
 function setupForms() {
   const essayForm = document.getElementById("essay-form");
   const mcqForm = document.getElementById("mcq-form");
@@ -125,6 +154,8 @@ function handleEssaySubmit(event) {
 
   event.target.reset();
   setupRatingDropdowns();
+  populateSubjectDropdowns();
+  populateSourceDropdowns();
   renderAll();
 }
 
@@ -151,6 +182,8 @@ function handleMcqSubmit(event) {
 
   event.target.reset();
   setupRatingDropdowns();
+  populateSubjectDropdowns();
+  populateSourceDropdowns();
   renderAll();
 }
 
@@ -161,6 +194,7 @@ function handleFlashcardSubmit(event) {
     id: createId("flashcard"),
     type: "flashcard",
     subject: getValue("flashcard-subject"),
+    source: getValue("flashcard-source"),
     front: getValue("flashcard-front"),
     back: getValue("flashcard-back"),
     rating: Number(getValue("flashcard-rating")),
@@ -173,6 +207,8 @@ function handleFlashcardSubmit(event) {
 
   event.target.reset();
   setupRatingDropdowns();
+  populateSubjectDropdowns();
+  populateSourceDropdowns();
   renderAll();
 }
 
@@ -283,7 +319,7 @@ function renderFlashcards() {
     return `
       <div class="bcc-item">
         <div class="bcc-item-title">${escapeHtml(card.front || "Untitled Flashcard")}</div>
-        <div class="bcc-item-meta">${getSubjectName(card.subject)}</div>
+        <div class="bcc-item-meta">${getSubjectName(card.subject)} · ${escapeHtml(card.source || "No source")}</div>
         <div class="bcc-rating">Rating: ${card.rating}/10 · Next Review: ${formatDate(card.nextReview)}</div>
         <div class="bcc-item-notes">${escapeHtml(card.back || "")}</div>
       </div>
