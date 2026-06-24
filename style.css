@@ -224,6 +224,40 @@ h2 {
   font-size: 22px;
 }
 
+.bcc-mode-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 24px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: #555555;
+}
+
+.bcc-mode-label select {
+  width: 220px;
+  padding: 10px;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+  font-size: 14px;
+}
+
+.bcc-session-button {
+  margin-top: 8px;
+  padding: 12px 22px;
+  border: 1px solid #111111;
+  background: #111111;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.bcc-session-button:hover {
+  background: #333333;
+}
+
 @media (max-width: 760px) {
   .bcc-header {
     padding: 22px 18px 16px;
@@ -258,35 +292,8 @@ h2 {
   .bcc-grid {
     grid-template-columns: 1fr;
   }
-}
-.bcc-mode-label {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 24px;
-  margin-bottom: 18px;
-  font-size: 13px;
-  color: #555;
-}
 
-.bcc-mode-label select {
-  width: 220px;
-  padding: 10px;
-  border: 1px solid #cccccc;
-  background: white;
-  font-size: 14px;
-}
-
-.bcc-session-button {
-  margin-top: 8px;
-  padding: 12px 22px;
-  border: 1px solid #111;
-  background: #111;
-  color: white;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.bcc-session-button:hover {
-  background: #333;
+  .bcc-mode-label select {
+    width: 100%;
+  }
 }
