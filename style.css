@@ -259,3 +259,34 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
+.bcc-mode-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 24px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: #555;
+}
+
+.bcc-mode-label select {
+  width: 220px;
+  padding: 10px;
+  border: 1px solid #cccccc;
+  background: white;
+  font-size: 14px;
+}
+
+.bcc-session-button {
+  margin-top: 8px;
+  padding: 12px 22px;
+  border: 1px solid #111;
+  background: #111;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.bcc-session-button:hover {
+  background: #333;
+}
