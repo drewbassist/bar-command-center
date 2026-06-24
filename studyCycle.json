@@ -1,0 +1,62 @@
+[
+  {
+    "day": 1,
+    "subjects": ["Civil Procedure", "Evidence"]
+  },
+  {
+    "day": 2,
+    "subjects": ["Contracts / Sales", "Torts"]
+  },
+  {
+    "day": 3,
+    "subjects": ["Criminal Law and Procedure", "Remedies"]
+  },
+  {
+    "day": 4,
+    "subjects": ["Constitutional Law", "Real Property"]
+  },
+  {
+    "day": 5,
+    "subjects": ["Business Associations", "Community Property"]
+  },
+  {
+    "day": 6,
+    "subjects": ["Professional Responsibility", "Trusts"]
+  },
+  {
+    "day": 7,
+    "subjects": ["Wills and Succession", "Evidence"]
+  },
+  {
+    "day": 8,
+    "subjects": ["Civil Procedure", "Contracts / Sales"]
+  },
+  {
+    "day": 9,
+    "subjects": ["Torts", "Criminal Law and Procedure"]
+  },
+  {
+    "day": 10,
+    "subjects": ["Remedies", "Constitutional Law"]
+  },
+  {
+    "day": 11,
+    "subjects": ["Real Property", "Business Associations"]
+  },
+  {
+    "day": 12,
+    "subjects": ["Community Property", "Professional Responsibility"]
+  },
+  {
+    "day": 13,
+    "subjects": ["Trusts", "Wills and Succession"]
+  },
+  {
+    "day": 14,
+    "subjects": ["Mixed Review", "Weakest Subject"]
+  },
+  {
+    "day": 15,
+    "subjects": ["Catch-up", "Comprehensive Review"]
+  }
+]
