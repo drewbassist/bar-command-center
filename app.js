@@ -4,6 +4,8 @@ let subjects = [];
 let essaySources = [];
 let mcqSources = [];
 let flashcardSources = [];
+let studyGoals = {};
+let studyCycle = [];
 
 let essays = [];
 let mcqs = [];
@@ -29,6 +31,8 @@ async function loadData() {
   essaySources = await loadJson("essaySources.json", []);
   mcqSources = await loadJson("mcqSources.json", []);
   flashcardSources = await loadJson("flashcardSources.json", []);
+  studyGoals = await loadJson("studyGoals.json", {});
+  studyCycle = await loadJson("studyCycle.json", []);
 
   essays = loadLocalData("bcc_essays", await loadJson("essays.json", []));
   mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
@@ -140,13 +144,9 @@ function populateDropdown(id, items) {
 }
 
 function setupForms() {
-  const essayForm = document.getElementById("essay-form");
-  const mcqForm = document.getElementById("mcq-form");
-  const flashcardForm = document.getElementById("flashcard-form");
-
-  essayForm.addEventListener("submit", handleEssaySubmit);
-  mcqForm.addEventListener("submit", handleMcqSubmit);
-  flashcardForm.addEventListener("submit", handleFlashcardSubmit);
+  document.getElementById("essay-form").addEventListener("submit", handleEssaySubmit);
+  document.getElementById("mcq-form").addEventListener("submit", handleMcqSubmit);
+  document.getElementById("flashcard-form").addEventListener("submit", handleFlashcardSubmit);
 }
 
 function handleEssaySubmit(event) {
@@ -169,10 +169,7 @@ function handleEssaySubmit(event) {
   createReviewsForItem(essay);
   saveData();
 
-  event.target.reset();
-  setupRatingDropdowns();
-  populateSubjectDropdowns();
-  populateSourceDropdowns();
+  resetForm(event.target);
   renderAll();
 }
 
@@ -198,10 +195,7 @@ function handleMcqSubmit(event) {
   createReviewsForItem(mcq);
   saveData();
 
-  event.target.reset();
-  setupRatingDropdowns();
-  populateSubjectDropdowns();
-  populateSourceDropdowns();
+  resetForm(event.target);
   renderAll();
 }
 
@@ -224,11 +218,15 @@ function handleFlashcardSubmit(event) {
   createReviewsForItem(flashcard);
   saveData();
 
-  event.target.reset();
+  resetForm(event.target);
+  renderAll();
+}
+
+function resetForm(form) {
+  form.reset();
   setupRatingDropdowns();
   populateSubjectDropdowns();
   populateSourceDropdowns();
-  renderAll();
 }
 
 function createReviewsForItem(item) {
@@ -252,6 +250,7 @@ function createReviewsForItem(item) {
 }
 
 function renderAll() {
+  renderPlanner();
   renderEssays();
   renderMcqs();
   renderFlashcards();
@@ -260,13 +259,73 @@ function renderAll() {
   renderStats();
 }
 
+function renderPlanner() {
+  const cycleInfo = getCurrentCycleInfo();
+  const dayPlan = cycleInfo.dayPlan;
+
+  document.getElementById("planner-cycle").textContent =
+    `Cycle ${cycleInfo.cycleNumber} · Day ${cycleInfo.dayNumber} of ${studyCycle.length}`;
+
+  document.getElementById("planner-subjects").innerHTML =
+    `<div class="bcc-mission-subjects">${dayPlan.subjects.join(" + ")}</div>`;
+
+  document.getElementById("dashboard-essays-target").textContent = studyGoals.essaysPerDay || 0;
+  document.getElementById("dashboard-mcqs-target").textContent = studyGoals.mcqsPerDay || 0;
+  document.getElementById("dashboard-flashcards-target").textContent = studyGoals.flashcardsPerDay || 0;
+
+  renderCycleMap(cycleInfo.dayNumber);
+}
+
+function renderCycleMap(activeDay) {
+  const map = document.getElementById("cycle-map");
+
+  map.innerHTML = studyCycle.map((day) => {
+    let className = "bcc-cycle-day";
+
+    if (day.day < activeDay) className += " completed";
+    if (day.day === activeDay) className += " active";
+
+    return `
+      <div class="${className}">
+        Day ${day.day}
+      </div>
+    `;
+  }).join("");
+}
+
+function getCurrentCycleInfo() {
+  const startKey = "bcc_cycle_start_date";
+  let startDate = localStorage.getItem(startKey);
+
+  if (!startDate) {
+    startDate = todayString();
+    localStorage.setItem(startKey, startDate);
+  }
+
+  const daysElapsed = daysBetween(startDate, todayString());
+  const cycleLength = studyCycle.length || 15;
+
+  const dayNumber = (daysElapsed % cycleLength) + 1;
+  const cycleNumber = Math.floor(daysElapsed / cycleLength) + 1;
+
+  const dayPlan = studyCycle.find((item) => item.day === dayNumber) || {
+    day: dayNumber,
+    subjects: ["Unassigned"]
+  };
+
+  return {
+    startDate,
+    daysElapsed,
+    dayNumber,
+    cycleNumber,
+    dayPlan
+  };
+}
+
 function renderDashboard() {
   const dueReviews = getDueReviews();
 
   document.getElementById("dashboard-reviews-due").textContent = dueReviews.length;
-
-  const dueFlashcards = dueReviews.filter((review) => review.itemType === "flashcard");
-  document.getElementById("dashboard-flashcards-due").textContent = dueFlashcards.length;
 
   const todayList = document.getElementById("today-list");
 
@@ -407,17 +466,9 @@ function findItem(id, type) {
 function getItemTitle(item, type) {
   if (!item) return "Missing Item";
 
-  if (type === "essay") {
-    return item.title || "Untitled Essay";
-  }
-
-  if (type === "mcq") {
-    return `${getSubjectName(item.subject)} Question ${item.questionNumber || ""}`;
-  }
-
-  if (type === "flashcard") {
-    return item.front || "Untitled Flashcard";
-  }
+  if (type === "essay") return item.title || "Untitled Essay";
+  if (type === "mcq") return `${getSubjectName(item.subject)} Question ${item.questionNumber || ""}`;
+  if (type === "flashcard") return item.front || "Untitled Flashcard";
 
   return "Untitled Item";
 }
@@ -444,6 +495,13 @@ function addDays(dateString, days) {
   const date = new Date(dateString + "T00:00:00");
   date.setDate(date.getDate() + days);
   return date.toISOString().slice(0, 10);
+}
+
+function daysBetween(startDate, endDate) {
+  const start = new Date(startDate + "T00:00:00");
+  const end = new Date(endDate + "T00:00:00");
+  const diff = end - start;
+  return Math.floor(diff / 86400000);
 }
 
 function formatDate(dateString) {
