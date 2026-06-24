@@ -1,1 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <title>Bar Command Center</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header class="bcc-header">
+    <div class="bcc-title">Bar Command Center</div>
+    <div class="bcc-subtitle">California Bar Study System</div>
+  </header>
+
+  <nav class="bcc-nav">
+    <button class="bcc-nav-button active" data-view="dashboard">Today</button>
+    <button class="bcc-nav-button" data-view="essays">Essays</button>
+    <button class="bcc-nav-button" data-view="mcqs">MCQs</button>
+    <button class="bcc-nav-button" data-view="flashcards">Flashcards</button>
+    <button class="bcc-nav-button" data-view="reviews">Reviews</button>
+    <button class="bcc-nav-button" data-view="stats">Stats</button>
+  </nav>
+
+  <main class="bcc-main">
+    <section id="dashboard" class="bcc-view active">
+      <h1>Today</h1>
+
+      <div class="bcc-grid">
+        <div class="bcc-card">
+          <div class="bcc-card-label">New Essays</div>
+          <div class="bcc-card-number">2</div>
+        </div>
+
+        <div class="bcc-card">
+          <div class="bcc-card-label">MCQs</div>
+          <div class="bcc-card-number">30</div>
+        </div>
+
+        <div class="bcc-card">
+          <div class="bcc-card-label">Flashcards Due</div>
+          <div class="bcc-card-number" id="dashboard-flashcards-due">0</div>
+        </div>
+
+        <div class="bcc-card">
+          <div class="bcc-card-label">Reviews Due</div>
+          <div class="bcc-card-number" id="dashboard-reviews-due">0</div>
+        </div>
+      </div>
+
+      <div class="bcc-panel">
+        <h2>Due Today</h2>
+        <div id="today-list" class="bcc-list-empty">No due items yet.</div>
+      </div>
+    </section>
+
+    <section id="essays" class="bcc-view">
+      <h1>Essays</h1>
+
+      <div class="bcc-panel">
+        <h2>Add Essay</h2>
+
+        <form id="essay-form" class="bcc-form">
+          <label>
+            Subject
+            <select id="essay-subject"></select>
+          </label>
+
+          <label>
+            Source
+            <select id="essay-source">
+              <option>California Bar</option>
+              <option>BarEssays</option>
+              <option>Basick</option>
+              <option>Fleming</option>
+              <option>Textbook</option>
+              <option>Custom</option>
+            </select>
+          </label>
+
+          <label>
+            Title
+            <input id="essay-title" type="text" placeholder="July 2019 Evidence Essay" />
+          </label>
+
+          <label>
+            Question Number
+            <input id="essay-question-number" type="text" placeholder="Q1" />
+          </label>
+
+          <label>
+            Rating
+            <select id="essay-rating"></select>
+          </label>
+
+          <label>
+            Notes
+            <textarea id="essay-notes" placeholder="Issues missed, rules, application notes"></textarea>
+          </label>
+
+          <button type="submit">Add Essay</button>
+        </form>
+      </div>
+
+      <div class="bcc-panel">
+        <h2>Essay Library</h2>
+        <div id="essay-list" class="bcc-list-empty">No essays added yet.</div>
+      </div>
+    </section>
+
+    <section id="mcqs" class="bcc-view">
+      <h1>MCQs</h1>
+
+      <div class="bcc-panel">
+        <h2>Add MCQ</h2>
+
+        <form id="mcq-form" class="bcc-form">
+          <label>
+            Subject
+            <select id="mcq-subject"></select>
+          </label>
+
+          <label>
+            Source
+            <select id="mcq-source">
+              <option>Finz</option>
+              <option>Emanuel</option>
+              <option>Quimbee</option>
+              <option>UWorld</option>
+              <option>Adaptibar</option>
+              <option>Textbook</option>
+              <option>Custom</option>
+            </select>
+          </label>
+
+          <label>
+            Deck
+            <input id="mcq-deck" type="text" placeholder="Evidence Deck 1" />
+          </label>
+
+          <label>
+            Card / Question Number
+            <input id="mcq-question-number" type="text" placeholder="143" />
+          </label>
+
+          <label>
+            Correct?
+            <select id="mcq-correct">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </label>
+
+          <label>
+            Rating
+            <select id="mcq-rating"></select>
+          </label>
+
+          <label>
+            Rule
+            <input id="mcq-rule" type="text" placeholder="Present Sense Impression" />
+          </label>
+
+          <label>
+            Notes
+            <textarea id="mcq-notes" placeholder="Why correct, why wrong, rule weakness"></textarea>
+          </label>
+
+          <button type="submit">Add MCQ</button>
+        </form>
+      </div>
+
+      <div class="bcc-panel">
+        <h2>MCQ Library</h2>
+        <div id="mcq-list" class="bcc-list-empty">No MCQs added yet.</div>
+      </div>
+    </section>
+
+    <section id="flashcards" class="bcc-view">
+      <h1>Flashcards</h1>
+
+      <div class="bcc-panel">
+        <h2>Add Flashcard</h2>
+
+        <form id="flashcard-form" class="bcc-form">
+          <label>
+            Subject
+            <select id="flashcard-subject"></select>
+          </label>
+
+          <label>
+            Front
+            <input id="flashcard-front" type="text" placeholder="Elements of negligence" />
+          </label>
+
+          <label>
+            Back
+            <textarea id="flashcard-back" placeholder="Duty, breach, causation, damages"></textarea>
+          </label>
+
+          <label>
+            Rating
+            <select id="flashcard-rating"></select>
+          </label>
+
+          <button type="submit">Add Flashcard</button>
+        </form>
+      </div>
+
+      <div class="bcc-panel">
+        <h2>Flashcard Library</h2>
+        <div id="flashcard-list" class="bcc-list-empty">No flashcards added yet.</div>
+      </div>
+    </section>
+
+    <section id="reviews" class="bcc-view">
+      <h1>Reviews</h1>
+
+      <div class="bcc-panel">
+        <h2>Review Queue</h2>
+        <div id="review-list" class="bcc-list-empty">No reviews scheduled yet.</div>
+      </div>
+    </section>
+
+    <section id="stats" class="bcc-view">
+      <h1>Stats</h1>
+
+      <div class="bcc-grid">
+        <div class="bcc-card">
+          <div class="bcc-card-label">Essays</div>
+          <div class="bcc-card-number" id="stats-essays">0</div>
+        </div>
+
+        <div class="bcc-card">
+          <div class="bcc-card-label">MCQs</div>
+          <div class="bcc-card-number" id="stats-mcqs">0</div>
+        </div>
+
+        <div class="bcc-card">
+          <div class="bcc-card-label">Flashcards</div>
+          <div class="bcc-card-number" id="stats-flashcards">0</div>
+        </div>
+
+        <div class="bcc-card">
+          <div class="bcc-card-label">Reviews</div>
+          <div class="bcc-card-number" id="stats-reviews">0</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
