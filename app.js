@@ -4,7 +4,6 @@ let subjects = [];
 let essaySources = [];
 let mcqSources = [];
 let flashcardSources = [];
-let studyModes = [];
 let studyGoals = {};
 let studyCycle = [];
 
@@ -15,6 +14,67 @@ let reviews = [];
 let sessionHistory = [];
 let currentSession = 1;
 
+const fallbackSubjects = [
+  { id: "contracts", name: "Contracts" },
+  { id: "torts", name: "Torts" },
+  { id: "criminal-law", name: "Criminal Law" },
+  { id: "evidence", name: "Evidence" },
+  { id: "civil-procedure", name: "Civil Procedure" },
+  { id: "constitutional-law", name: "Constitutional Law" },
+  { id: "real-property", name: "Real Property" },
+  { id: "professional-responsibility", name: "Professional Responsibility" }
+];
+
+const fallbackEssaySources = [
+  "BarEssays",
+  "California Bar Essays",
+  "Basick Essays",
+  "Fleming's",
+  "Quimbee",
+  "Other"
+];
+
+const fallbackMcqSources = [
+  "Finz",
+  "Emanuel",
+  "Strategies & Tactics",
+  "Quimbee",
+  "UWorld",
+  "AdaptiBar",
+  "Other"
+];
+
+const fallbackFlashcardSources = [
+  "Personal Rules",
+  "Quimbee",
+  "Basick",
+  "Critical Pass",
+  "Other"
+];
+
+const studyModes = [
+  "Standard Study",
+  "Essay Focus",
+  "MCQ Focus",
+  "Flashcard Focus",
+  "Review Mode",
+  "Mixed Practice"
+];
+
+const fallbackStudyGoals = {
+  essaysPerDay: 1,
+  mcqsPerDay: 16,
+  flashcardsPerDay: 25
+};
+
+const fallbackStudyCycle = [
+  { day: 1, subjects: ["Contracts", "Torts"] },
+  { day: 2, subjects: ["Criminal Law", "Evidence"] },
+  { day: 3, subjects: ["Contracts", "Evidence"] },
+  { day: 4, subjects: ["Torts", "Criminal Law"] },
+  { day: 5, subjects: ["Mixed Review"] }
+];
+
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
@@ -22,7 +82,7 @@ async function init() {
 
   setupNavigation();
   setupRatingDropdowns();
-  setupStudyModeDropdowns();
+  setupStudyModeDropdown();
   populateSubjectDropdowns();
   populateSourceDropdowns();
   setupForms();
@@ -32,20 +92,12 @@ async function init() {
 }
 
 async function loadData() {
-  subjects = await loadJson("subjects.json", []);
-  essaySources = await loadJson("essaySources.json", []);
-  mcqSources = await loadJson("mcqSources.json", []);
-  flashcardSources = await loadJson("flashcardSources.json", []);
-  studyModes = await loadJson("studyModes.json", [
-    "Standard Study",
-    "Essay Focus",
-    "MCQ Focus",
-    "Flashcard Focus",
-    "Review Mode"
-  ]);
-
-  studyGoals = await loadJson("studyGoals.json", {});
-  studyCycle = await loadJson("studyCycle.json", []);
+  subjects = await loadJson("subjects.json", fallbackSubjects);
+  essaySources = await loadJson("essaySources.json", fallbackEssaySources);
+  mcqSources = await loadJson("mcqSources.json", fallbackMcqSources);
+  flashcardSources = await loadJson("flashcardSources.json", fallbackFlashcardSources);
+  studyGoals = await loadJson("studyGoals.json", fallbackStudyGoals);
+  studyCycle = await loadJson("studyCycle.json", fallbackStudyCycle);
 
   essays = loadLocalData("bcc_essays", await loadJson("essays.json", []));
   mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
@@ -61,7 +113,6 @@ async function loadData() {
 
   if (studyCycle.length > 0 && currentSession > studyCycle.length) {
     currentSession = 1;
-    localStorage.setItem("bcc_current_session", String(currentSession));
   }
 }
 
@@ -69,7 +120,18 @@ async function loadJson(path, fallback) {
   try {
     const response = await fetch(path);
     if (!response.ok) return fallback;
-    return await response.json();
+
+    const data = await response.json();
+
+    if (Array.isArray(fallback) && (!Array.isArray(data) || data.length === 0)) {
+      return fallback;
+    }
+
+    if (!Array.isArray(fallback) && (!data || Object.keys(data).length === 0)) {
+      return fallback;
+    }
+
+    return data;
   } catch (error) {
     return fallback;
   }
@@ -123,18 +185,12 @@ function setupSessionButton() {
 function completeCurrentSession() {
   const sessionInfo = getCurrentSessionInfo();
 
-  const alreadyCompletedToday = sessionHistory.some((session) => {
-    return session.sessionNumber === sessionInfo.sessionNumber &&
-      session.completedDate === todayString();
-  });
-
-  if (alreadyCompletedToday) return;
-
   sessionHistory.push({
     id: createId("session"),
     sessionNumber: sessionInfo.sessionNumber,
     completedDate: todayString(),
     subjects: sessionInfo.sessionPlan.subjects,
+    studyMode: getValue("study-mode"),
     essaysTarget: studyGoals.essaysPerDay || 0,
     mcqsTarget: studyGoals.mcqsPerDay || 0,
     flashcardsTarget: studyGoals.flashcardsPerDay || 0
@@ -151,74 +207,58 @@ function completeCurrentSession() {
 }
 
 function setupRatingDropdowns() {
-  const ratingSelects = [
-    document.getElementById("essay-rating"),
-    document.getElementById("mcq-rating"),
-    document.getElementById("flashcard-rating")
-  ];
-
-  ratingSelects.forEach((select) => {
-    if (!select) return;
-
-    select.innerHTML = "";
-
-    for (let i = 1; i <= 10; i++) {
-      const option = document.createElement("option");
-      option.value = String(i);
-      option.textContent = String(i);
-      select.appendChild(option);
-    }
-
-    select.value = "5";
-  });
+  populateNumberDropdown("essay-rating", 1, 10, "5");
+  populateNumberDropdown("mcq-rating", 1, 10, "5");
+  populateNumberDropdown("flashcard-rating", 1, 10, "5");
 }
 
-function setupStudyModeDropdowns() {
-  const dropdowns = [
-    document.getElementById("study-mode"),
-    document.getElementById("planner-study-mode"),
-    document.getElementById("dashboard-study-mode")
-  ];
+function populateNumberDropdown(id, min, max, selectedValue) {
+  const dropdown = document.getElementById(id);
+  if (!dropdown) return;
 
-  dropdowns.forEach((dropdown) => {
-    if (!dropdown) return;
+  dropdown.innerHTML = "";
 
-    dropdown.innerHTML = "";
+  for (let i = min; i <= max; i++) {
+    const option = document.createElement("option");
+    option.value = String(i);
+    option.textContent = String(i);
+    dropdown.appendChild(option);
+  }
 
-    studyModes.forEach((mode) => {
-      const option = document.createElement("option");
+  dropdown.value = selectedValue;
+}
 
-      if (typeof mode === "string") {
-        option.value = mode;
-        option.textContent = mode;
-      } else {
-        option.value = mode.id || mode.name || "";
-        option.textContent = mode.name || mode.label || mode.id || "";
-      }
+function setupStudyModeDropdown() {
+  const dropdown = document.getElementById("study-mode");
+  if (!dropdown) return;
 
-      dropdown.appendChild(option);
-    });
+  dropdown.innerHTML = "";
+
+  studyModes.forEach((mode) => {
+    const option = document.createElement("option");
+    option.value = mode;
+    option.textContent = mode;
+    dropdown.appendChild(option);
   });
 }
 
 function populateSubjectDropdowns() {
-  const dropdowns = [
-    document.getElementById("essay-subject"),
-    document.getElementById("mcq-subject"),
-    document.getElementById("flashcard-subject")
-  ];
+  populateSubjectDropdown("essay-subject");
+  populateSubjectDropdown("mcq-subject");
+  populateSubjectDropdown("flashcard-subject");
+}
 
-  dropdowns.forEach((dropdown) => {
-    if (!dropdown) return;
+function populateSubjectDropdown(id) {
+  const dropdown = document.getElementById(id);
+  if (!dropdown) return;
 
-    dropdown.innerHTML = "";
+  dropdown.innerHTML = "";
 
-    subjects.forEach((subject) => {
-      const option = document.createElement("option");
-      option.value = subject.id;
-      option.textContent = subject.name;
-      dropdown.appendChild(option);
-    });
+  subjects.forEach((subject) => {
+    const option = document.createElement("option");
+    option.value = subject.id;
+    option.textContent = subject.name;
+    dropdown.appendChild(option);
   });
 }
 
@@ -265,14 +305,12 @@ function handleEssaySubmit(event) {
     questionNumber: getValue("essay-question-number"),
     rating: Number(getValue("essay-rating")),
     notes: getValue("essay-notes"),
-    completedDate: todayString(),
-    nextReview: addDays(todayString(), 1)
+    completedDate: todayString()
   };
 
   essays.push(essay);
   createReviewsForItem(essay);
   saveData();
-
   resetForm(event.target);
   renderAll();
 }
@@ -292,14 +330,12 @@ function handleMcqSubmit(event) {
     rating: Number(getValue("mcq-rating")),
     rule: getValue("mcq-rule"),
     notes: getValue("mcq-notes"),
-    completedDate: todayString(),
-    nextReview: addDays(todayString(), 1)
+    completedDate: todayString()
   };
 
   mcqs.push(mcq);
   createReviewsForItem(mcq);
   saveData();
-
   resetForm(event.target);
   renderAll();
 }
@@ -316,14 +352,12 @@ function handleFlashcardSubmit(event) {
     front: getValue("flashcard-front"),
     back: getValue("flashcard-back"),
     rating: Number(getValue("flashcard-rating")),
-    completedDate: todayString(),
-    nextReview: addDays(todayString(), 1)
+    completedDate: todayString()
   };
 
   flashcards.push(flashcard);
   createReviewsForItem(flashcard);
   saveData();
-
   resetForm(event.target);
   renderAll();
 }
@@ -331,7 +365,7 @@ function handleFlashcardSubmit(event) {
 function resetForm(form) {
   form.reset();
   setupRatingDropdowns();
-  setupStudyModeDropdowns();
+  setupStudyModeDropdown();
   populateSubjectDropdowns();
   populateSourceDropdowns();
 }
@@ -366,12 +400,11 @@ function renderPlanner() {
   const sessionInfo = getCurrentSessionInfo();
   const sessionPlan = sessionInfo.sessionPlan;
 
-  setText("planner-cycle", `Session ${sessionInfo.sessionNumber} of ${studyCycle.length || 15}`);
-
+  setText("planner-cycle", `Session ${sessionInfo.sessionNumber} of ${studyCycle.length}`);
+  
   const plannerSubjects = document.getElementById("planner-subjects");
   if (plannerSubjects) {
-    plannerSubjects.innerHTML =
-      `<div class="bcc-mission-subjects">${sessionPlan.subjects.join(" + ")}</div>`;
+    plannerSubjects.innerHTML = `<div class="bcc-mission-subjects">${sessionPlan.subjects.join(" + ")}</div>`;
   }
 
   setText("dashboard-essays-target", studyGoals.essaysPerDay || 0);
@@ -391,24 +424,15 @@ function renderSessionMap(activeSession) {
     if (session.day < activeSession) className += " completed";
     if (session.day === activeSession) className += " active";
 
-    return `
-      <div class="${className}">
-        Session ${session.day}
-      </div>
-    `;
+    return `<div class="${className}">Session ${session.day}</div>`;
   }).join("");
 }
 
 function getCurrentSessionInfo() {
-  const cycleLength = studyCycle.length || 15;
+  const cycleLength = studyCycle.length || 1;
 
-  if (currentSession < 1) {
-    currentSession = 1;
-  }
-
-  if (currentSession > cycleLength) {
-    currentSession = 1;
-  }
+  if (currentSession < 1) currentSession = 1;
+  if (currentSession > cycleLength) currentSession = 1;
 
   const sessionPlan = studyCycle.find((item) => item.day === currentSession) || {
     day: currentSession,
@@ -423,7 +447,6 @@ function getCurrentSessionInfo() {
 
 function renderDashboard() {
   const dueReviews = getDueReviews();
-
   setText("dashboard-reviews-due", dueReviews.length);
 
   const todayList = document.getElementById("today-list");
@@ -564,12 +587,12 @@ function completeReview(reviewId) {
 function renderStats() {
   const weekCount = countSessionsSince(7);
   const monthCount = countSessionsSince(30);
-  const pendingReviewCount = reviews.filter((review) => review.status === "pending").length;
+  const pendingReviews = reviews.filter((review) => review.status === "pending").length;
 
   setText("stats-essays", essays.length);
   setText("stats-mcqs", mcqs.length);
   setText("stats-flashcards", flashcards.length);
-  setText("stats-reviews", pendingReviewCount);
+  setText("stats-reviews", pendingReviews);
 
   const statsSection = document.getElementById("stats");
   if (!statsSection) return;
