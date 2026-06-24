@@ -18,8 +18,8 @@
   <nav class="bcc-nav">
     <button class="bcc-nav-button active" data-view="dashboard">Today</button>
     <button class="bcc-nav-button" data-view="essays">Essays</button>
-    <button class="bcc-nav-button" data-view="mcqs">Questions</button>
-    <button class="bcc-nav-button" data-view="flashcards">Cards</button>
+    <button class="bcc-nav-button" data-view="mcqs">MCQs</button>
+    <button class="bcc-nav-button" data-view="flashcards">Flashcards</button>
     <button class="bcc-nav-button" data-view="reviews">Reviews</button>
     <button class="bcc-nav-button" data-view="stats">Progress</button>
   </nav>
@@ -36,8 +36,8 @@
           <select id="study-mode">
             <option value="standard">Standard Study</option>
             <option value="essay-focus">Essay Focus</option>
-            <option value="mcq-focus">Question Focus</option>
-            <option value="flashcard-focus">Card Focus</option>
+            <option value="mcq-focus">MCQ Focus</option>
+            <option value="flashcard-focus">Flashcard Focus</option>
             <option value="review-mode">Review Mode</option>
             <option value="mixed-practice">Mixed Practice</option>
           </select>
@@ -55,12 +55,12 @@
         </div>
 
         <div class="bcc-card">
-          <div class="bcc-card-label">Questions Today</div>
+          <div class="bcc-card-label">MCQs Today</div>
           <div class="bcc-card-number" id="dashboard-mcqs-target">0</div>
         </div>
 
         <div class="bcc-card">
-          <div class="bcc-card-label">Cards Today</div>
+          <div class="bcc-card-label">Flashcards Today</div>
           <div class="bcc-card-number" id="dashboard-flashcards-target">0</div>
         </div>
 
@@ -82,8 +82,6 @@
     </section>
 
     <section id="essays" class="bcc-view">
-      <h1>Essays</h1>
-
       <div class="bcc-panel">
         <h2>Log Essay</h2>
 
@@ -101,6 +99,11 @@
           <label>
             Title
             <input id="essay-title" type="text" placeholder="July 2019 Evidence Essay" />
+          </label>
+
+          <label>
+            Page Number
+            <input id="essay-page-number" type="text" placeholder="Page 42" />
           </label>
 
           <label>
@@ -129,10 +132,8 @@
     </section>
 
     <section id="mcqs" class="bcc-view">
-      <h1>Question Practice</h1>
-
       <div class="bcc-panel">
-        <h2>Log Question</h2>
+        <h2>Log MCQ</h2>
 
         <form id="mcq-form" class="bcc-form">
           <label>
@@ -169,30 +170,23 @@
           </label>
 
           <label>
-            Rule
-            <input id="mcq-rule" type="text" placeholder="Present Sense Impression" />
-          </label>
-
-          <label>
             Notes
             <textarea id="mcq-notes" placeholder="Why correct, why wrong, rule weakness"></textarea>
           </label>
 
-          <button type="submit">Save Question</button>
+          <button type="submit">Save MCQ</button>
         </form>
       </div>
 
       <div class="bcc-panel">
-        <h2>Recent Questions</h2>
-        <div id="mcq-list" class="bcc-list-empty">No questions added yet.</div>
+        <h2>Recent MCQs</h2>
+        <div id="mcq-list" class="bcc-list-empty">No MCQs added yet.</div>
       </div>
     </section>
 
     <section id="flashcards" class="bcc-view">
-      <h1>Flashcards</h1>
-
       <div class="bcc-panel">
-        <h2>New Card</h2>
+        <h2>Log Flashcard</h2>
 
         <form id="flashcard-form" class="bcc-form">
           <label>
@@ -203,6 +197,16 @@
           <label>
             Source
             <select id="flashcard-source"></select>
+          </label>
+
+          <label>
+            Deck
+            <input id="flashcard-deck" type="text" placeholder="Evidence Deck 1" />
+          </label>
+
+          <label>
+            Card / Question Number
+            <input id="flashcard-question-number" type="text" placeholder="143" />
           </label>
 
           <label>
@@ -220,19 +224,17 @@
             <select id="flashcard-rating"></select>
           </label>
 
-          <button type="submit">Save Card</button>
+          <button type="submit">Save Flashcard</button>
         </form>
       </div>
 
       <div class="bcc-panel">
-        <h2>Recent Cards</h2>
-        <div id="flashcard-list" class="bcc-list-empty">No cards added yet.</div>
+        <h2>Recent Flashcards</h2>
+        <div id="flashcard-list" class="bcc-list-empty">No flashcards added yet.</div>
       </div>
     </section>
 
     <section id="reviews" class="bcc-view">
-      <h1>Reviews</h1>
-
       <div class="bcc-panel">
         <h2>Review Queue</h2>
         <div id="review-list" class="bcc-list-empty">No reviews scheduled yet.</div>
@@ -240,8 +242,6 @@
     </section>
 
     <section id="stats" class="bcc-view">
-      <h1>Progress</h1>
-
       <div class="bcc-grid">
         <div class="bcc-card">
           <div class="bcc-card-label">Essays</div>
@@ -249,12 +249,12 @@
         </div>
 
         <div class="bcc-card">
-          <div class="bcc-card-label">Questions</div>
+          <div class="bcc-card-label">MCQs</div>
           <div class="bcc-card-number" id="stats-mcqs">0</div>
         </div>
 
         <div class="bcc-card">
-          <div class="bcc-card-label">Cards</div>
+          <div class="bcc-card-label">Flashcards</div>
           <div class="bcc-card-number" id="stats-flashcards">0</div>
         </div>
 
