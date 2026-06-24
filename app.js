@@ -1,4 +1,4 @@
-const reviewIntervals = [1, 4, 14, 45, 90, 180, 365];
+const reviewIntervals = [1, 3, 7, 30];
 
 let subjects = [];
 let essaySources = [];
@@ -30,10 +30,10 @@ async function loadData() {
   mcqSources = await loadJson("mcqSources.json", []);
   flashcardSources = await loadJson("flashcardSources.json", []);
 
-  essays = await loadJson("essays.json", []);
-  mcqs = await loadJson("mcqs.json", []);
-  flashcards = await loadJson("flashcards.json", []);
-  reviews = await loadJson("reviews.json", []);
+  essays = loadLocalData("bcc_essays", await loadJson("essays.json", []));
+  mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
+  flashcards = loadLocalData("bcc_flashcards", await loadJson("flashcards.json", []));
+  reviews = loadLocalData("bcc_reviews", await loadJson("reviews.json", []));
 }
 
 async function loadJson(path, fallback) {
@@ -44,6 +44,22 @@ async function loadJson(path, fallback) {
   } catch (error) {
     return fallback;
   }
+}
+
+function loadLocalData(key, fallback) {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function saveData() {
+  localStorage.setItem("bcc_essays", JSON.stringify(essays));
+  localStorage.setItem("bcc_mcqs", JSON.stringify(mcqs));
+  localStorage.setItem("bcc_flashcards", JSON.stringify(flashcards));
+  localStorage.setItem("bcc_reviews", JSON.stringify(reviews));
 }
 
 function setupNavigation() {
@@ -151,6 +167,7 @@ function handleEssaySubmit(event) {
 
   essays.push(essay);
   createReviewsForItem(essay);
+  saveData();
 
   event.target.reset();
   setupRatingDropdowns();
@@ -179,6 +196,7 @@ function handleMcqSubmit(event) {
 
   mcqs.push(mcq);
   createReviewsForItem(mcq);
+  saveData();
 
   event.target.reset();
   setupRatingDropdowns();
@@ -204,6 +222,7 @@ function handleFlashcardSubmit(event) {
 
   flashcards.push(flashcard);
   createReviewsForItem(flashcard);
+  saveData();
 
   event.target.reset();
   setupRatingDropdowns();
@@ -213,14 +232,19 @@ function handleFlashcardSubmit(event) {
 }
 
 function createReviewsForItem(item) {
-  reviewIntervals.forEach((interval) => {
+  let currentDate = todayString();
+
+  reviewIntervals.forEach((interval, index) => {
+    currentDate = addDays(currentDate, interval);
+
     reviews.push({
       id: createId("review"),
       itemId: item.id,
       itemType: item.type,
       subject: item.subject,
-      dueDate: addDays(todayString(), interval),
+      dueDate: currentDate,
       intervalDays: interval,
+      reviewNumber: index + 1,
       status: "pending",
       ratingAtCreation: item.rating
     });
@@ -352,7 +376,7 @@ function renderReviewItem(review) {
     <div class="bcc-item">
       <div class="bcc-item-title">${escapeHtml(title)}</div>
       <div class="bcc-item-meta">
-        ${capitalize(review.itemType)} · ${getSubjectName(review.subject)} · Due ${formatDate(review.dueDate)} · ${review.intervalDays} days
+        ${capitalize(review.itemType)} · ${getSubjectName(review.subject)} · Review ${review.reviewNumber || ""} · Due ${formatDate(review.dueDate)}
       </div>
     </div>
   `;
