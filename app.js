@@ -1,4 +1,3 @@
-
 const reviewIntervals = [1, 3, 7, 30];
 
 let subjects = [];
