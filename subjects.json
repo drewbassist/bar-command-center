@@ -1,1 +1,15 @@
-
+[
+  { "id": "civil_procedure", "name": "Civil Procedure" },
+  { "id": "constitutional_law", "name": "Constitutional Law" },
+  { "id": "contracts_sales", "name": "Contracts / Sales" },
+  { "id": "criminal_law_procedure", "name": "Criminal Law and Procedure" },
+  { "id": "evidence", "name": "Evidence" },
+  { "id": "real_property", "name": "Real Property" },
+  { "id": "torts", "name": "Torts" },
+  { "id": "business_associations", "name": "Business Associations" },
+  { "id": "community_property", "name": "Community Property" },
+  { "id": "professional_responsibility", "name": "Professional Responsibility" },
+  { "id": "remedies", "name": "Remedies" },
+  { "id": "trusts", "name": "Trusts" },
+  { "id": "wills_succession", "name": "Wills and Succession" }
+]
