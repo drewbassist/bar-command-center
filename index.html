@@ -28,26 +28,37 @@
     <section id="dashboard" class="bcc-view active">
       <h1>Today</h1>
 
+      <div class="bcc-panel">
+        <h2 id="planner-title">Today's Mission</h2>
+        <div id="planner-cycle" class="bcc-item-meta">Loading study cycle...</div>
+        <div id="planner-subjects" class="bcc-item-title"></div>
+      </div>
+
       <div class="bcc-grid">
         <div class="bcc-card">
-          <div class="bcc-card-label">New Essays</div>
-          <div class="bcc-card-number">2</div>
+          <div class="bcc-card-label">Essays Today</div>
+          <div class="bcc-card-number" id="dashboard-essays-target">0</div>
         </div>
 
         <div class="bcc-card">
-          <div class="bcc-card-label">MCQs</div>
-          <div class="bcc-card-number">30</div>
+          <div class="bcc-card-label">MCQs Today</div>
+          <div class="bcc-card-number" id="dashboard-mcqs-target">0</div>
         </div>
 
         <div class="bcc-card">
-          <div class="bcc-card-label">Flashcards Due</div>
-          <div class="bcc-card-number" id="dashboard-flashcards-due">0</div>
+          <div class="bcc-card-label">Flashcards Today</div>
+          <div class="bcc-card-number" id="dashboard-flashcards-target">0</div>
         </div>
 
         <div class="bcc-card">
           <div class="bcc-card-label">Reviews Due</div>
           <div class="bcc-card-number" id="dashboard-reviews-due">0</div>
         </div>
+      </div>
+
+      <div class="bcc-panel">
+        <h2>Cycle Map</h2>
+        <div id="cycle-map" class="bcc-cycle-map"></div>
       </div>
 
       <div class="bcc-panel">
@@ -70,14 +81,7 @@
 
           <label>
             Source
-            <select id="essay-source">
-              <option>California Bar</option>
-              <option>BarEssays</option>
-              <option>Basick</option>
-              <option>Fleming</option>
-              <option>Textbook</option>
-              <option>Custom</option>
-            </select>
+            <select id="essay-source"></select>
           </label>
 
           <label>
@@ -124,15 +128,7 @@
 
           <label>
             Source
-            <select id="mcq-source">
-              <option>Finz</option>
-              <option>Emanuel</option>
-              <option>Quimbee</option>
-              <option>UWorld</option>
-              <option>Adaptibar</option>
-              <option>Textbook</option>
-              <option>Custom</option>
-            </select>
+            <select id="mcq-source"></select>
           </label>
 
           <label>
@@ -189,10 +185,12 @@
             Subject
             <select id="flashcard-subject"></select>
           </label>
-<label>
-  Source
-  <select id="flashcard-source"></select>
-</label>
+
+          <label>
+            Source
+            <select id="flashcard-source"></select>
+          </label>
+
           <label>
             Front
             <input id="flashcard-front" type="text" placeholder="Elements of negligence" />
