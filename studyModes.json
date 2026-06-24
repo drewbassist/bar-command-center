@@ -1,0 +1,20 @@
+{
+  "full": {
+    "label": "Full",
+    "essaysPerDay": 2,
+    "mcqsPerDay": 20,
+    "flashcardsPerDay": 20
+  },
+  "light": {
+    "label": "Light",
+    "essaysPerDay": 1,
+    "mcqsPerDay": 10,
+    "flashcardsPerDay": 10
+  },
+  "reviewsOnly": {
+    "label": "Reviews Only",
+    "essaysPerDay": 0,
+    "mcqsPerDay": 0,
+    "flashcardsPerDay": 0
+  }
+}
