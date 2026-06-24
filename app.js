@@ -11,6 +11,8 @@ let essays = [];
 let mcqs = [];
 let flashcards = [];
 let reviews = [];
+let sessionHistory = [];
+let currentSession = 1;
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -22,6 +24,7 @@ async function init() {
   populateSubjectDropdowns();
   populateSourceDropdowns();
   setupForms();
+  setupSessionButton();
 
   renderAll();
 }
@@ -38,6 +41,18 @@ async function loadData() {
   mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
   flashcards = loadLocalData("bcc_flashcards", await loadJson("flashcards.json", []));
   reviews = loadLocalData("bcc_reviews", await loadJson("reviews.json", []));
+  sessionHistory = loadLocalData("bcc_session_history", []);
+
+  currentSession = Number(localStorage.getItem("bcc_current_session") || "1");
+
+  if (!Number.isFinite(currentSession) || currentSession < 1) {
+    currentSession = 1;
+  }
+
+  if (studyCycle.length > 0 && currentSession > studyCycle.length) {
+    currentSession = 1;
+    localStorage.setItem("bcc_current_session", String(currentSession));
+  }
 }
 
 async function loadJson(path, fallback) {
@@ -64,6 +79,8 @@ function saveData() {
   localStorage.setItem("bcc_mcqs", JSON.stringify(mcqs));
   localStorage.setItem("bcc_flashcards", JSON.stringify(flashcards));
   localStorage.setItem("bcc_reviews", JSON.stringify(reviews));
+  localStorage.setItem("bcc_session_history", JSON.stringify(sessionHistory));
+  localStorage.setItem("bcc_current_session", String(currentSession));
 }
 
 function setupNavigation() {
@@ -81,6 +98,36 @@ function setupNavigation() {
       document.getElementById(target).classList.add("active");
     });
   });
+}
+
+function setupSessionButton() {
+  const button = document.getElementById("complete-session-button");
+  if (!button) return;
+
+  button.addEventListener("click", completeCurrentSession);
+}
+
+function completeCurrentSession() {
+  const sessionInfo = getCurrentSessionInfo();
+
+  sessionHistory.push({
+    id: createId("session"),
+    sessionNumber: sessionInfo.sessionNumber,
+    completedDate: todayString(),
+    subjects: sessionInfo.sessionPlan.subjects,
+    essaysTarget: studyGoals.essaysPerDay || 0,
+    mcqsTarget: studyGoals.mcqsPerDay || 0,
+    flashcardsTarget: studyGoals.flashcardsPerDay || 0
+  });
+
+  currentSession += 1;
+
+  if (studyCycle.length > 0 && currentSession > studyCycle.length) {
+    currentSession = 1;
+  }
+
+  saveData();
+  renderAll();
 }
 
 function setupRatingDropdowns() {
@@ -260,65 +307,58 @@ function renderAll() {
 }
 
 function renderPlanner() {
-  const cycleInfo = getCurrentCycleInfo();
-  const dayPlan = cycleInfo.dayPlan;
+  const sessionInfo = getCurrentSessionInfo();
+  const sessionPlan = sessionInfo.sessionPlan;
 
   document.getElementById("planner-cycle").textContent =
-    `Cycle ${cycleInfo.cycleNumber} · Day ${cycleInfo.dayNumber} of ${studyCycle.length}`;
+    `Session ${sessionInfo.sessionNumber} of ${studyCycle.length}`;
 
   document.getElementById("planner-subjects").innerHTML =
-    `<div class="bcc-mission-subjects">${dayPlan.subjects.join(" + ")}</div>`;
+    `<div class="bcc-mission-subjects">${sessionPlan.subjects.join(" + ")}</div>`;
 
   document.getElementById("dashboard-essays-target").textContent = studyGoals.essaysPerDay || 0;
   document.getElementById("dashboard-mcqs-target").textContent = studyGoals.mcqsPerDay || 0;
   document.getElementById("dashboard-flashcards-target").textContent = studyGoals.flashcardsPerDay || 0;
 
-  renderCycleMap(cycleInfo.dayNumber);
+  renderSessionMap(sessionInfo.sessionNumber);
 }
 
-function renderCycleMap(activeDay) {
+function renderSessionMap(activeSession) {
   const map = document.getElementById("cycle-map");
 
-  map.innerHTML = studyCycle.map((day) => {
+  map.innerHTML = studyCycle.map((session) => {
     let className = "bcc-cycle-day";
 
-    if (day.day < activeDay) className += " completed";
-    if (day.day === activeDay) className += " active";
+    if (session.day < activeSession) className += " completed";
+    if (session.day === activeSession) className += " active";
 
     return `
       <div class="${className}">
-        Day ${day.day}
+        Session ${session.day}
       </div>
     `;
   }).join("");
 }
 
-function getCurrentCycleInfo() {
-  const startKey = "bcc_cycle_start_date";
-  let startDate = localStorage.getItem(startKey);
-
-  if (!startDate) {
-    startDate = todayString();
-    localStorage.setItem(startKey, startDate);
-  }
-
-  const daysElapsed = daysBetween(startDate, todayString());
+function getCurrentSessionInfo() {
   const cycleLength = studyCycle.length || 15;
 
-  const dayNumber = (daysElapsed % cycleLength) + 1;
-  const cycleNumber = Math.floor(daysElapsed / cycleLength) + 1;
+  if (currentSession < 1) {
+    currentSession = 1;
+  }
 
-  const dayPlan = studyCycle.find((item) => item.day === dayNumber) || {
-    day: dayNumber,
+  if (currentSession > cycleLength) {
+    currentSession = 1;
+  }
+
+  const sessionPlan = studyCycle.find((item) => item.day === currentSession) || {
+    day: currentSession,
     subjects: ["Unassigned"]
   };
 
   return {
-    startDate,
-    daysElapsed,
-    dayNumber,
-    cycleNumber,
-    dayPlan
+    sessionNumber: currentSession,
+    sessionPlan
   };
 }
 
@@ -442,10 +482,41 @@ function renderReviewItem(review) {
 }
 
 function renderStats() {
+  const weekCount = countSessionsSince(7);
+  const monthCount = countSessionsSince(30);
+
   document.getElementById("stats-essays").textContent = essays.length;
   document.getElementById("stats-mcqs").textContent = mcqs.length;
   document.getElementById("stats-flashcards").textContent = flashcards.length;
   document.getElementById("stats-reviews").textContent = reviews.length;
+
+  const statsSection = document.getElementById("stats");
+
+  let sessionStats = document.getElementById("session-stats-panel");
+
+  if (!sessionStats) {
+    sessionStats = document.createElement("div");
+    sessionStats.id = "session-stats-panel";
+    sessionStats.className = "bcc-panel";
+    statsSection.appendChild(sessionStats);
+  }
+
+  sessionStats.innerHTML = `
+    <h2>Session History</h2>
+    <div class="bcc-item">
+      <div class="bcc-item-title">Sessions completed this week: ${weekCount}</div>
+      <div class="bcc-item-meta">Sessions completed this month: ${monthCount}</div>
+      <div class="bcc-item-meta">Total completed sessions: ${sessionHistory.length}</div>
+    </div>
+  `;
+}
+
+function countSessionsSince(days) {
+  const cutoff = addDays(todayString(), -days);
+
+  return sessionHistory.filter((session) => {
+    return session.completedDate >= cutoff;
+  }).length;
 }
 
 function getDueReviews() {
@@ -495,13 +566,6 @@ function addDays(dateString, days) {
   const date = new Date(dateString + "T00:00:00");
   date.setDate(date.getDate() + days);
   return date.toISOString().slice(0, 10);
-}
-
-function daysBetween(startDate, endDate) {
-  const start = new Date(startDate + "T00:00:00");
-  const end = new Date(endDate + "T00:00:00");
-  const diff = end - start;
-  return Math.floor(diff / 86400000);
 }
 
 function formatDate(dateString) {
