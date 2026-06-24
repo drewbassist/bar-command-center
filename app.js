@@ -302,6 +302,7 @@ function handleEssaySubmit(event) {
     subject: getValue("essay-subject"),
     source: getValue("essay-source"),
     title: getValue("essay-title"),
+    pageNumber: getValue("essay-page-number"),
     questionNumber: getValue("essay-question-number"),
     rating: Number(getValue("essay-rating")),
     notes: getValue("essay-notes"),
@@ -324,11 +325,10 @@ function handleMcqSubmit(event) {
     studyMode: getValue("study-mode"),
     subject: getValue("mcq-subject"),
     source: getValue("mcq-source"),
-    deck: getValue("mcq-deck"),
+    pageNumber: getValue("mcq-page-number"),
     questionNumber: getValue("mcq-question-number"),
     correct: getValue("mcq-correct") === "true",
     rating: Number(getValue("mcq-rating")),
-    rule: getValue("mcq-rule"),
     notes: getValue("mcq-notes"),
     completedDate: todayString()
   };
@@ -349,9 +349,9 @@ function handleFlashcardSubmit(event) {
     studyMode: getValue("study-mode"),
     subject: getValue("flashcard-subject"),
     source: getValue("flashcard-source"),
-    front: getValue("flashcard-front"),
-    back: getValue("flashcard-back"),
+    flashcardNumber: getValue("flashcard-number"),
     rating: Number(getValue("flashcard-rating")),
+    notes: getValue("flashcard-notes"),
     completedDate: todayString()
   };
 
@@ -401,7 +401,7 @@ function renderPlanner() {
   const sessionPlan = sessionInfo.sessionPlan;
 
   setText("planner-cycle", `Session ${sessionInfo.sessionNumber} of ${studyCycle.length}`);
-  
+
   const plannerSubjects = document.getElementById("planner-subjects");
   if (plannerSubjects) {
     plannerSubjects.innerHTML = `<div class="bcc-mission-subjects">${sessionPlan.subjects.join(" + ")}</div>`;
@@ -478,7 +478,7 @@ function renderEssays() {
       <div class="bcc-item">
         <div class="bcc-item-title">${escapeHtml(essay.title || "Untitled Essay")}</div>
         <div class="bcc-item-meta">
-          ${getSubjectName(essay.subject)} · ${escapeHtml(essay.source)} · ${escapeHtml(essay.questionNumber || "No question number")}
+          ${getSubjectName(essay.subject)} · ${escapeHtml(essay.source)} · ${escapeHtml(essay.pageNumber || "No page number")} · ${escapeHtml(essay.questionNumber || "No question number")}
         </div>
         <div class="bcc-rating">Rating: ${essay.rating}/10 · Next Review: ${formatDate(getNextReviewDate(essay.id, "essay"))}</div>
         ${essay.notes ? `<div class="bcc-item-notes">${escapeHtml(essay.notes)}</div>` : ""}
@@ -501,12 +501,11 @@ function renderMcqs() {
   list.innerHTML = mcqs.map((mcq) => {
     return `
       <div class="bcc-item">
-        <div class="bcc-item-title">${getSubjectName(mcq.subject)} · Question ${escapeHtml(mcq.questionNumber || "")}</div>
+        <div class="bcc-item-title">${getSubjectName(mcq.subject)} · MCQ ${escapeHtml(mcq.questionNumber || "")}</div>
         <div class="bcc-item-meta">
-          ${escapeHtml(mcq.source)} · ${escapeHtml(mcq.deck || "No deck")} · ${mcq.correct ? "Correct" : "Incorrect"}
+          ${escapeHtml(mcq.source)} · ${escapeHtml(mcq.pageNumber || "No page number")} · ${mcq.correct ? "Correct" : "Incorrect"}
         </div>
         <div class="bcc-rating">Rating: ${mcq.rating}/10 · Next Review: ${formatDate(getNextReviewDate(mcq.id, "mcq"))}</div>
-        ${mcq.rule ? `<div class="bcc-item-notes">Rule: ${escapeHtml(mcq.rule)}</div>` : ""}
         ${mcq.notes ? `<div class="bcc-item-notes">${escapeHtml(mcq.notes)}</div>` : ""}
       </div>
     `;
@@ -527,10 +526,10 @@ function renderFlashcards() {
   list.innerHTML = flashcards.map((card) => {
     return `
       <div class="bcc-item">
-        <div class="bcc-item-title">${escapeHtml(card.front || "Untitled Flashcard")}</div>
-        <div class="bcc-item-meta">${getSubjectName(card.subject)} · ${escapeHtml(card.source || "No source")}</div>
+        <div class="bcc-item-title">${getSubjectName(card.subject)} · Flashcard ${escapeHtml(card.flashcardNumber || "")}</div>
+        <div class="bcc-item-meta">${escapeHtml(card.source || "No source")}</div>
         <div class="bcc-rating">Rating: ${card.rating}/10 · Next Review: ${formatDate(getNextReviewDate(card.id, "flashcard"))}</div>
-        <div class="bcc-item-notes">${escapeHtml(card.back || "")}</div>
+        ${card.notes ? `<div class="bcc-item-notes">${escapeHtml(card.notes)}</div>` : ""}
       </div>
     `;
   }).join("");
@@ -655,8 +654,8 @@ function getItemTitle(item, type) {
   if (!item) return "Missing Item";
 
   if (type === "essay") return item.title || "Untitled Essay";
-  if (type === "mcq") return `${getSubjectName(item.subject)} Question ${item.questionNumber || ""}`;
-  if (type === "flashcard") return item.front || "Untitled Flashcard";
+  if (type === "mcq") return `${getSubjectName(item.subject)} MCQ ${item.questionNumber || ""}`;
+  if (type === "flashcard") return `${getSubjectName(item.subject)} Flashcard ${item.flashcardNumber || ""}`;
 
   return "Untitled Item";
 }
