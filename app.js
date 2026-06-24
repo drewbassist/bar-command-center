@@ -1,3 +1,4 @@
+```javascript
 const reviewIntervals = [1, 3, 7, 30];
 
 let subjects = [];
@@ -159,20 +160,29 @@ function setupNavigation() {
   const buttons = document.querySelectorAll(".bcc-nav-button");
   const views = document.querySelectorAll(".bcc-view");
 
+  function activateView(viewId) {
+    const targetView = document.getElementById(viewId);
+    if (!targetView) return;
+
+    buttons.forEach((button) => {
+      button.classList.toggle("active", button.dataset.view === viewId);
+    });
+
+    views.forEach((view) => {
+      view.classList.toggle("active", view.id === viewId);
+    });
+
+    localStorage.setItem("bcc_active_view", viewId);
+  }
+
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
-      const target = button.dataset.view;
-      const targetView = document.getElementById(target);
-
-      if (!targetView) return;
-
-      buttons.forEach((btn) => btn.classList.remove("active"));
-      views.forEach((view) => view.classList.remove("active"));
-
-      button.classList.add("active");
-      targetView.classList.add("active");
+      activateView(button.dataset.view);
     });
   });
+
+  const savedView = localStorage.getItem("bcc_active_view") || "dashboard";
+  activateView(savedView);
 }
 
 function setupSessionButton() {
@@ -715,3 +725,4 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+```
