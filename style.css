@@ -16,19 +16,19 @@ body {
 }
 
 .bcc-header {
-  padding: 40px 32px 26px;
+  padding: 22px 32px 16px;
   border-bottom: 1px solid #e5e5e5;
 }
 
 .bcc-title {
-  font-size: 42px;
+  font-size: 30px;
   font-weight: 300;
   letter-spacing: 0.01em;
 }
 
 .bcc-subtitle {
-  margin-top: 8px;
-  font-size: 14px;
+  margin-top: 4px;
+  font-size: 13px;
   color: #666666;
 }
 
@@ -38,7 +38,7 @@ body {
   z-index: 10;
   display: flex;
   gap: 8px;
-  padding: 12px 32px;
+  padding: 10px 32px;
   background: #ffffff;
   border-bottom: 1px solid #e5e5e5;
   overflow-x: auto;
@@ -46,20 +46,14 @@ body {
 
 .bcc-nav-button {
   width: 120px;
-  padding: 12px 0;
+  padding: 10px 0;
   border: 1px solid #d9d9d9;
   background: #ffffff;
   color: #444444;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.15s ease;
-}
-
-.bcc-nav-button:hover {
-  border-color: #111111;
-  color: #111111;
+  border-radius: 3px;
 }
 
 .bcc-nav-button.active {
@@ -70,9 +64,9 @@ body {
 
 .bcc-main {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 40px 24px 72px;
+  padding: 22px 24px 36px;
 }
 
 .bcc-view {
@@ -84,29 +78,28 @@ body {
 }
 
 h1 {
-  margin: 0 0 28px;
-  font-size: 40px;
+  margin: 0 0 16px;
+  font-size: 32px;
   font-weight: 300;
-  letter-spacing: -0.02em;
 }
 
 h2 {
-  margin: 0 0 16px;
-  font-size: 20px;
+  margin: 0 0 10px;
+  font-size: 18px;
   font-weight: 400;
 }
 
 .bcc-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  margin-bottom: 28px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .bcc-card {
   border: 1px solid #e5e5e5;
-  padding: 28px;
-  min-height: 140px;
+  padding: 18px;
+  min-height: 105px;
   background: #ffffff;
 }
 
@@ -116,27 +109,27 @@ h2 {
 }
 
 .bcc-card-number {
-  margin-top: 22px;
-  font-size: 54px;
+  margin-top: 14px;
+  font-size: 42px;
   font-weight: 300;
   line-height: 1;
 }
 
 .bcc-panel {
   border: 1px solid #e5e5e5;
-  padding: 28px;
-  margin-bottom: 28px;
+  padding: 18px;
+  margin-bottom: 16px;
   background: #ffffff;
 }
 
 .bcc-form {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .bcc-form label {
   display: grid;
-  gap: 6px;
+  gap: 5px;
   font-size: 13px;
   color: #444444;
 }
@@ -148,13 +141,13 @@ h2 {
   border: 1px solid #cccccc;
   background: #ffffff;
   color: #111111;
-  padding: 10px;
+  padding: 9px;
   font: inherit;
   font-size: 14px;
 }
 
 .bcc-form textarea {
-  min-height: 90px;
+  min-height: 78px;
   resize: vertical;
 }
 
@@ -163,7 +156,7 @@ h2 {
   border: 1px solid #111111;
   background: #111111;
   color: #ffffff;
-  padding: 12px 18px;
+  padding: 10px 16px;
   font-size: 14px;
   cursor: pointer;
   border-radius: 0;
@@ -176,7 +169,7 @@ h2 {
 
 .bcc-item {
   border-top: 1px solid #eeeeee;
-  padding: 14px 0;
+  padding: 10px 0;
 }
 
 .bcc-item:first-child {
@@ -184,42 +177,42 @@ h2 {
 }
 
 .bcc-item-title {
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .bcc-item-meta {
-  margin-top: 4px;
-  font-size: 13px;
+  margin-top: 3px;
+  font-size: 12px;
   color: #666666;
 }
 
 .bcc-item-notes {
-  margin-top: 8px;
+  margin-top: 6px;
   font-size: 13px;
-  line-height: 1.45;
+  line-height: 1.4;
   color: #333333;
 }
 
 .bcc-rating {
-  margin-top: 8px;
+  margin-top: 6px;
   font-size: 13px;
 }
 
 .bcc-cycle-map {
   display: grid;
   grid-template-columns: repeat(15, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .bcc-cycle-day {
   border: 1px solid #dddddd;
-  min-height: 72px;
+  min-height: 52px;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 12px;
-  line-height: 1.3;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.25;
   color: #555555;
 }
 
@@ -235,25 +228,25 @@ h2 {
 }
 
 .bcc-mission-subjects {
-  margin-top: 16px;
-  margin-bottom: 12px;
-  font-size: 24px;
-  line-height: 1.3;
+  margin-top: 10px;
+  margin-bottom: 6px;
+  font-size: 22px;
+  line-height: 1.25;
 }
 
 .bcc-mode-label {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 24px;
-  margin-bottom: 18px;
+  gap: 6px;
+  margin-top: 14px;
+  margin-bottom: 12px;
   font-size: 13px;
   color: #555555;
 }
 
 .bcc-mode-label select {
   width: 220px;
-  padding: 10px;
+  padding: 9px;
   border: 1px solid #cccccc;
   background: #ffffff;
   color: #111111;
@@ -262,16 +255,15 @@ h2 {
 }
 
 .bcc-session-button {
-  margin-top: 22px;
+  margin-top: 8px;
   width: 220px;
-  height: 46px;
+  height: 42px;
   border: none;
   background: #111111;
   color: #ffffff;
   font-size: 14px;
   letter-spacing: 0.02em;
   cursor: pointer;
-  transition: 0.15s;
   border-radius: 0;
 }
 
@@ -281,11 +273,11 @@ h2 {
 
 @media (max-width: 760px) {
   .bcc-header {
-    padding: 30px 18px 22px;
+    padding: 20px 18px 14px;
   }
 
   .bcc-title {
-    font-size: 34px;
+    font-size: 28px;
   }
 
   .bcc-nav {
@@ -293,7 +285,7 @@ h2 {
   }
 
   .bcc-main {
-    padding: 28px 18px 56px;
+    padding: 22px 18px 40px;
   }
 
   .bcc-grid {
@@ -305,11 +297,11 @@ h2 {
   }
 
   h1 {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .bcc-card-number {
-    font-size: 44px;
+    font-size: 36px;
   }
 }
 
