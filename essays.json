@@ -1,4 +1,4 @@
-[]<select id="essay-source">
+<select id="essay-source">
   <option>California Bar PDF</option>
   <option>Essay Exam Writing for the California Bar Exam (Basick &amp; Schindler)</option>
   <option>Barbri First-Year Outlines</option>
