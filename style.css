@@ -250,13 +250,23 @@ h2 {
 
 .bcc-backup-actions {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
   align-items: center;
 }
 
 .bcc-backup-actions .bcc-session-button {
   margin-top: 0;
+}
+
+.bcc-backup-actions label.bcc-session-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#import-backup-input {
+  display: none;
 }
 
 @media (max-width: 760px) {
