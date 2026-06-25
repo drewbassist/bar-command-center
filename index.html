@@ -245,14 +245,17 @@
       <div class="bcc-panel">
         <h2>Backup</h2>
 
-        <button id="export-backup-button" class="bcc-session-button">
-          Export Backup
-        </button>
+        <div class="bcc-backup-actions">
+          <button id="export-backup-button" class="bcc-session-button">
+            Export Backup
+          </button>
 
-        <label class="bcc-session-button" style="display:inline-block; cursor:pointer;">
-          Import Backup
-          <input id="import-backup-input" type="file" accept=".json" style="display:none;" />
-        </label>
+          <label class="bcc-session-button" for="import-backup-input">
+            Import Backup
+          </label>
+
+          <input id="import-backup-input" type="file" accept=".json" />
+        </div>
       </div>
     </section>
   </main>
