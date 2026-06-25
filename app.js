@@ -25,6 +25,7 @@ async function init() {
   populateSourceDropdowns();
   setupForms();
   setupSessionButton();
+  setupBackupButtons();
 
   renderAll();
 }
@@ -307,6 +308,82 @@ function createReviewsForItem(item) {
       ratingAtCreation: item.rating
     });
   });
+}
+
+function setupBackupButtons() {
+  const exportButton = document.getElementById("export-backup-button");
+  const importInput = document.getElementById("import-backup-input");
+
+  if (exportButton) {
+    exportButton.addEventListener("click", exportBackup);
+  }
+
+  if (importInput) {
+    importInput.addEventListener("change", importBackup);
+  }
+}
+
+function exportBackup() {
+  const backup = {
+    exportedAt: new Date().toISOString(),
+    app: "Drew's BarOS",
+    essays,
+    mcqs,
+    flashcards,
+    reviews,
+    sessionHistory,
+    currentSession
+  };
+
+  const file = new Blob([JSON.stringify(backup, null, 2)], {
+    type: "application/json"
+  });
+
+  const url = URL.createObjectURL(file);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = `baros-backup-${todayString()}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+}
+
+function importBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function () {
+    try {
+      const backup = JSON.parse(reader.result);
+
+      essays = Array.isArray(backup.essays) ? backup.essays : [];
+      mcqs = Array.isArray(backup.mcqs) ? backup.mcqs : [];
+      flashcards = Array.isArray(backup.flashcards) ? backup.flashcards : [];
+      reviews = Array.isArray(backup.reviews) ? backup.reviews : [];
+      sessionHistory = Array.isArray(backup.sessionHistory) ? backup.sessionHistory : [];
+      currentSession = Number(backup.currentSession || 1);
+
+      if (!Number.isFinite(currentSession) || currentSession < 1) {
+        currentSession = 1;
+      }
+
+      saveData();
+      renderAll();
+
+      event.target.value = "";
+      alert("Backup imported successfully.");
+    } catch (error) {
+      event.target.value = "";
+      alert("Could not import backup. The file is not valid BarOS JSON.");
+    }
+  };
+
+  reader.readAsText(file);
 }
 
 function renderAll() {
