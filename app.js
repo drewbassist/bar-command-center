@@ -4,7 +4,6 @@ let subjects = [];
 let essaySources = [];
 let mcqSources = [];
 let flashcardSources = [];
-let studyModes = [];
 let studyGoals = {};
 let studyCycle = [];
 
@@ -22,7 +21,6 @@ async function init() {
 
   setupNavigation();
   setupRatingDropdowns();
-  setupStudyModeDropdown();
   populateSubjectDropdowns();
   populateSourceDropdowns();
   setupForms();
@@ -36,14 +34,6 @@ async function loadData() {
   essaySources = await loadJson("essaySources.json", []);
   mcqSources = await loadJson("mcqSources.json", []);
   flashcardSources = await loadJson("flashcardSources.json", []);
-  studyModes = [
-  "Standard Study",
-  "Essay Focus",
-  "MCQ Focus",
-  "Flashcard Focus",
-  "Review Mode",
-  "Mixed Practice"
-];
   studyGoals = await loadJson("studyGoals.json", {});
   studyCycle = await loadJson("studyCycle.json", []);
 
@@ -142,7 +132,6 @@ function completeCurrentSession() {
     sessionNumber: sessionInfo.sessionNumber,
     completedDate: todayString(),
     subjects: sessionInfo.sessionPlan.subjects,
-    studyMode: getValue("study-mode"),
     essaysTarget: studyGoals.essaysPerDay || 0,
     mcqsTarget: studyGoals.mcqsPerDay || 0,
     flashcardsTarget: studyGoals.flashcardsPerDay || 0
@@ -180,27 +169,6 @@ function populateNumberDropdown(id, min, max, selectedValue) {
   dropdown.value = selectedValue;
 }
 
-function setupStudyModeDropdown() {
-  const dropdown = document.getElementById("study-mode");
-  if (!dropdown) return;
-
-  dropdown.innerHTML = "";
-
-  studyModes.forEach((mode) => {
-    const option = document.createElement("option");
-
-    if (typeof mode === "string") {
-      option.value = mode;
-      option.textContent = mode;
-    } else {
-      option.value = mode.id || mode.value || mode.name || "";
-      option.textContent = mode.name || mode.label || mode.value || mode.id || "";
-    }
-
-    dropdown.appendChild(option);
-  });
-}
-
 function populateSubjectDropdowns() {
   populateSubjectDropdown("essay-subject");
   populateSubjectDropdown("mcq-subject");
@@ -235,15 +203,8 @@ function populateDropdown(id, items) {
 
   items.forEach((item) => {
     const option = document.createElement("option");
-
-    if (typeof item === "string") {
-      option.value = item;
-      option.textContent = item;
-    } else {
-      option.value = item.id || item.value || item.name || "";
-      option.textContent = item.name || item.label || item.value || item.id || "";
-    }
-
+    option.value = item;
+    option.textContent = item;
     dropdown.appendChild(option);
   });
 }
@@ -264,7 +225,6 @@ function handleEssaySubmit(event) {
   const essay = {
     id: createId("essay"),
     type: "essay",
-    studyMode: getValue("study-mode"),
     subject: getValue("essay-subject"),
     source: getValue("essay-source"),
     title: getValue("essay-title"),
@@ -288,7 +248,6 @@ function handleMcqSubmit(event) {
   const mcq = {
     id: createId("mcq"),
     type: "mcq",
-    studyMode: getValue("study-mode"),
     subject: getValue("mcq-subject"),
     source: getValue("mcq-source"),
     pageNumber: getValue("mcq-page-number"),
@@ -312,7 +271,6 @@ function handleFlashcardSubmit(event) {
   const flashcard = {
     id: createId("flashcard"),
     type: "flashcard",
-    studyMode: getValue("study-mode"),
     subject: getValue("flashcard-subject"),
     source: getValue("flashcard-source"),
     flashcardNumber: getValue("flashcard-number"),
@@ -331,7 +289,6 @@ function handleFlashcardSubmit(event) {
 function resetForm(form) {
   form.reset();
   setupRatingDropdowns();
-  setupStudyModeDropdown();
   populateSubjectDropdowns();
   populateSourceDropdowns();
 }
