@@ -269,6 +269,63 @@ h2 {
   display: none;
 }
 
+/* Review matrix */
+
+.bcc-review-row {
+  padding: 18px 0;
+}
+
+.bcc-review-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.bcc-review-cell {
+  border: 1px solid #dddddd;
+  border-radius: 10px;
+  padding: 14px;
+  background: #ffffff;
+}
+
+.bcc-review-cell.due {
+  border-color: #111111;
+}
+
+.bcc-review-cell.completed {
+  background: #f2f2f2;
+  color: #777777;
+}
+
+.bcc-review-label {
+  font-size: 12px;
+  color: #666666;
+  margin-bottom: 4px;
+}
+
+.bcc-review-date {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.bcc-review-cell .bcc-small-button {
+  width: 100%;
+  border: 1px solid #111111;
+  background: #111111;
+  color: #ffffff;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.bcc-review-cell .bcc-small-button:disabled {
+  background: #cccccc;
+  border-color: #cccccc;
+  color: #666666;
+  cursor: default;
+}
+
 @media (max-width: 760px) {
   .bcc-header {
     padding: 16px 18px 10px;
@@ -296,6 +353,12 @@ h2 {
 
   .bcc-card-number {
     font-size: 30px;
+  }
+}
+
+@media (max-width: 700px) {
+  .bcc-review-grid {
+    grid-template-columns: 1fr;
   }
 }
 
