@@ -453,13 +453,10 @@ function renderPlanner() {
   setText("planner-cycle", "Daily totals. Minimums. Reviews. Nothing extra.");
 
   const plannerSubjects = document.getElementById("planner-subjects");
-  if (plannerSubjects) {
-    const subjectList = Array.isArray(sessionPlan.subjects) && sessionPlan.subjects.length > 0
-      ? sessionPlan.subjects.join(" + ")
-      : "No required subject today";
-
-    plannerSubjects.innerHTML = `<div class="bcc-mission-subjects">${escapeHtml(subjectList)}</div>`;
-  }
+if (plannerSubjects) {
+  plannerSubjects.innerHTML =
+    `<div class="bcc-mission-subjects">No assigned subject. Log today's work.</div>`;
+}
 
   const essaysToday = getTodayCount(essays);
   const mcqsToday = getTodayMcqTotal();
