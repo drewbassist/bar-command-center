@@ -298,12 +298,18 @@ function handleMcqSubmit(event) {
 function handleFlashcardSubmit(event) {
   event.preventDefault();
 
+  const startCard = getValue("flashcard-start-card");
+  const endCard = getValue("flashcard-end-card");
+  const countFromRange = getCountFromRange(startCard, endCard);
+
   const flashcard = {
     id: createId("flashcard"),
     type: "flashcard",
     subject: getValue("flashcard-subject"),
     source: getValue("flashcard-source"),
-    count: Number(getValue("flashcard-count")) || 0,
+    startCard,
+    endCard,
+    count: Number(getValue("flashcard-count")) || countFromRange || 0,
     newCount: Number(getValue("flashcard-new-count")) || 0,
     rating: Number(getValue("flashcard-rating")),
     notes: getValue("flashcard-notes"),
@@ -500,7 +506,7 @@ function renderEssays() {
     <div class="bcc-item">
       <div class="bcc-item-title">${escapeHtml(essay.title || "Untitled Essay")}</div>
       <div class="bcc-item-meta">
-        ${escapeHtml(getSubjectName(essay.subject))} · ${escapeHtml(essay.source)} · ${escapeHtml(essay.pageNumber || "No page number")} · ${escapeHtml(essay.questionNumber || "No question number")}
+        ${escapeHtml(getSubjectName(essay.subject))} · ${escapeHtml(essay.source || "No source")} · ${escapeHtml(essay.pageNumber || "No page number")} · ${escapeHtml(essay.questionNumber || "No question number")}
       </div>
       <div class="bcc-rating">Rating: ${essay.rating}/10 · Next Review: ${formatDate(getNextReviewDate(essay.id, "essay"))}</div>
       ${essay.notes ? `<div class="bcc-item-notes">${escapeHtml(essay.notes)}</div>` : ""}
@@ -544,9 +550,9 @@ function renderFlashcards() {
   list.className = "";
   list.innerHTML = flashcards.map((card) => `
     <div class="bcc-item">
-      <div class="bcc-item-title">${escapeHtml(getSubjectName(card.subject))} · ${Number(card.count) || 0} cards reviewed</div>
+      <div class="bcc-item-title">${escapeHtml(getFlashcardTitle(card))}</div>
       <div class="bcc-item-meta">
-        ${escapeHtml(card.source || "No source")} · ${Number(card.newCount) || 0} new cards
+        ${escapeHtml(card.source || "No source")} · ${Number(card.count) || 0} cards reviewed · ${Number(card.newCount) || 0} new cards
       </div>
       <div class="bcc-rating">Rating: ${card.rating}/10 · Next Review: ${formatDate(getNextReviewDate(card.id, "flashcard"))}</div>
       ${card.notes ? `<div class="bcc-item-notes">${escapeHtml(card.notes)}</div>` : ""}
@@ -587,12 +593,47 @@ function renderReviews() {
     return;
   }
 
-  const sortedReviews = [...reviews].sort((a, b) => {
-    return new Date(a.dueDate) - new Date(b.dueDate);
-  });
+  const groups = getReviewGroups();
+
+  if (groups.length === 0) {
+    list.className = "bcc-list-empty";
+    list.textContent = "No reviews scheduled yet.";
+    return;
+  }
 
   list.className = "";
-  list.innerHTML = sortedReviews.map(renderReviewItem).join("");
+  list.innerHTML = groups.map(renderReviewGroup).join("");
+}
+
+function renderReviewGroup(group) {
+  const item = findItem(group.itemId, group.itemType);
+  const title = getItemTitle(item, group.itemType);
+  const subject = getSubjectName(group.subject);
+
+  const cells = group.reviews.map((review) => {
+    const isCompleted = review.status === "completed";
+    const isDue = review.status === "pending" && review.dueDate <= todayString();
+
+    return `
+      <div class="bcc-review-cell ${isCompleted ? "completed" : ""} ${isDue ? "due" : ""}">
+        <div class="bcc-review-label">Day ${escapeHtml(review.intervalDays || "")}</div>
+        <div class="bcc-review-date">${formatDate(review.dueDate)}</div>
+        <button class="bcc-small-button" onclick="completeReview('${escapeHtml(review.id)}')" ${isCompleted ? "disabled" : ""}>
+          ${isCompleted ? "Reviewed" : "Mark Reviewed"}
+        </button>
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div class="bcc-item bcc-review-row">
+      <div class="bcc-item-title">${escapeHtml(title)}</div>
+      <div class="bcc-item-meta">${escapeHtml(getTypeLabel(group.itemType))} · ${escapeHtml(subject)}</div>
+      <div class="bcc-review-grid">
+        ${cells}
+      </div>
+    </div>
+  `;
 }
 
 function renderReviewItem(review) {
@@ -656,6 +697,44 @@ function renderStats() {
       <div class="bcc-item-meta">Total completed sessions: ${sessionHistory.length}</div>
     </div>
   `;
+}
+
+function getReviewGroups() {
+  const groups = {};
+
+  reviews.forEach((review) => {
+    const key = `${review.itemType}_${review.itemId}`;
+
+    if (!groups[key]) {
+      groups[key] = {
+        itemId: review.itemId,
+        itemType: review.itemType,
+        subject: review.subject,
+        reviews: []
+      };
+    }
+
+    groups[key].reviews.push(review);
+  });
+
+  return Object.values(groups)
+    .map((group) => {
+      group.reviews.sort((a, b) => Number(a.reviewNumber) - Number(b.reviewNumber));
+      return group;
+    })
+    .sort((a, b) => {
+      const nextA = getGroupNextDueDate(a);
+      const nextB = getGroupNextDueDate(b);
+      return new Date(nextA || "9999-12-31") - new Date(nextB || "9999-12-31");
+    });
+}
+
+function getGroupNextDueDate(group) {
+  const pending = group.reviews
+    .filter((review) => review.status === "pending")
+    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+  return pending.length > 0 ? pending[0].dueDate : "";
 }
 
 function countSessionsSince(days) {
@@ -756,10 +835,29 @@ function getItemTitle(item, type) {
 
   if (type === "essay") return item.title || "Untitled Essay";
   if (type === "mcq") return `${getSubjectName(item.subject)} MCQ Session`;
-  if (type === "flashcard") return `${getSubjectName(item.subject)} Flashcard Session`;
+  if (type === "flashcard") return getFlashcardTitle(item);
   if (type === "lecture") return item.title || `${getSubjectName(item.subject)} Lecture Review`;
 
   return "Untitled Item";
+}
+
+function getFlashcardTitle(card) {
+  if (!card) return "Flashcard Session";
+
+  const subject = getSubjectName(card.subject);
+  const source = card.source || "Flashcards";
+  const start = card.startCard || "";
+  const end = card.endCard || "";
+
+  if (start && end) {
+    return `${subject} · ${source} · Cards ${start}-${end}`;
+  }
+
+  if (start) {
+    return `${subject} · ${source} · Card ${start}`;
+  }
+
+  return `${subject} · ${source} · Flashcard Session`;
 }
 
 function getTypeLabel(type) {
@@ -813,6 +911,21 @@ function getLectureGoal() {
     studyGoals.lectures ||
     0
   );
+}
+
+function getCountFromRange(start, end) {
+  const startNumber = Number(start);
+  const endNumber = Number(end);
+
+  if (!Number.isFinite(startNumber) || !Number.isFinite(endNumber)) {
+    return 0;
+  }
+
+  if (endNumber < startNumber) {
+    return 0;
+  }
+
+  return endNumber - startNumber + 1;
 }
 
 function getSubjectName(subjectId) {
