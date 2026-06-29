@@ -4,7 +4,7 @@ let subjects = [];
 let essaySources = [];
 let mcqSources = [];
 let flashcardSources = [];
-let lectureSources = [];
+
 let studyGoals = {};
 let studyCycle = [];
 
@@ -38,7 +38,7 @@ async function loadData() {
   essaySources = await loadJson("essaySources.json", []);
   mcqSources = await loadJson("mcqSources.json", []);
   flashcardSources = await loadJson("flashcardSources.json", []);
-  lectureSources = await loadJson("lectureSources.json", []);
+  
   studyGoals = await loadJson("studyGoals.json", {});
   studyCycle = await loadJson("studyCycle.json", []);
 
@@ -215,7 +215,7 @@ function populateSourceDropdowns() {
   populateDropdown("essay-source", essaySources);
   populateDropdown("mcq-source", mcqSources);
   populateDropdown("flashcard-source", flashcardSources);
-  populateDropdown("lecture-source", lectureSources);
+
 }
 
 function populateDropdown(id, items) {
@@ -319,7 +319,7 @@ function handleLectureSubmit(event) {
     id: createId("lecture"),
     type: "lecture",
     subject: getValue("lecture-subject"),
-    source: getValue("lecture-source"),
+    source: "AIL",
     title: getValue("lecture-title"),
     minutes: Number(getValue("lecture-minutes")) || 0,
     rating: Number(getValue("lecture-rating")),
