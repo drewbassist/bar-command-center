@@ -4,12 +4,14 @@ let subjects = [];
 let essaySources = [];
 let mcqSources = [];
 let flashcardSources = [];
+let lectureSources = [];
 let studyGoals = {};
 let studyCycle = [];
 
 let essays = [];
 let mcqs = [];
 let flashcards = [];
+let lectures = [];
 let reviews = [];
 let sessionHistory = [];
 let currentSession = 1;
@@ -20,6 +22,7 @@ async function init() {
   await loadData();
 
   setupNavigation();
+  setupViewJumpButtons();
   setupRatingDropdowns();
   populateSubjectDropdowns();
   populateSourceDropdowns();
@@ -35,12 +38,14 @@ async function loadData() {
   essaySources = await loadJson("essaySources.json", []);
   mcqSources = await loadJson("mcqSources.json", []);
   flashcardSources = await loadJson("flashcardSources.json", []);
+  lectureSources = await loadJson("lectureSources.json", []);
   studyGoals = await loadJson("studyGoals.json", {});
   studyCycle = await loadJson("studyCycle.json", []);
 
   essays = loadLocalData("bcc_essays", await loadJson("essays.json", []));
   mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
   flashcards = loadLocalData("bcc_flashcards", await loadJson("flashcards.json", []));
+  lectures = loadLocalData("bcc_lectures", await loadJson("lectures.json", []));
   reviews = loadLocalData("bcc_reviews", await loadJson("reviews.json", []));
   sessionHistory = loadLocalData("bcc_session_history", []);
 
@@ -84,6 +89,7 @@ function saveData() {
   localStorage.setItem("bcc_essays", JSON.stringify(essays));
   localStorage.setItem("bcc_mcqs", JSON.stringify(mcqs));
   localStorage.setItem("bcc_flashcards", JSON.stringify(flashcards));
+  localStorage.setItem("bcc_lectures", JSON.stringify(lectures));
   localStorage.setItem("bcc_reviews", JSON.stringify(reviews));
   localStorage.setItem("bcc_session_history", JSON.stringify(sessionHistory));
   localStorage.setItem("bcc_current_session", String(currentSession));
@@ -93,7 +99,7 @@ function setupNavigation() {
   const buttons = document.querySelectorAll(".bcc-nav-button");
   const views = document.querySelectorAll(".bcc-view");
 
-  function activateView(viewId) {
+  window.activateBccView = function (viewId) {
     const targetView = document.getElementById(viewId);
     if (!targetView) return;
 
@@ -106,16 +112,29 @@ function setupNavigation() {
     });
 
     localStorage.setItem("bcc_active_view", viewId);
-  }
+  };
 
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
-      activateView(button.dataset.view);
+      window.activateBccView(button.dataset.view);
     });
   });
 
   const savedView = localStorage.getItem("bcc_active_view") || "dashboard";
-  activateView(savedView);
+  window.activateBccView(savedView);
+}
+
+function setupViewJumpButtons() {
+  const jumpButtons = document.querySelectorAll("[data-view-jump]");
+
+  jumpButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const viewId = button.dataset.viewJump;
+      if (window.activateBccView) {
+        window.activateBccView(viewId);
+      }
+    });
+  });
 }
 
 function setupSessionButton() {
@@ -135,7 +154,8 @@ function completeCurrentSession() {
     subjects: sessionInfo.sessionPlan.subjects,
     essaysTarget: studyGoals.essaysPerDay || 0,
     mcqsTarget: studyGoals.mcqsPerDay || 0,
-    flashcardsTarget: studyGoals.flashcardsPerDay || 0
+    flashcardsTarget: studyGoals.flashcardsPerDay || 0,
+    lecturesTarget: studyGoals.lecturesPerDay || studyGoals.lectureReviewsPerDay || 0
   });
 
   currentSession += 1;
@@ -152,6 +172,7 @@ function setupRatingDropdowns() {
   populateNumberDropdown("essay-rating", 1, 10, "5");
   populateNumberDropdown("mcq-rating", 1, 10, "5");
   populateNumberDropdown("flashcard-rating", 1, 10, "5");
+  populateNumberDropdown("lecture-rating", 1, 10, "5");
 }
 
 function populateNumberDropdown(id, min, max, selectedValue) {
@@ -174,6 +195,7 @@ function populateSubjectDropdowns() {
   populateSubjectDropdown("essay-subject");
   populateSubjectDropdown("mcq-subject");
   populateSubjectDropdown("flashcard-subject");
+  populateSubjectDropdown("lecture-subject");
 }
 
 function populateSubjectDropdown(id) {
@@ -194,6 +216,7 @@ function populateSourceDropdowns() {
   populateDropdown("essay-source", essaySources);
   populateDropdown("mcq-source", mcqSources);
   populateDropdown("flashcard-source", flashcardSources);
+  populateDropdown("lecture-source", lectureSources);
 }
 
 function populateDropdown(id, items) {
@@ -214,10 +237,12 @@ function setupForms() {
   const essayForm = document.getElementById("essay-form");
   const mcqForm = document.getElementById("mcq-form");
   const flashcardForm = document.getElementById("flashcard-form");
+  const lectureForm = document.getElementById("lecture-form");
 
   if (essayForm) essayForm.addEventListener("submit", handleEssaySubmit);
   if (mcqForm) mcqForm.addEventListener("submit", handleMcqSubmit);
   if (flashcardForm) flashcardForm.addEventListener("submit", handleFlashcardSubmit);
+  if (lectureForm) lectureForm.addEventListener("submit", handleLectureSubmit);
 }
 
 function handleEssaySubmit(event) {
@@ -287,6 +312,28 @@ function handleFlashcardSubmit(event) {
   renderAll();
 }
 
+function handleLectureSubmit(event) {
+  event.preventDefault();
+
+  const lecture = {
+    id: createId("lecture"),
+    type: "lecture",
+    subject: getValue("lecture-subject"),
+    source: getValue("lecture-source"),
+    title: getValue("lecture-title"),
+    minutes: Number(getValue("lecture-minutes")) || 0,
+    rating: Number(getValue("lecture-rating")),
+    notes: getValue("lecture-notes"),
+    completedDate: todayString()
+  };
+
+  lectures.push(lecture);
+  createReviewsForItem(lecture);
+  saveData();
+  resetForm(event.target);
+  renderAll();
+}
+
 function resetForm(form) {
   form.reset();
   setupRatingDropdowns();
@@ -330,6 +377,7 @@ function exportBackup() {
     essays,
     mcqs,
     flashcards,
+    lectures,
     reviews,
     sessionHistory,
     currentSession
@@ -364,6 +412,7 @@ function importBackup(event) {
       essays = Array.isArray(backup.essays) ? backup.essays : [];
       mcqs = Array.isArray(backup.mcqs) ? backup.mcqs : [];
       flashcards = Array.isArray(backup.flashcards) ? backup.flashcards : [];
+      lectures = Array.isArray(backup.lectures) ? backup.lectures : [];
       reviews = Array.isArray(backup.reviews) ? backup.reviews : [];
       sessionHistory = Array.isArray(backup.sessionHistory) ? backup.sessionHistory : [];
       currentSession = Number(backup.currentSession || 1);
@@ -391,6 +440,7 @@ function renderAll() {
   renderEssays();
   renderMcqs();
   renderFlashcards();
+  renderLectures();
   renderReviews();
   renderDashboard();
   renderStats();
@@ -401,20 +451,21 @@ function renderPlanner() {
   const sessionPlan = sessionInfo.sessionPlan;
   const cycleTotal = studyCycle.length || 0;
 
-  setText("planner-cycle", `Session ${sessionInfo.sessionNumber} of ${cycleTotal}`);
+  setText("planner-cycle", "Choose what you studied. Minimums still track below.");
 
   const plannerSubjects = document.getElementById("planner-subjects");
   if (plannerSubjects) {
     const subjectList = Array.isArray(sessionPlan.subjects) && sessionPlan.subjects.length > 0
       ? sessionPlan.subjects.join(" + ")
-      : "Unassigned";
+      : "No required subject today";
 
     plannerSubjects.innerHTML = `<div class="bcc-mission-subjects">${escapeHtml(subjectList)}</div>`;
   }
 
-  setText("dashboard-essays-target", studyGoals.essaysPerDay || 0);
-  setText("dashboard-mcqs-target", studyGoals.mcqsPerDay || 0);
-  setText("dashboard-flashcards-target", studyGoals.flashcardsPerDay || 0);
+  setText("dashboard-essays-target", getTodayCount(essays));
+  setText("dashboard-mcqs-target", getTodayCount(mcqs));
+  setText("dashboard-flashcards-target", getTodayCount(flashcards));
+  setText("dashboard-lectures-target", getTodayCount(lectures));
 
   renderSessionMap(sessionInfo.sessionNumber);
 }
@@ -545,6 +596,31 @@ function renderFlashcards() {
   }).join("");
 }
 
+function renderLectures() {
+  const list = document.getElementById("lecture-list");
+  if (!list) return;
+
+  if (lectures.length === 0) {
+    list.className = "bcc-list-empty";
+    list.textContent = "No lecture reviews added yet.";
+    return;
+  }
+
+  list.className = "";
+  list.innerHTML = lectures.map((lecture) => {
+    return `
+      <div class="bcc-item">
+        <div class="bcc-item-title">${escapeHtml(lecture.title || "Untitled Lecture")}</div>
+        <div class="bcc-item-meta">
+          ${escapeHtml(getSubjectName(lecture.subject))} · ${escapeHtml(lecture.source || "No source")} · ${escapeHtml(lecture.minutes || 0)} min
+        </div>
+        <div class="bcc-rating">Rating: ${lecture.rating}/10 · Next Review: ${formatDate(getNextReviewDate(lecture.id, "lecture"))}</div>
+        ${lecture.notes ? `<div class="bcc-item-notes">${escapeHtml(lecture.notes)}</div>` : ""}
+      </div>
+    `;
+  }).join("");
+}
+
 function renderReviews() {
   const list = document.getElementById("review-list");
   if (!list) return;
@@ -571,7 +647,7 @@ function renderReviewItem(review) {
     <div class="bcc-item">
       <div class="bcc-item-title">${escapeHtml(title)}</div>
       <div class="bcc-item-meta">
-        ${escapeHtml(capitalize(review.itemType))} · ${escapeHtml(getSubjectName(review.subject))} · Review ${escapeHtml(review.reviewNumber || "")} · Due ${formatDate(review.dueDate)} · ${escapeHtml(capitalize(review.status))}
+        ${escapeHtml(getTypeLabel(review.itemType))} · ${escapeHtml(getSubjectName(review.subject))} · Review ${escapeHtml(review.reviewNumber || "")} · Due ${formatDate(review.dueDate)} · ${escapeHtml(capitalize(review.status))}
       </div>
       ${
         review.status === "pending"
@@ -601,6 +677,7 @@ function renderStats() {
   setText("stats-essays", essays.length);
   setText("stats-mcqs", mcqs.length);
   setText("stats-flashcards", flashcards.length);
+  setText("stats-lectures", lectures.length);
   setText("stats-reviews", pendingReviews);
 
   const statsSection = document.getElementById("stats");
@@ -633,6 +710,11 @@ function countSessionsSince(days) {
   }).length;
 }
 
+function getTodayCount(items) {
+  const today = todayString();
+  return items.filter((item) => item.completedDate === today).length;
+}
+
 function getDueReviews() {
   const today = todayString();
 
@@ -657,6 +739,7 @@ function findItem(id, type) {
   if (type === "essay") return essays.find((item) => item.id === id);
   if (type === "mcq") return mcqs.find((item) => item.id === id);
   if (type === "flashcard") return flashcards.find((item) => item.id === id);
+  if (type === "lecture") return lectures.find((item) => item.id === id);
   return null;
 }
 
@@ -666,8 +749,15 @@ function getItemTitle(item, type) {
   if (type === "essay") return item.title || "Untitled Essay";
   if (type === "mcq") return `${getSubjectName(item.subject)} MCQ ${item.questionNumber || ""}`;
   if (type === "flashcard") return `${getSubjectName(item.subject)} Flashcard ${item.flashcardNumber || ""}`;
+  if (type === "lecture") return item.title || `${getSubjectName(item.subject)} Lecture Review`;
 
   return "Untitled Item";
+}
+
+function getTypeLabel(type) {
+  if (type === "mcq") return "MCQ";
+  if (type === "lecture") return "Lecture Review";
+  return capitalize(type);
 }
 
 function getSubjectName(subjectId) {
