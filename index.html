@@ -35,7 +35,7 @@
         <div class="bcc-today-actions">
           <button class="bcc-session-button" data-view-jump="essays">Log Essay</button>
           <button class="bcc-session-button" data-view-jump="mcqs">Log MCQ</button>
-          <button class="bcc-session-button" data-view-jump="flashcards">Log Flashcard</button>
+          <button class="bcc-session-button" data-view-jump="flashcards">Log Flashcard Session</button>
           <button class="bcc-session-button" data-view-jump="lectures">Log Lecture Review</button>
         </div>
 
@@ -187,7 +187,7 @@
 
     <section id="flashcards" class="bcc-view">
       <div class="bcc-panel">
-        <h2>Log Flashcard</h2>
+        <h2>Log Flashcard Session</h2>
 
         <form id="flashcard-form" class="bcc-form">
           <label>
@@ -201,8 +201,13 @@
           </label>
 
           <label>
-            Flashcard Number
-            <input id="flashcard-number" type="text" placeholder="143" />
+            Cards Reviewed
+            <input id="flashcard-count" type="number" min="0" placeholder="30" />
+          </label>
+
+          <label>
+            New Cards
+            <input id="flashcard-new-count" type="number" min="0" placeholder="0" />
           </label>
 
           <label>
@@ -212,16 +217,16 @@
 
           <label>
             Notes
-            <textarea id="flashcard-notes" placeholder="Rule, exception, mnemonic, or anything worth remembering"></textarea>
+            <textarea id="flashcard-notes" placeholder="Rules missed, weak areas, exceptions, or anything worth remembering"></textarea>
           </label>
 
-          <button type="submit">Save Flashcard</button>
+          <button type="submit">Save Flashcard Session</button>
         </form>
       </div>
 
       <div class="bcc-panel">
-        <h2>Recent Flashcards</h2>
-        <div id="flashcard-list" class="bcc-list-empty">No flashcards added yet.</div>
+        <h2>Recent Flashcard Sessions</h2>
+        <div id="flashcard-list" class="bcc-list-empty">No flashcard sessions added yet.</div>
       </div>
     </section>
 
