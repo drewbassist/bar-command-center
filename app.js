@@ -29,7 +29,7 @@ async function init() {
   populateSubjectDropdowns();
   populateSourceDropdowns();
   setupForms();
-  setupSessionButton();
+
   setupStudyModeSelector();
   setupBackupButtons();
 
