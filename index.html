@@ -34,7 +34,7 @@
 
         <div class="bcc-today-actions">
           <button class="bcc-session-button" data-view-jump="essays">Log Essay</button>
-          <button class="bcc-session-button" data-view-jump="mcqs">Log MCQ</button>
+          <button class="bcc-session-button" data-view-jump="mcqs">Log MCQ Session</button>
           <button class="bcc-session-button" data-view-jump="flashcards">Log Flashcard Session</button>
           <button class="bcc-session-button" data-view-jump="lectures">Log Lecture Review</button>
         </div>
@@ -134,7 +134,7 @@
 
     <section id="mcqs" class="bcc-view">
       <div class="bcc-panel">
-        <h2>Log MCQ</h2>
+        <h2>Log MCQ Session</h2>
 
         <form id="mcq-form" class="bcc-form">
           <label>
@@ -148,21 +148,13 @@
           </label>
 
           <label>
-            Page Number
-            <input id="mcq-page-number" type="text" placeholder="Page 42" />
+            Questions Completed
+            <input id="mcq-count" type="number" min="0" placeholder="40" />
           </label>
 
           <label>
-            Question Number
-            <input id="mcq-question-number" type="text" placeholder="143" />
-          </label>
-
-          <label>
-            Correct?
-            <select id="mcq-correct">
-              <option value="true">Yes</option>
-              <option value="false">No</option>
-            </select>
+            Correct
+            <input id="mcq-correct-count" type="number" min="0" placeholder="31" />
           </label>
 
           <label>
@@ -172,16 +164,16 @@
 
           <label>
             Notes
-            <textarea id="mcq-notes" placeholder="Why correct, why wrong, rule weakness"></textarea>
+            <textarea id="mcq-notes" placeholder="Rules missed, weak areas, timing, or patterns"></textarea>
           </label>
 
-          <button type="submit">Save MCQ</button>
+          <button type="submit">Save MCQ Session</button>
         </form>
       </div>
 
       <div class="bcc-panel">
-        <h2>Recent MCQs</h2>
-        <div id="mcq-list" class="bcc-list-empty">No MCQs added yet.</div>
+        <h2>Recent MCQ Sessions</h2>
+        <div id="mcq-list" class="bcc-list-empty">No MCQ sessions added yet.</div>
       </div>
     </section>
 
