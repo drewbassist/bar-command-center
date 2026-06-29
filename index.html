@@ -33,8 +33,43 @@
     <section id="dashboard" class="bcc-view">
       <div class="bcc-panel">
         <h2 id="planner-title">Today</h2>
-        <div id="planner-cycle" class="bcc-item-meta">Choose what you studied. Minimums still track below.</div>
+        <div id="planner-cycle" class="bcc-item-meta">Daily totals. Minimums. Reviews. Nothing extra.</div>
         <div id="planner-subjects" class="bcc-item-title"></div>
+      </div>
+
+      <div class="bcc-panel">
+        <h2>Today's Totals</h2>
+
+        <div class="bcc-grid">
+          <div class="bcc-card">
+            <div class="bcc-card-label">Essays</div>
+            <div class="bcc-card-number" id="dashboard-essays-target">0</div>
+          </div>
+
+          <div class="bcc-card">
+            <div class="bcc-card-label">MCQs</div>
+            <div class="bcc-card-number" id="dashboard-mcqs-target">0</div>
+          </div>
+
+          <div class="bcc-card">
+            <div class="bcc-card-label">Flashcards</div>
+            <div class="bcc-card-number" id="dashboard-flashcards-target">0</div>
+          </div>
+
+          <div class="bcc-card">
+            <div class="bcc-card-label">Lecture Minutes</div>
+            <div class="bcc-card-number" id="dashboard-lectures-target">0</div>
+          </div>
+
+          <div class="bcc-card">
+            <div class="bcc-card-label">Reviews Due</div>
+            <div class="bcc-card-number" id="dashboard-reviews-due">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bcc-panel">
+        <h2>Quick Log</h2>
 
         <div class="bcc-today-actions">
           <button class="bcc-session-button" data-view-jump="essays">Log Essay</button>
@@ -42,42 +77,40 @@
           <button class="bcc-session-button" data-view-jump="flashcards">Log Flashcard Session</button>
           <button class="bcc-session-button" data-view-jump="lectures">Log Lecture Review</button>
         </div>
-
-        <button id="complete-session-button" class="bcc-session-button">
-          Complete Session
-        </button>
-      </div>
-
-      <div class="bcc-grid">
-        <div class="bcc-card">
-          <div class="bcc-card-label">Essays Today</div>
-          <div class="bcc-card-number" id="dashboard-essays-target">0</div>
-        </div>
-
-        <div class="bcc-card">
-          <div class="bcc-card-label">MCQs Today</div>
-          <div class="bcc-card-number" id="dashboard-mcqs-target">0</div>
-        </div>
-
-        <div class="bcc-card">
-          <div class="bcc-card-label">Flashcards Today</div>
-          <div class="bcc-card-number" id="dashboard-flashcards-target">0</div>
-        </div>
-
-        <div class="bcc-card">
-          <div class="bcc-card-label">Lecture Review Today</div>
-          <div class="bcc-card-number" id="dashboard-lectures-target">0</div>
-        </div>
-
-        <div class="bcc-card">
-          <div class="bcc-card-label">Reviews Due</div>
-          <div class="bcc-card-number" id="dashboard-reviews-due">0</div>
-        </div>
       </div>
 
       <div class="bcc-panel">
-        <h2>Cycle Map</h2>
-        <div id="cycle-map" class="bcc-cycle-map"></div>
+        <h2>Minimums</h2>
+
+        <div class="bcc-list">
+          <div class="bcc-item">
+            <div class="bcc-item-title">Essays</div>
+            <div class="bcc-item-meta">
+              <span id="dashboard-essays-target-minimum">0</span> completed today
+            </div>
+          </div>
+
+          <div class="bcc-item">
+            <div class="bcc-item-title">MCQs</div>
+            <div class="bcc-item-meta">
+              <span id="dashboard-mcqs-target-minimum">0</span> completed today
+            </div>
+          </div>
+
+          <div class="bcc-item">
+            <div class="bcc-item-title">Flashcards</div>
+            <div class="bcc-item-meta">
+              <span id="dashboard-flashcards-target-minimum">0</span> reviewed today
+            </div>
+          </div>
+
+          <div class="bcc-item">
+            <div class="bcc-item-title">Lecture Review</div>
+            <div class="bcc-item-meta">
+              <span id="dashboard-lectures-target-minimum">0</span> minutes reviewed today
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="bcc-panel">
