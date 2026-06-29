@@ -151,10 +151,10 @@ function completeCurrentSession() {
     sessionNumber: sessionInfo.sessionNumber,
     completedDate: todayString(),
     subjects: sessionInfo.sessionPlan.subjects,
-    essaysTarget: studyGoals.essaysPerDay || 0,
-    mcqsTarget: studyGoals.mcqsPerDay || 0,
-    flashcardsTarget: studyGoals.flashcardsPerDay || 0,
-    lecturesTarget: studyGoals.lecturesPerDay || studyGoals.lectureReviewsPerDay || 0
+    essaysTarget: getEssayGoal(),
+    mcqsTarget: getMcqGoal(),
+    flashcardsTarget: getFlashcardGoal(),
+    lecturesTarget: getLectureGoal()
   });
 
   currentSession += 1;
@@ -447,17 +447,6 @@ function renderAll() {
 }
 
 function renderPlanner() {
-  const sessionInfo = getCurrentSessionInfo();
-  const sessionPlan = sessionInfo.sessionPlan;
-
-  setText("planner-cycle", "Daily totals. Minimums. Reviews. Nothing extra.");
-
-  const plannerSubjects = document.getElementById("planner-subjects");
-if (plannerSubjects) {
-  plannerSubjects.innerHTML =
-    `<div class="bcc-mission-subjects">No assigned subject. Log today's work.</div>`;
-}
-
   const essaysToday = getTodayCount(essays);
   const mcqsToday = getTodayMcqTotal();
   const flashcardsToday = getTodayFlashcardTotal();
@@ -472,6 +461,11 @@ if (plannerSubjects) {
   setText("dashboard-mcqs-target-minimum", mcqsToday);
   setText("dashboard-flashcards-target-minimum", flashcardsToday);
   setText("dashboard-lectures-target-minimum", lectureMinutesToday);
+
+  setText("dashboard-essays-goal", getEssayGoal());
+  setText("dashboard-mcqs-goal", getMcqGoal());
+  setText("dashboard-flashcards-goal", getFlashcardGoal());
+  setText("dashboard-lectures-goal", getLectureGoal());
 }
 
 function renderDashboard() {
@@ -790,6 +784,35 @@ function getCurrentSessionInfo() {
     sessionNumber: currentSession,
     sessionPlan
   };
+}
+
+function getEssayGoal() {
+  return Number(studyGoals.essaysPerDay || studyGoals.essayGoal || studyGoals.essays || 0);
+}
+
+function getMcqGoal() {
+  return Number(studyGoals.mcqsPerDay || studyGoals.mcqGoal || studyGoals.mcqs || 0);
+}
+
+function getFlashcardGoal() {
+  return Number(
+    studyGoals.flashcardsPerDay ||
+    studyGoals.flashcardGoal ||
+    studyGoals.flashcards ||
+    studyGoals.cardsPerDay ||
+    0
+  );
+}
+
+function getLectureGoal() {
+  return Number(
+    studyGoals.lectureMinutesPerDay ||
+    studyGoals.lecturesPerDay ||
+    studyGoals.lectureReviewsPerDay ||
+    studyGoals.lectureGoal ||
+    studyGoals.lectures ||
+    0
+  );
 }
 
 function getSubjectName(subjectId) {
