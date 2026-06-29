@@ -474,7 +474,7 @@ function importBackup(event) {
 }
 
 function renderAll() {
-  
+  renderPlanner();
   renderEssays();
   renderMcqs();
   renderFlashcards();
