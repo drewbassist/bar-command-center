@@ -38,7 +38,7 @@ async function loadData() {
   essaySources = await loadJson("essaySources.json", []);
   mcqSources = await loadJson("mcqSources.json", []);
   flashcardSources = await loadJson("flashcardSources.json", []);
-  
+
   studyGoals = await loadJson("studyGoals.json", {});
   studyCycle = await loadJson("studyCycle.json", []);
 
@@ -215,7 +215,6 @@ function populateSourceDropdowns() {
   populateDropdown("essay-source", essaySources);
   populateDropdown("mcq-source", mcqSources);
   populateDropdown("flashcard-source", flashcardSources);
-
 }
 
 function populateDropdown(id, items) {
@@ -270,14 +269,20 @@ function handleEssaySubmit(event) {
 function handleMcqSubmit(event) {
   event.preventDefault();
 
+  const count = Number(getValue("mcq-count")) || 0;
+  const correctCount = Number(getValue("mcq-correct-count")) || 0;
+  const incorrectCount = Math.max(count - correctCount, 0);
+  const accuracy = count > 0 ? Math.round((correctCount / count) * 100) : 0;
+
   const mcq = {
     id: createId("mcq"),
     type: "mcq",
     subject: getValue("mcq-subject"),
     source: getValue("mcq-source"),
-    pageNumber: getValue("mcq-page-number"),
-    questionNumber: getValue("mcq-question-number"),
-    correct: getValue("mcq-correct") === "true",
+    count,
+    correctCount,
+    incorrectCount,
+    accuracy,
     rating: Number(getValue("mcq-rating")),
     notes: getValue("mcq-notes"),
     completedDate: todayString()
@@ -445,7 +450,7 @@ function renderPlanner() {
   const sessionInfo = getCurrentSessionInfo();
   const sessionPlan = sessionInfo.sessionPlan;
 
-  setText("planner-cycle", "Choose what you studied. Minimums still track below.");
+  setText("planner-cycle", "Daily totals. Minimums. Reviews. Nothing extra.");
 
   const plannerSubjects = document.getElementById("planner-subjects");
   if (plannerSubjects) {
@@ -456,48 +461,20 @@ function renderPlanner() {
     plannerSubjects.innerHTML = `<div class="bcc-mission-subjects">${escapeHtml(subjectList)}</div>`;
   }
 
-  setText("dashboard-essays-target", getTodayCount(essays));
-  setText("dashboard-mcqs-target", getTodayCount(mcqs));
-  setText("dashboard-flashcards-target", getTodayFlashcardTotal());
-  setText("dashboard-lectures-target", getTodayLectureMinutes());
+  const essaysToday = getTodayCount(essays);
+  const mcqsToday = getTodayMcqTotal();
+  const flashcardsToday = getTodayFlashcardTotal();
+  const lectureMinutesToday = getTodayLectureMinutes();
 
-  renderSessionMap(sessionInfo.sessionNumber);
-}
+  setText("dashboard-essays-target", essaysToday);
+  setText("dashboard-mcqs-target", mcqsToday);
+  setText("dashboard-flashcards-target", flashcardsToday);
+  setText("dashboard-lectures-target", lectureMinutesToday);
 
-function renderSessionMap(activeSession) {
-  const map = document.getElementById("cycle-map");
-  if (!map) return;
-
-  if (studyCycle.length === 0) {
-    map.innerHTML = `<div class="bcc-list-empty">No study cycle loaded.</div>`;
-    return;
-  }
-
-  map.innerHTML = studyCycle.map((session) => {
-    let className = "bcc-cycle-day";
-
-    if (session.day < activeSession) className += " completed";
-    if (session.day === activeSession) className += " active";
-
-    return `<div class="${className}">Session ${escapeHtml(session.day)}</div>`;
-  }).join("");
-}
-
-function getCurrentSessionInfo() {
-  const cycleLength = studyCycle.length || 1;
-
-  if (currentSession < 1) currentSession = 1;
-  if (currentSession > cycleLength) currentSession = 1;
-
-  const sessionPlan = studyCycle.find((item) => Number(item.day) === Number(currentSession)) || {
-    day: currentSession,
-    subjects: ["Unassigned"]
-  };
-
-  return {
-    sessionNumber: currentSession,
-    sessionPlan
-  };
+  setText("dashboard-essays-target-minimum", essaysToday);
+  setText("dashboard-mcqs-target-minimum", mcqsToday);
+  setText("dashboard-flashcards-target-minimum", flashcardsToday);
+  setText("dashboard-lectures-target-minimum", lectureMinutesToday);
 }
 
 function renderDashboard() {
@@ -546,16 +523,16 @@ function renderMcqs() {
 
   if (mcqs.length === 0) {
     list.className = "bcc-list-empty";
-    list.textContent = "No MCQs added yet.";
+    list.textContent = "No MCQ sessions added yet.";
     return;
   }
 
   list.className = "";
   list.innerHTML = mcqs.map((mcq) => `
     <div class="bcc-item">
-      <div class="bcc-item-title">${escapeHtml(getSubjectName(mcq.subject))} · MCQ ${escapeHtml(mcq.questionNumber || "")}</div>
+      <div class="bcc-item-title">${escapeHtml(getSubjectName(mcq.subject))} · ${getMcqCountValue(mcq)} questions</div>
       <div class="bcc-item-meta">
-        ${escapeHtml(mcq.source)} · ${escapeHtml(mcq.pageNumber || "No page number")} · ${mcq.correct ? "Correct" : "Incorrect"}
+        ${escapeHtml(mcq.source || "No source")} · ${Number(mcq.correctCount) || 0} correct · ${getMcqAccuracy(mcq)}%
       </div>
       <div class="bcc-rating">Rating: ${mcq.rating}/10 · Next Review: ${formatDate(getNextReviewDate(mcq.id, "mcq"))}</div>
       ${mcq.notes ? `<div class="bcc-item-notes">${escapeHtml(mcq.notes)}</div>` : ""}
@@ -601,7 +578,7 @@ function renderLectures() {
     <div class="bcc-item">
       <div class="bcc-item-title">${escapeHtml(lecture.title || "Untitled Lecture")}</div>
       <div class="bcc-item-meta">
-        ${escapeHtml(getSubjectName(lecture.subject))} · ${escapeHtml(lecture.source || "No source")} · ${Number(lecture.minutes) || 0} min
+        ${escapeHtml(getSubjectName(lecture.subject))} · ${escapeHtml(lecture.source || "AIL")} · ${Number(lecture.minutes) || 0} min
       </div>
       <div class="bcc-rating">Rating: ${lecture.rating}/10 · Next Review: ${formatDate(getNextReviewDate(lecture.id, "lecture"))}</div>
       ${lecture.notes ? `<div class="bcc-item-notes">${escapeHtml(lecture.notes)}</div>` : ""}
@@ -663,7 +640,7 @@ function renderStats() {
   const pendingReviews = reviews.filter((review) => review.status === "pending").length;
 
   setText("stats-essays", essays.length);
-  setText("stats-mcqs", mcqs.length);
+  setText("stats-mcqs", getMcqTotal());
   setText("stats-flashcards", getFlashcardTotal());
   setText("stats-lectures", getLectureMinutesTotal());
   setText("stats-reviews", pendingReviews);
@@ -701,6 +678,36 @@ function countSessionsSince(days) {
 function getTodayCount(items) {
   const today = todayString();
   return items.filter((item) => item.completedDate === today).length;
+}
+
+function getTodayMcqTotal() {
+  const today = todayString();
+  return mcqs
+    .filter((mcq) => mcq.completedDate === today)
+    .reduce((total, mcq) => total + getMcqCountValue(mcq), 0);
+}
+
+function getMcqTotal() {
+  return mcqs.reduce((total, mcq) => total + getMcqCountValue(mcq), 0);
+}
+
+function getMcqCountValue(mcq) {
+  if (Number(mcq.count) > 0) return Number(mcq.count);
+
+  if (mcq.questionNumber || typeof mcq.correct === "boolean") {
+    return 1;
+  }
+
+  return 0;
+}
+
+function getMcqAccuracy(mcq) {
+  const count = getMcqCountValue(mcq);
+  const correct = Number(mcq.correctCount) || (mcq.correct ? 1 : 0);
+
+  if (count <= 0) return 0;
+
+  return Math.round((correct / count) * 100);
 }
 
 function getTodayFlashcardTotal() {
@@ -757,7 +764,7 @@ function getItemTitle(item, type) {
   if (!item) return "Missing Item";
 
   if (type === "essay") return item.title || "Untitled Essay";
-  if (type === "mcq") return `${getSubjectName(item.subject)} MCQ ${item.questionNumber || ""}`;
+  if (type === "mcq") return `${getSubjectName(item.subject)} MCQ Session`;
   if (type === "flashcard") return `${getSubjectName(item.subject)} Flashcard Session`;
   if (type === "lecture") return item.title || `${getSubjectName(item.subject)} Lecture Review`;
 
@@ -765,10 +772,27 @@ function getItemTitle(item, type) {
 }
 
 function getTypeLabel(type) {
-  if (type === "mcq") return "MCQ";
+  if (type === "mcq") return "MCQ Session";
   if (type === "flashcard") return "Flashcard Session";
   if (type === "lecture") return "Lecture Review";
   return capitalize(type);
+}
+
+function getCurrentSessionInfo() {
+  const cycleLength = studyCycle.length || 1;
+
+  if (currentSession < 1) currentSession = 1;
+  if (currentSession > cycleLength) currentSession = 1;
+
+  const sessionPlan = studyCycle.find((item) => Number(item.day) === Number(currentSession)) || {
+    day: currentSession,
+    subjects: ["Unassigned"]
+  };
+
+  return {
+    sessionNumber: currentSession,
+    sessionPlan
+  };
 }
 
 function getSubjectName(subjectId) {
