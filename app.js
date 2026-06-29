@@ -7,6 +7,8 @@ let flashcardSources = [];
 
 let studyGoals = {};
 let studyCycle = [];
+let studyModes = {};
+let currentStudyMode = "full";
 
 let essays = [];
 let mcqs = [];
@@ -28,6 +30,7 @@ async function init() {
   populateSourceDropdowns();
   setupForms();
   setupSessionButton();
+  setupStudyModeSelector();
   setupBackupButtons();
 
   renderAll();
@@ -41,6 +44,8 @@ async function loadData() {
 
   studyGoals = await loadJson("studyGoals.json", {});
   studyCycle = await loadJson("studyCycle.json", []);
+  studyModes = await loadJson("studyModes.json", {});
+  currentStudyMode = localStorage.getItem("bcc_study_mode") || "full";
 
   essays = loadLocalData("bcc_essays", await loadJson("essays.json", []));
   mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
@@ -93,6 +98,7 @@ function saveData() {
   localStorage.setItem("bcc_reviews", JSON.stringify(reviews));
   localStorage.setItem("bcc_session_history", JSON.stringify(sessionHistory));
   localStorage.setItem("bcc_current_session", String(currentSession));
+  localStorage.setItem("bcc_study_mode", currentStudyMode);
 }
 
 function setupNavigation() {
@@ -141,6 +147,32 @@ function setupSessionButton() {
   if (!button) return;
 
   button.addEventListener("click", completeCurrentSession);
+}
+
+function setupStudyModeSelector() {
+  const selector = document.getElementById("study-mode-select");
+  if (!selector) return;
+
+  selector.innerHTML = "";
+
+  Object.entries(studyModes).forEach(([modeId, mode]) => {
+    const option = document.createElement("option");
+    option.value = modeId;
+    option.textContent = mode.label || capitalize(modeId);
+    selector.appendChild(option);
+  });
+
+  if (!studyModes[currentStudyMode]) {
+    currentStudyMode = Object.keys(studyModes)[0] || "full";
+  }
+
+  selector.value = currentStudyMode;
+
+  selector.addEventListener("change", () => {
+    currentStudyMode = selector.value;
+    saveData();
+    renderAll();
+  });
 }
 
 function completeCurrentSession() {
@@ -249,7 +281,7 @@ function handleEssaySubmit(event) {
   const essay = {
     id: createId("essay"),
     type: "essay",
-    subject: getValue("essay-subject"),
+    subject: normalizeSubjectSelection(getValue("essay-subject"), getValue("essay-source")),
     source: getValue("essay-source"),
     title: getValue("essay-title"),
     pageNumber: getValue("essay-page-number"),
@@ -277,7 +309,7 @@ function handleMcqSubmit(event) {
   const mcq = {
     id: createId("mcq"),
     type: "mcq",
-    subject: getValue("mcq-subject"),
+    subject: normalizeSubjectSelection(getValue("mcq-subject"), getValue("mcq-source")),
     source: getValue("mcq-source"),
     count,
     correctCount,
@@ -305,7 +337,7 @@ function handleFlashcardSubmit(event) {
   const flashcard = {
     id: createId("flashcard"),
     type: "flashcard",
-    subject: getValue("flashcard-subject"),
+    subject: normalizeSubjectSelection(getValue("flashcard-subject"), getValue("flashcard-source")),
     source: getValue("flashcard-source"),
     startCard,
     endCard,
@@ -457,6 +489,10 @@ function renderPlanner() {
   const mcqsToday = getTodayMcqTotal();
   const flashcardsToday = getTodayFlashcardTotal();
   const lectureMinutesToday = getTodayLectureMinutes();
+  const sessionInfo = getCurrentSessionInfo();
+  const subjectsToday = Array.isArray(sessionInfo.sessionPlan.subjects)
+    ? sessionInfo.sessionPlan.subjects
+    : [];
 
   setText("dashboard-essays-target", essaysToday);
   setText("dashboard-mcqs-target", mcqsToday);
@@ -472,6 +508,32 @@ function renderPlanner() {
   setText("dashboard-mcqs-goal", getMcqGoal());
   setText("dashboard-flashcards-goal", getFlashcardGoal());
   setText("dashboard-lectures-goal", getLectureGoal());
+
+  setText("dashboard-session-number", sessionInfo.sessionNumber);
+  setText("dashboard-study-mode-label", getCurrentStudyModeLabel());
+  setText("dashboard-mission-subjects", subjectsToday.join(" + ") || "Unassigned");
+  setText("dashboard-mission-targets", `Essay ${getEssayGoal()} · MCQs ${getMcqGoal()} · Flashcards ${getFlashcardGoal()} · Lecture minutes ${getLectureGoal()}`);
+
+  renderCycleMap();
+}
+
+function renderCycleMap() {
+  const map = document.getElementById("cycle-map");
+  if (!map) return;
+
+  map.innerHTML = studyCycle.map((day) => {
+    const dayNumber = Number(day.day);
+    const isActive = dayNumber === Number(currentSession);
+    const wasCompleted = sessionHistory.some((session) => Number(session.sessionNumber) === dayNumber);
+    const subjectsText = Array.isArray(day.subjects) ? day.subjects.join(" + ") : "Unassigned";
+
+    return `
+      <div class="bcc-cycle-day ${isActive ? "active" : ""} ${wasCompleted ? "completed" : ""}">
+        <div>Day ${escapeHtml(dayNumber)}</div>
+        <div>${escapeHtml(subjectsText)}</div>
+      </div>
+    `;
+  }).join("");
 }
 
 function renderDashboard() {
@@ -885,19 +947,23 @@ function getCurrentSessionInfo() {
 }
 
 function getEssayGoal() {
-  return Number(studyGoals.essaysPerDay || studyGoals.essayGoal || studyGoals.essays || 0);
+  const mode = getCurrentStudyMode();
+  return Number(mode.essaysPerDay ?? studyGoals.essaysPerDay ?? studyGoals.essayGoal ?? studyGoals.essays ?? 0);
 }
 
 function getMcqGoal() {
-  return Number(studyGoals.mcqsPerDay || studyGoals.mcqGoal || studyGoals.mcqs || 0);
+  const mode = getCurrentStudyMode();
+  return Number(mode.mcqsPerDay ?? studyGoals.mcqsPerDay ?? studyGoals.mcqGoal ?? studyGoals.mcqs ?? 0);
 }
 
 function getFlashcardGoal() {
+  const mode = getCurrentStudyMode();
   return Number(
-    studyGoals.flashcardsPerDay ||
-    studyGoals.flashcardGoal ||
-    studyGoals.flashcards ||
-    studyGoals.cardsPerDay ||
+    mode.flashcardsPerDay ??
+    studyGoals.flashcardsPerDay ??
+    studyGoals.flashcardGoal ??
+    studyGoals.flashcards ??
+    studyGoals.cardsPerDay ??
     0
   );
 }
@@ -911,6 +977,53 @@ function getLectureGoal() {
     studyGoals.lectures ||
     0
   );
+}
+
+function getCurrentStudyMode() {
+  return studyModes[currentStudyMode] || {};
+}
+
+function getCurrentStudyModeLabel() {
+  const mode = getCurrentStudyMode();
+  return mode.label || capitalize(currentStudyMode);
+}
+
+function normalizeSubjectSelection(selectedSubject, sourceText) {
+  const inferredSubject = inferSubjectFromText(sourceText);
+
+  if (inferredSubject && (!selectedSubject || selectedSubject === subjects[0]?.id)) {
+    return inferredSubject;
+  }
+
+  return selectedSubject;
+}
+
+function inferSubjectFromText(text) {
+  const value = String(text || "").toLowerCase();
+
+  const matches = [
+    ["constitutional", "constitutional_law"],
+    ["con law", "constitutional_law"],
+    ["civil procedure", "civil_procedure"],
+    ["civ pro", "civil_procedure"],
+    ["contracts", "contracts_sales"],
+    ["sales", "contracts_sales"],
+    ["criminal", "criminal_law_procedure"],
+    ["evidence", "evidence"],
+    ["real property", "real_property"],
+    ["property", "real_property"],
+    ["torts", "torts"],
+    ["business", "business_associations"],
+    ["community property", "community_property"],
+    ["professional responsibility", "professional_responsibility"],
+    ["remedies", "remedies"],
+    ["trusts", "trusts"],
+    ["wills", "wills_succession"],
+    ["succession", "wills_succession"]
+  ];
+
+  const match = matches.find(([needle]) => value.includes(needle));
+  return match ? match[1] : "";
 }
 
 function getCountFromRange(start, end) {
