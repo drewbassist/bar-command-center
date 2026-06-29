@@ -32,9 +32,14 @@
   <main class="bcc-main">
     <section id="dashboard" class="bcc-view">
       <div class="bcc-panel">
-        <h2 id="planner-title">Today</h2>
-        <div id="planner-cycle" class="bcc-item-meta">Daily totals. Minimums. Reviews. Nothing extra.</div>
-        <div id="planner-subjects" class="bcc-item-title"></div>
+        <h2>Quick Log</h2>
+
+        <div class="bcc-today-actions">
+          <button class="bcc-session-button" data-view-jump="essays">Log Essay</button>
+          <button class="bcc-session-button" data-view-jump="mcqs">Log MCQ Session</button>
+          <button class="bcc-session-button" data-view-jump="flashcards">Log Flashcard Session</button>
+          <button class="bcc-session-button" data-view-jump="lectures">Log Lecture Review</button>
+        </div>
       </div>
 
       <div class="bcc-panel">
@@ -69,45 +74,42 @@
       </div>
 
       <div class="bcc-panel">
-        <h2>Quick Log</h2>
-
-        <div class="bcc-today-actions">
-          <button class="bcc-session-button" data-view-jump="essays">Log Essay</button>
-          <button class="bcc-session-button" data-view-jump="mcqs">Log MCQ Session</button>
-          <button class="bcc-session-button" data-view-jump="flashcards">Log Flashcard Session</button>
-          <button class="bcc-session-button" data-view-jump="lectures">Log Lecture Review</button>
-        </div>
-      </div>
-
-      <div class="bcc-panel">
         <h2>Minimums</h2>
 
         <div class="bcc-list">
           <div class="bcc-item">
             <div class="bcc-item-title">Essays</div>
             <div class="bcc-item-meta">
-              <span id="dashboard-essays-target-minimum">0</span> completed today
+              <span id="dashboard-essays-target-minimum">0</span> /
+              <span id="dashboard-essays-goal">0</span>
+              completed today
             </div>
           </div>
 
           <div class="bcc-item">
             <div class="bcc-item-title">MCQs</div>
             <div class="bcc-item-meta">
-              <span id="dashboard-mcqs-target-minimum">0</span> completed today
+              <span id="dashboard-mcqs-target-minimum">0</span> /
+              <span id="dashboard-mcqs-goal">0</span>
+              completed today
             </div>
           </div>
 
           <div class="bcc-item">
             <div class="bcc-item-title">Flashcards</div>
             <div class="bcc-item-meta">
-              <span id="dashboard-flashcards-target-minimum">0</span> reviewed today
+              <span id="dashboard-flashcards-target-minimum">0</span> /
+              <span id="dashboard-flashcards-goal">0</span>
+              reviewed today
             </div>
           </div>
 
           <div class="bcc-item">
             <div class="bcc-item-title">Lecture Review</div>
             <div class="bcc-item-meta">
-              <span id="dashboard-lectures-target-minimum">0</span> minutes reviewed today
+              <span id="dashboard-lectures-target-minimum">0</span> /
+              <span id="dashboard-lectures-goal">0</span>
+              minutes reviewed today
             </div>
           </div>
         </div>
@@ -270,11 +272,6 @@
           </label>
 
           <label>
-            Source
-            <select id="lecture-source"></select>
-          </label>
-
-          <label>
             Lecture Title
             <input id="lecture-title" type="text" placeholder="Evidence Hearsay Exceptions" />
           </label>
@@ -329,7 +326,7 @@
         </div>
 
         <div class="bcc-card">
-          <div class="bcc-card-label">Lecture Reviews</div>
+          <div class="bcc-card-label">Lecture Minutes</div>
           <div class="bcc-card-number" id="stats-lectures">0</div>
         </div>
 
