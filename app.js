@@ -200,17 +200,24 @@ function completeCurrentSession() {
 }
 
 function setupRatingDropdowns() {
-  populateNumberDropdown("essay-rating", 1, 10, "5");
-  populateNumberDropdown("mcq-rating", 1, 10, "5");
-  populateNumberDropdown("flashcard-rating", 1, 10, "5");
-  populateNumberDropdown("lecture-rating", 1, 10, "5");
+  populateNumberDropdown("essay-rating", 1, 10);
+  populateNumberDropdown("mcq-rating", 1, 10);
+  populateNumberDropdown("flashcard-rating", 1, 10);
+  populateNumberDropdown("lecture-rating", 1, 10);
 }
 
-function populateNumberDropdown(id, min, max, selectedValue) {
+function populateNumberDropdown(id, min, max) {
   const dropdown = document.getElementById(id);
   if (!dropdown) return;
 
   dropdown.innerHTML = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Rating";
+  placeholder.disabled = true;
+  placeholder.selected = true;
+  dropdown.appendChild(placeholder);
 
   for (let i = min; i <= max; i++) {
     const option = document.createElement("option");
@@ -218,8 +225,6 @@ function populateNumberDropdown(id, min, max, selectedValue) {
     option.textContent = String(i);
     dropdown.appendChild(option);
   }
-
-  dropdown.value = selectedValue;
 }
 
 function populateSubjectDropdowns() {
