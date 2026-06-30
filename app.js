@@ -261,6 +261,21 @@ function populateDropdown(id, items) {
 
   dropdown.innerHTML = "";
 
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.disabled = true;
+  placeholder.selected = true;
+
+  if (id.includes("source")) {
+    placeholder.textContent = "Select Source";
+  } else if (id.includes("rating")) {
+    placeholder.textContent = "Rating";
+  } else {
+    placeholder.textContent = "Select";
+  }
+
+  dropdown.appendChild(placeholder);
+
   items.forEach((item) => {
     const option = document.createElement("option");
     option.value = item;
