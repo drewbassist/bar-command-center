@@ -235,6 +235,13 @@ function populateSubjectDropdown(id) {
 
   dropdown.innerHTML = "";
 
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Select Subject";
+  placeholder.disabled = true;
+  placeholder.selected = true;
+  dropdown.appendChild(placeholder);
+
   subjects.forEach((subject) => {
     const option = document.createElement("option");
     option.value = subject.id;
@@ -242,7 +249,6 @@ function populateSubjectDropdown(id) {
     dropdown.appendChild(option);
   });
 }
-
 function populateSourceDropdowns() {
   populateDropdown("essay-source", essaySources);
   populateDropdown("mcq-source", mcqSources);
