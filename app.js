@@ -225,6 +225,8 @@ function populateNumberDropdown(id, min, max) {
     option.textContent = String(i);
     dropdown.appendChild(option);
   }
+
+  dropdown.value = "";
 }
 
 function populateSubjectDropdowns() {
