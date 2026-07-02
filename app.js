@@ -911,7 +911,17 @@ function getNextReviewDate(itemId, itemType) {
 
   return pendingReviews.length > 0 ? pendingReviews[0].dueDate : "";
 }
+function countReviewedItems(type) {
+  const reviewedItems = new Set();
 
+  reviews.forEach((review) => {
+    if (review.itemType === type && review.status === "completed") {
+      reviewedItems.add(review.itemId);
+    }
+  });
+
+  return reviewedItems.size;
+}
 function findItem(id, type) {
   if (type === "essay") return essays.find((item) => item.id === id);
   if (type === "mcq") return mcqs.find((item) => item.id === id);
