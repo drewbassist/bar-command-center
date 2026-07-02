@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +25,6 @@
     <button class="bcc-nav-button" data-view="essays">Essays</button>
     <button class="bcc-nav-button" data-view="mcqs">MCQs</button>
     <button class="bcc-nav-button" data-view="flashcards">Flashcards</button>
-    <button class="bcc-nav-button" data-view="lectures">Lectures</button>
     <button class="bcc-nav-button" data-view="reviews">Reviews</button>
     <button class="bcc-nav-button" data-view="stats">Progress</button>
   </nav>
@@ -38,7 +38,6 @@
           <button class="bcc-session-button" data-view-jump="essays">Log Essay</button>
           <button class="bcc-session-button" data-view-jump="mcqs">Log MCQ Session</button>
           <button class="bcc-session-button" data-view-jump="flashcards">Log Flashcard Session</button>
-          <button class="bcc-session-button" data-view-jump="lectures">Log Lecture Review</button>
         </div>
       </div>
 
@@ -59,11 +58,6 @@
           <div class="bcc-card">
             <div class="bcc-card-label">Flashcards</div>
             <div class="bcc-card-number" id="dashboard-flashcards-target">0</div>
-          </div>
-
-          <div class="bcc-card">
-            <div class="bcc-card-label">Lecture Minutes</div>
-            <div class="bcc-card-number" id="dashboard-lectures-target">0</div>
           </div>
 
           <div class="bcc-card">
@@ -100,16 +94,7 @@
             <div class="bcc-item-meta">
               <span id="dashboard-flashcards-target-minimum">0</span> /
               <span id="dashboard-flashcards-goal">0</span>
-              reviewed today
-            </div>
-          </div>
-
-          <div class="bcc-item">
-            <div class="bcc-item-title">Lecture Review</div>
-            <div class="bcc-item-meta">
-              <span id="dashboard-lectures-target-minimum">0</span> /
-              <span id="dashboard-lectures-goal">0</span>
-              minutes reviewed today
+              completed today
             </div>
           </div>
         </div>
@@ -256,46 +241,6 @@
       </div>
     </section>
 
-    <section id="lectures" class="bcc-view">
-      <div class="bcc-panel">
-        <h2>Log Lecture Review</h2>
-
-        <form id="lecture-form" class="bcc-form">
-          <label>
-            Subject
-            <select id="lecture-subject"></select>
-          </label>
-
-          <label>
-            Lecture Title
-            <input id="lecture-title" type="text" />
-          </label>
-
-          <label>
-            Minutes Reviewed
-            <input id="lecture-minutes" type="number" min="0" />
-          </label>
-
-          <label>
-            Rating
-            <select id="lecture-rating"></select>
-          </label>
-
-          <label>
-            Notes
-            <textarea id="lecture-notes"></textarea>
-          </label>
-
-          <button type="submit">Save Lecture Review</button>
-        </form>
-      </div>
-
-      <div class="bcc-panel">
-        <h2>Recent Lecture Reviews</h2>
-        <div id="lecture-list" class="bcc-list-empty">No lecture reviews added yet.</div>
-      </div>
-    </section>
-
     <section id="reviews" class="bcc-view">
       <div class="bcc-panel">
         <h2>Review Queue</h2>
@@ -306,23 +251,18 @@
     <section id="stats" class="bcc-view">
       <div class="bcc-grid">
         <div class="bcc-card">
-          <div class="bcc-card-label">Essays</div>
+          <div class="bcc-card-label">Essays Done</div>
           <div class="bcc-card-number" id="stats-essays">0</div>
         </div>
 
         <div class="bcc-card">
-          <div class="bcc-card-label">MCQs</div>
+          <div class="bcc-card-label">MCQs Done</div>
           <div class="bcc-card-number" id="stats-mcqs">0</div>
         </div>
 
         <div class="bcc-card">
-          <div class="bcc-card-label">Flashcards</div>
+          <div class="bcc-card-label">Flashcards Done</div>
           <div class="bcc-card-number" id="stats-flashcards">0</div>
-        </div>
-
-        <div class="bcc-card">
-          <div class="bcc-card-label">Lecture Minutes</div>
-          <div class="bcc-card-number" id="stats-lectures">0</div>
         </div>
 
         <div class="bcc-card">
@@ -343,7 +283,7 @@
         </div>
 
         <div class="bcc-item">
-          <div class="bcc-item-title">MCQ Sets</div>
+          <div class="bcc-item-title">MCQs</div>
           <div class="bcc-item-meta">
             <span id="stats-mcq-sets-done">0</span> done •
             <span id="stats-mcq-sets-reviewed">0</span> reviewed
@@ -351,18 +291,10 @@
         </div>
 
         <div class="bcc-item">
-          <div class="bcc-item-title">Flashcard Sets</div>
+          <div class="bcc-item-title">Flashcards</div>
           <div class="bcc-item-meta">
             <span id="stats-flashcard-sets-done">0</span> done •
             <span id="stats-flashcard-sets-reviewed">0</span> reviewed
-          </div>
-        </div>
-
-        <div class="bcc-item">
-          <div class="bcc-item-title">Lecture Reviews</div>
-          <div class="bcc-item-meta">
-            <span id="stats-lecture-sets-done">0</span> done •
-            <span id="stats-lecture-sets-reviewed">0</span> reviewed
           </div>
         </div>
       </div>
