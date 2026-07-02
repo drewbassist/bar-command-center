@@ -792,15 +792,7 @@ function renderStats() {
     statsSection.appendChild(sessionStats);
   }
 
-  sessionStats.innerHTML = `
-    <h2>Session History</h2>
-    <div class="bcc-item">
-      <div class="bcc-item-title">Sessions completed this week: ${weekCount}</div>
-      <div class="bcc-item-meta">Sessions completed this month: ${monthCount}</div>
-      <div class="bcc-item-meta">Total completed sessions: ${sessionHistory.length}</div>
-    </div>
-  `;
-}
+
 
   sessionStats.innerHTML = `
     <h2>Session History</h2>
