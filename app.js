@@ -767,6 +767,19 @@ function renderStats() {
   setText("stats-lectures", getLectureMinutesTotal());
   setText("stats-reviews", pendingReviews);
 
+  // Done / Reviewed tracking
+  setText("stats-essay-sets-done", essays.length);
+  setText("stats-essay-sets-reviewed", countReviewedItems("essay"));
+
+  setText("stats-mcq-sets-done", mcqs.length);
+  setText("stats-mcq-sets-reviewed", countReviewedItems("mcq"));
+
+  setText("stats-flashcard-sets-done", flashcards.length);
+  setText("stats-flashcard-sets-reviewed", countReviewedItems("flashcard"));
+
+  setText("stats-lecture-sets-done", lectures.length);
+  setText("stats-lecture-sets-reviewed", countReviewedItems("lecture"));
+
   const statsSection = document.getElementById("stats");
   if (!statsSection) return;
 
@@ -778,6 +791,16 @@ function renderStats() {
     sessionStats.className = "bcc-panel";
     statsSection.appendChild(sessionStats);
   }
+
+  sessionStats.innerHTML = `
+    <h2>Session History</h2>
+    <div class="bcc-item">
+      <div class="bcc-item-title">Sessions completed this week: ${weekCount}</div>
+      <div class="bcc-item-meta">Sessions completed this month: ${monthCount}</div>
+      <div class="bcc-item-meta">Total completed sessions: ${sessionHistory.length}</div>
+    </div>
+  `;
+}
 
   sessionStats.innerHTML = `
     <h2>Session History</h2>
