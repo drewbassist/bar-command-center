@@ -1090,7 +1090,20 @@ function getCountFromRange(start, end) {
 
   return endNumber - startNumber + 1;
 }
+function getCountFromCardRange(range) {
+  const match = String(range || "").match(/(\d+)\s*[-–]\s*(\d+)/);
 
+  if (!match) return 0;
+
+  const start = Number(match[1]);
+  const end = Number(match[2]);
+
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) {
+    return 0;
+  }
+
+  return end - start + 1;
+}
 function getSubjectName(subjectId) {
   const subject = subjects.find((item) => item.id === subjectId);
   return subject ? subject.name : subjectId || "";
