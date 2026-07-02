@@ -358,19 +358,16 @@ function handleMcqSubmit(event) {
 function handleFlashcardSubmit(event) {
   event.preventDefault();
 
-  const startCard = getValue("flashcard-start-card");
-  const endCard = getValue("flashcard-end-card");
-  const countFromRange = getCountFromRange(startCard, endCard);
+  const cardRange = getValue("flashcard-card-range");
+  const count = getCountFromCardRange(cardRange);
 
   const flashcard = {
     id: createId("flashcard"),
     type: "flashcard",
     subject: normalizeSubjectSelection(getValue("flashcard-subject"), getValue("flashcard-source")),
     source: getValue("flashcard-source"),
-    startCard,
-    endCard,
-    count: Number(getValue("flashcard-count")) || countFromRange || 0,
-    newCount: Number(getValue("flashcard-new-count")) || 0,
+    cardRange,
+    count,
     rating: Number(getValue("flashcard-rating")),
     notes: getValue("flashcard-notes"),
     completedDate: todayString()
