@@ -754,51 +754,54 @@ function completeReview(reviewId) {
 }
 
 function renderStats() {
-  const weekCount = countSessionsSince(7);
-  const monthCount = countSessionsSince(30);
-  const pendingReviews = reviews.filter((review) => review.status === "pending").length;
+  const pendingReviews = reviews.filter(r => r.status === "pending").length;
 
-  setText("stats-essays", essays.length);
-  setText("stats-mcqs", getMcqTotal());
-  setText("stats-flashcards", getFlashcardTotal());
-  setText("stats-lectures", getLectureMinutesTotal());
+  const essaysWritten = essays.length;
+  const essaysReviewed = countReviewedItems("essay");
+
+  const mcqsDone = mcqs.reduce((t,m)=>t+(Number(m.count)||0),0);
+  const mcqsReviewed = reviews.filter(r=>r.itemType==="mcq" && r.status==="completed")
+    .reduce((t,r)=>{
+      const m = mcqs.find(x=>x.id===r.itemId);
+      return t + (m ? (Number(m.count)||0) : 0);
+    },0);
+  const mcqsCorrect = mcqs.reduce((t,m)=>t+(Number(m.correctCount)||0),0);
+  const mcqAccuracy = mcqsDone ? Math.round(mcqsCorrect/mcqsDone*100) : 0;
+
+  const flashcardsDone = flashcards.reduce((t,f)=>t+(Number(f.count)||0),0);
+  const flashcardsReviewed = reviews.filter(r=>r.itemType==="flashcard" && r.status==="completed")
+    .reduce((t,r)=>{
+      const f=flashcards.find(x=>x.id===r.itemId);
+      return t + (f ? (Number(f.count)||0) : 0);
+    },0);
+
+  const lectureMinutesDone = lectures.reduce((t,l)=>t+(Number(l.minutes)||0),0);
+  const lectureMinutesReviewed = reviews.filter(r=>r.itemType==="lecture" && r.status==="completed")
+    .reduce((t,r)=>{
+      const l=lectures.find(x=>x.id===r.itemId);
+      return t + (l ? (Number(l.minutes)||0) : 0);
+    },0);
+
+  setText("stats-essays", essaysWritten);
+  setText("stats-mcqs", mcqsDone);
+  setText("stats-flashcards", flashcardsDone);
+  setText("stats-lectures", lectureMinutesDone);
   setText("stats-reviews", pendingReviews);
 
-  // Done / Reviewed tracking
-  setText("stats-essay-sets-done", essays.length);
-  setText("stats-essay-sets-reviewed", countReviewedItems("essay"));
+  setText("stats-essay-sets-done", essaysWritten);
+  setText("stats-essay-sets-reviewed", essaysReviewed);
 
-  setText("stats-mcq-sets-done", mcqs.length);
-  setText("stats-mcq-sets-reviewed", countReviewedItems("mcq"));
+  setText("stats-mcq-sets-done", mcqsDone);
+  setText("stats-mcq-sets-reviewed", mcqsReviewed);
 
-  setText("stats-flashcard-sets-done", flashcards.length);
-  setText("stats-flashcard-sets-reviewed", countReviewedItems("flashcard"));
+  setText("stats-flashcard-sets-done", flashcardsDone);
+  setText("stats-flashcard-sets-reviewed", flashcardsReviewed);
 
-  setText("stats-lecture-sets-done", lectures.length);
-  setText("stats-lecture-sets-reviewed", countReviewedItems("lecture"));
+  setText("stats-lecture-sets-done", lectureMinutesDone);
+  setText("stats-lecture-sets-reviewed", lectureMinutesReviewed);
 
-  const statsSection = document.getElementById("stats");
-  if (!statsSection) return;
-
-  let sessionStats = document.getElementById("session-stats-panel");
-
-  if (!sessionStats) {
-    sessionStats = document.createElement("div");
-    sessionStats.id = "session-stats-panel";
-    sessionStats.className = "bcc-panel";
-    statsSection.appendChild(sessionStats);
-  }
-
-
-
-  sessionStats.innerHTML = `
-    <h2>Session History</h2>
-    <div class="bcc-item">
-      <div class="bcc-item-title">Sessions completed this week: ${weekCount}</div>
-      <div class="bcc-item-meta">Sessions completed this month: ${monthCount}</div>
-      <div class="bcc-item-meta">Total completed sessions: ${sessionHistory.length}</div>
-    </div>
-  `;
+  const panel=document.getElementById("session-stats-panel");
+  if(panel) panel.remove();
 }
 
 function getReviewGroups() {
@@ -958,15 +961,9 @@ function getFlashcardTitle(card) {
 
   const subject = getSubjectName(card.subject);
   const source = card.source || "Flashcards";
-  const start = card.startCard || "";
-  const end = card.endCard || "";
 
-  if (start && end) {
-    return `${subject} · ${source} · Cards ${start}-${end}`;
-  }
-
-  if (start) {
-    return `${subject} · ${source} · Card ${start}`;
+  if (card.cardRange) {
+    return `${subject} · ${source} · Cards ${card.cardRange}`;
   }
 
   return `${subject} · ${source} · Flashcard Session`;
