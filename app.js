@@ -49,7 +49,7 @@ async function loadData() {
 
   essays = loadLocalData("bcc_essays", await loadJson("essays.json", []));
   mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
-  flashcards = loadLocalData("bcc_flashcards", await loadJson("flashcards.json", []));
+  flashcards = migrateFlashcards(loadLocalData("bcc_flashcards", await loadJson("flashcards.json", [])));
   lectures = loadLocalData("bcc_lectures", await loadJson("lectures.json", []));
   reviews = loadLocalData("bcc_reviews", await loadJson("reviews.json", []));
   sessionHistory = loadLocalData("bcc_session_history", []);
@@ -63,6 +63,8 @@ async function loadData() {
   if (studyCycle.length > 0 && currentSession > studyCycle.length) {
     currentSession = 1;
   }
+
+  saveData();
 }
 
 async function loadJson(path, fallback) {
@@ -88,6 +90,32 @@ function loadLocalData(key, fallback) {
   } catch (error) {
     return fallback;
   }
+}
+
+function migrateFlashcards(items) {
+  if (!Array.isArray(items)) return [];
+
+  return items.map((card) => {
+    const migrated = { ...card };
+
+    if (!migrated.cardRange) {
+      if (migrated.startCard && migrated.endCard) {
+        migrated.cardRange = `${migrated.startCard}-${migrated.endCard}`;
+      } else if (migrated.range) {
+        migrated.cardRange = migrated.range;
+      } else if (migrated.cards) {
+        migrated.cardRange = migrated.cards;
+      } else if (migrated.card_range) {
+        migrated.cardRange = migrated.card_range;
+      }
+    }
+
+    if (!Number(migrated.count) && migrated.cardRange) {
+      migrated.count = getCountFromCardRange(migrated.cardRange);
+    }
+
+    return migrated;
+  });
 }
 
 function saveData() {
@@ -256,6 +284,7 @@ function populateSubjectDropdown(id) {
     dropdown.appendChild(option);
   });
 }
+
 function populateSourceDropdowns() {
   populateDropdown("essay-source", essaySources);
   populateDropdown("mcq-source", mcqSources);
@@ -474,7 +503,7 @@ function importBackup(event) {
 
       essays = Array.isArray(backup.essays) ? backup.essays : [];
       mcqs = Array.isArray(backup.mcqs) ? backup.mcqs : [];
-      flashcards = Array.isArray(backup.flashcards) ? backup.flashcards : [];
+      flashcards = migrateFlashcards(Array.isArray(backup.flashcards) ? backup.flashcards : []);
       lectures = Array.isArray(backup.lectures) ? backup.lectures : [];
       reviews = Array.isArray(backup.reviews) ? backup.reviews : [];
       sessionHistory = Array.isArray(backup.sessionHistory) ? backup.sessionHistory : [];
@@ -639,7 +668,7 @@ function renderFlashcards() {
     <div class="bcc-item">
       <div class="bcc-item-title">${escapeHtml(getFlashcardTitle(card))}</div>
       <div class="bcc-item-meta">
-        ${escapeHtml(card.source || "No source")} · ${Number(card.count) || 0} cards reviewed · ${Number(card.newCount) || 0} new cards
+        ${escapeHtml(card.source || "No source")} · ${getFlashcardDetail(card)}
       </div>
       <div class="bcc-rating">Rating: ${card.rating}/10 · Next Review: ${formatDate(getNextReviewDate(card.id, "flashcard"))}</div>
       ${card.notes ? `<div class="bcc-item-notes">${escapeHtml(card.notes)}</div>` : ""}
@@ -903,6 +932,23 @@ function getFlashcardTotal() {
   return flashcards.reduce((total, card) => total + (Number(card.count) || 0), 0);
 }
 
+function getFlashcardDetail(card) {
+  if (!card) return "0 cards reviewed";
+
+  const range = card.cardRange ? `Cards ${card.cardRange}` : "";
+  const count = Number(card.count) || 0;
+
+  if (range && count > 0) {
+    return `${range} · ${count} cards reviewed`;
+  }
+
+  if (range) {
+    return range;
+  }
+
+  return `${count} cards reviewed`;
+}
+
 function getTodayLectureMinutes() {
   const today = todayString();
   return lectures
@@ -933,6 +979,7 @@ function getNextReviewDate(itemId, itemType) {
 
   return pendingReviews.length > 0 ? pendingReviews[0].dueDate : "";
 }
+
 function countReviewedItems(type) {
   const reviewedItems = new Set();
 
@@ -944,6 +991,7 @@ function countReviewedItems(type) {
 
   return reviewedItems.size;
 }
+
 function findItem(id, type) {
   if (type === "essay") return essays.find((item) => item.id === id);
   if (type === "mcq") return mcqs.find((item) => item.id === id);
@@ -981,9 +1029,7 @@ function getReviewDetailLine(item, type) {
   if (!item) return "";
 
   if (type === "flashcard") {
-    const source = item.source || "Flashcards";
-    const range = item.cardRange ? `Cards ${item.cardRange}` : `${Number(item.count) || 0} cards`;
-    return `${source} · ${range}`;
+    return getFlashcardDetail(item);
   }
 
   if (type === "mcq") {
@@ -1120,6 +1166,7 @@ function getCountFromRange(start, end) {
 
   return endNumber - startNumber + 1;
 }
+
 function getCountFromCardRange(range) {
   const match = String(range || "").match(/(\d+)\s*[-–]\s*(\d+)/);
 
@@ -1134,6 +1181,7 @@ function getCountFromCardRange(range) {
 
   return end - start + 1;
 }
+
 function getSubjectName(subjectId) {
   const subject = subjects.find((item) => item.id === subjectId);
   return subject ? subject.name : subjectId || "";
