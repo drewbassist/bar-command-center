@@ -696,6 +696,7 @@ function renderReviewGroup(group) {
   const item = findItem(group.itemId, group.itemType);
   const title = getItemTitle(item, group.itemType);
   const subject = getSubjectName(group.subject);
+  const detail = getReviewDetailLine(item, group.itemType);
 
   const cells = group.reviews.map((review) => {
     const isCompleted = review.status === "completed";
@@ -715,7 +716,10 @@ function renderReviewGroup(group) {
   return `
     <div class="bcc-item bcc-review-row">
       <div class="bcc-item-title">${escapeHtml(title)}</div>
-      <div class="bcc-item-meta">${escapeHtml(getTypeLabel(group.itemType))} · ${escapeHtml(subject)}</div>
+      <div class="bcc-item-meta">
+        ${escapeHtml(getTypeLabel(group.itemType))} · ${escapeHtml(subject)}
+        ${detail ? ` · ${escapeHtml(detail)}` : ""}
+      </div>
       <div class="bcc-review-grid">
         ${cells}
       </div>
@@ -726,12 +730,15 @@ function renderReviewGroup(group) {
 function renderReviewItem(review) {
   const item = findItem(review.itemId, review.itemType);
   const title = getItemTitle(item, review.itemType);
+  const detail = getReviewDetailLine(item, review.itemType);
 
   return `
     <div class="bcc-item">
       <div class="bcc-item-title">${escapeHtml(title)}</div>
       <div class="bcc-item-meta">
-        ${escapeHtml(getTypeLabel(review.itemType))} · ${escapeHtml(getSubjectName(review.subject))} · Review ${escapeHtml(review.reviewNumber || "")} · Due ${formatDate(review.dueDate)} · ${escapeHtml(capitalize(review.status))}
+        ${escapeHtml(getTypeLabel(review.itemType))} · ${escapeHtml(getSubjectName(review.subject))}
+        ${detail ? ` · ${escapeHtml(detail)}` : ""}
+        · Review ${escapeHtml(review.reviewNumber || "")} · Due ${formatDate(review.dueDate)} · ${escapeHtml(capitalize(review.status))}
       </div>
       ${
         review.status === "pending"
@@ -961,12 +968,38 @@ function getFlashcardTitle(card) {
 
   const subject = getSubjectName(card.subject);
   const source = card.source || "Flashcards";
+  const range = card.cardRange || "";
 
-  if (card.cardRange) {
-    return `${subject} · ${source} · Cards ${card.cardRange}`;
+  if (range) {
+    return `${subject} · ${source} · Cards ${range}`;
   }
 
   return `${subject} · ${source} · Flashcard Session`;
+}
+
+function getReviewDetailLine(item, type) {
+  if (!item) return "";
+
+  if (type === "flashcard") {
+    const source = item.source || "Flashcards";
+    const range = item.cardRange ? `Cards ${item.cardRange}` : `${Number(item.count) || 0} cards`;
+    return `${source} · ${range}`;
+  }
+
+  if (type === "mcq") {
+    const source = item.source || "No source";
+    const count = getMcqCountValue(item);
+    return `${source} · ${count} questions`;
+  }
+
+  if (type === "essay") {
+    const source = item.source || "No source";
+    const page = item.pageNumber ? `Page ${item.pageNumber}` : "No page";
+    const question = item.questionNumber ? `Question ${item.questionNumber}` : "No question";
+    return `${source} · ${page} · ${question}`;
+  }
+
+  return "";
 }
 
 function getTypeLabel(type) {
