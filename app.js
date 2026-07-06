@@ -17,6 +17,7 @@ let lectures = [];
 let reviews = [];
 let sessionHistory = [];
 let currentSession = 1;
+let editingEntry = null;
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -29,6 +30,7 @@ async function init() {
   populateSubjectDropdowns();
   populateSourceDropdowns();
   setupForms();
+  setupSessionButton();
 
   setupStudyModeSelector();
   setupBackupButtons();
@@ -49,7 +51,7 @@ async function loadData() {
 
   essays = loadLocalData("bcc_essays", await loadJson("essays.json", []));
   mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
-  flashcards = migrateFlashcards(loadLocalData("bcc_flashcards", await loadJson("flashcards.json", [])));
+  flashcards = loadLocalData("bcc_flashcards", await loadJson("flashcards.json", []));
   lectures = loadLocalData("bcc_lectures", await loadJson("lectures.json", []));
   reviews = loadLocalData("bcc_reviews", await loadJson("reviews.json", []));
   sessionHistory = loadLocalData("bcc_session_history", []);
@@ -63,8 +65,6 @@ async function loadData() {
   if (studyCycle.length > 0 && currentSession > studyCycle.length) {
     currentSession = 1;
   }
-
-  saveData();
 }
 
 async function loadJson(path, fallback) {
@@ -90,32 +90,6 @@ function loadLocalData(key, fallback) {
   } catch (error) {
     return fallback;
   }
-}
-
-function migrateFlashcards(items) {
-  if (!Array.isArray(items)) return [];
-
-  return items.map((card) => {
-    const migrated = { ...card };
-
-    if (!migrated.cardRange) {
-      if (migrated.startCard && migrated.endCard) {
-        migrated.cardRange = `${migrated.startCard}-${migrated.endCard}`;
-      } else if (migrated.range) {
-        migrated.cardRange = migrated.range;
-      } else if (migrated.cards) {
-        migrated.cardRange = migrated.cards;
-      } else if (migrated.card_range) {
-        migrated.cardRange = migrated.card_range;
-      }
-    }
-
-    if (!Number(migrated.count) && migrated.cardRange) {
-      migrated.count = getCountFromCardRange(migrated.cardRange);
-    }
-
-    return migrated;
-  });
 }
 
 function saveData() {
@@ -284,7 +258,6 @@ function populateSubjectDropdown(id) {
     dropdown.appendChild(option);
   });
 }
-
 function populateSourceDropdowns() {
   populateDropdown("essay-source", essaySources);
   populateDropdown("mcq-source", mcqSources);
@@ -335,8 +308,7 @@ function setupForms() {
 function handleEssaySubmit(event) {
   event.preventDefault();
 
-  const essay = {
-    id: createId("essay"),
+  const essayData = {
     type: "essay",
     subject: normalizeSubjectSelection(getValue("essay-subject"), getValue("essay-source")),
     source: getValue("essay-source"),
@@ -344,7 +316,26 @@ function handleEssaySubmit(event) {
     pageNumber: getValue("essay-page-number"),
     questionNumber: getValue("essay-question-number"),
     rating: Number(getValue("essay-rating")),
-    notes: getValue("essay-notes"),
+    notes: getValue("essay-notes")
+  };
+
+  if (editingEntry && editingEntry.type === "essay") {
+    const existing = essays.find((item) => item.id === editingEntry.id);
+    if (existing) {
+      Object.assign(existing, essayData, {
+        id: existing.id,
+        completedDate: existing.completedDate,
+        editedAt: new Date().toISOString()
+      });
+      syncReviewsForEditedItem(existing);
+      finishEditing(event.target);
+      return;
+    }
+  }
+
+  const essay = {
+    id: createId("essay"),
+    ...essayData,
     completedDate: todayString()
   };
 
@@ -363,8 +354,7 @@ function handleMcqSubmit(event) {
   const incorrectCount = Math.max(count - correctCount, 0);
   const accuracy = count > 0 ? Math.round((correctCount / count) * 100) : 0;
 
-  const mcq = {
-    id: createId("mcq"),
+  const mcqData = {
     type: "mcq",
     subject: normalizeSubjectSelection(getValue("mcq-subject"), getValue("mcq-source")),
     source: getValue("mcq-source"),
@@ -373,7 +363,26 @@ function handleMcqSubmit(event) {
     incorrectCount,
     accuracy,
     rating: Number(getValue("mcq-rating")),
-    notes: getValue("mcq-notes"),
+    notes: getValue("mcq-notes")
+  };
+
+  if (editingEntry && editingEntry.type === "mcq") {
+    const existing = mcqs.find((item) => item.id === editingEntry.id);
+    if (existing) {
+      Object.assign(existing, mcqData, {
+        id: existing.id,
+        completedDate: existing.completedDate,
+        editedAt: new Date().toISOString()
+      });
+      syncReviewsForEditedItem(existing);
+      finishEditing(event.target);
+      return;
+    }
+  }
+
+  const mcq = {
+    id: createId("mcq"),
+    ...mcqData,
     completedDate: todayString()
   };
 
@@ -390,15 +399,33 @@ function handleFlashcardSubmit(event) {
   const cardRange = getValue("flashcard-card-range");
   const count = getCountFromCardRange(cardRange);
 
-  const flashcard = {
-    id: createId("flashcard"),
+  const flashcardData = {
     type: "flashcard",
     subject: normalizeSubjectSelection(getValue("flashcard-subject"), getValue("flashcard-source")),
     source: getValue("flashcard-source"),
     cardRange,
     count,
     rating: Number(getValue("flashcard-rating")),
-    notes: getValue("flashcard-notes"),
+    notes: getValue("flashcard-notes")
+  };
+
+  if (editingEntry && editingEntry.type === "flashcard") {
+    const existing = flashcards.find((item) => item.id === editingEntry.id);
+    if (existing) {
+      Object.assign(existing, flashcardData, {
+        id: existing.id,
+        completedDate: existing.completedDate,
+        editedAt: new Date().toISOString()
+      });
+      syncReviewsForEditedItem(existing);
+      finishEditing(event.target);
+      return;
+    }
+  }
+
+  const flashcard = {
+    id: createId("flashcard"),
+    ...flashcardData,
     completedDate: todayString()
   };
 
@@ -412,15 +439,33 @@ function handleFlashcardSubmit(event) {
 function handleLectureSubmit(event) {
   event.preventDefault();
 
-  const lecture = {
-    id: createId("lecture"),
+  const lectureData = {
     type: "lecture",
     subject: getValue("lecture-subject"),
     source: "AIL",
     title: getValue("lecture-title"),
     minutes: Number(getValue("lecture-minutes")) || 0,
     rating: Number(getValue("lecture-rating")),
-    notes: getValue("lecture-notes"),
+    notes: getValue("lecture-notes")
+  };
+
+  if (editingEntry && editingEntry.type === "lecture") {
+    const existing = lectures.find((item) => item.id === editingEntry.id);
+    if (existing) {
+      Object.assign(existing, lectureData, {
+        id: existing.id,
+        completedDate: existing.completedDate,
+        editedAt: new Date().toISOString()
+      });
+      syncReviewsForEditedItem(existing);
+      finishEditing(event.target);
+      return;
+    }
+  }
+
+  const lecture = {
+    id: createId("lecture"),
+    ...lectureData,
     completedDate: todayString()
   };
 
@@ -431,11 +476,155 @@ function handleLectureSubmit(event) {
   renderAll();
 }
 
+
+function startEditEntry(type, id) {
+  const item = findItem(id, type);
+  if (!item) return;
+
+  editingEntry = { type, id };
+
+  if (type === "essay") {
+    setFormValue("essay-subject", item.subject);
+    setFormValue("essay-source", item.source);
+    setFormValue("essay-title", item.title);
+    setFormValue("essay-page-number", item.pageNumber);
+    setFormValue("essay-question-number", item.questionNumber);
+    setFormValue("essay-rating", item.rating);
+    setFormValue("essay-notes", item.notes);
+    setSubmitButtonText("essay-form", "Save Edit");
+    showEditNotice("essay-form", "Editing saved essay entry. Existing review schedule will be retained.");
+    goToView("essays");
+  }
+
+  if (type === "mcq") {
+    setFormValue("mcq-subject", item.subject);
+    setFormValue("mcq-source", item.source);
+    setFormValue("mcq-count", item.count);
+    setFormValue("mcq-correct-count", item.correctCount);
+    setFormValue("mcq-rating", item.rating);
+    setFormValue("mcq-notes", item.notes);
+    setSubmitButtonText("mcq-form", "Save Edit");
+    showEditNotice("mcq-form", "Editing saved MCQ entry. Existing review schedule will be retained.");
+    goToView("mcqs");
+  }
+
+  if (type === "flashcard") {
+    setFormValue("flashcard-subject", item.subject);
+    setFormValue("flashcard-source", item.source);
+    setFormValue("flashcard-card-range", item.cardRange);
+    setFormValue("flashcard-rating", item.rating);
+    setFormValue("flashcard-notes", item.notes);
+    setSubmitButtonText("flashcard-form", "Save Edit");
+    showEditNotice("flashcard-form", "Editing saved flashcard entry. Existing review schedule will be retained.");
+    goToView("flashcards");
+  }
+
+  if (type === "lecture") {
+    setFormValue("lecture-subject", item.subject);
+    setFormValue("lecture-title", item.title);
+    setFormValue("lecture-minutes", item.minutes);
+    setFormValue("lecture-rating", item.rating);
+    setFormValue("lecture-notes", item.notes);
+    setSubmitButtonText("lecture-form", "Save Edit");
+    showEditNotice("lecture-form", "Editing saved lecture entry. Existing review schedule will be retained.");
+    goToView("lectures");
+  }
+
+  const form = document.getElementById(`${type === "mcq" ? "mcq" : type}-form`);
+  if (form) {
+    form.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+function cancelEditEntry(form) {
+  editingEntry = null;
+  resetForm(form);
+  renderAll();
+}
+
+function finishEditing(form) {
+  saveData();
+  editingEntry = null;
+  resetForm(form);
+  renderAll();
+}
+
+function syncReviewsForEditedItem(item) {
+  reviews.forEach((review) => {
+    if (review.itemId === item.id && review.itemType === item.type) {
+      review.subject = item.subject;
+      review.ratingAtCreation = item.rating;
+    }
+  });
+}
+
+function showEditNotice(formId, message) {
+  const form = document.getElementById(formId);
+  if (!form) return;
+
+  let notice = form.querySelector(".bcc-edit-notice");
+
+  if (!notice) {
+    notice = document.createElement("div");
+    notice.className = "bcc-edit-notice";
+    notice.style.margin = "8px 0";
+    notice.style.fontSize = "12px";
+    notice.style.color = "#555555";
+    form.prepend(notice);
+  }
+
+  notice.innerHTML = `${escapeHtml(message)} <button type="button" class="bcc-small-button" onclick="cancelEditEntry(this.closest('form'))">Cancel</button>`;
+}
+
+function clearEditNotice(form) {
+  if (!form) return;
+  const notice = form.querySelector(".bcc-edit-notice");
+  if (notice) notice.remove();
+}
+
+function setSubmitButtonText(formId, text) {
+  const form = document.getElementById(formId);
+  if (!form) return;
+
+  const button = form.querySelector('button[type="submit"]');
+  if (button) button.textContent = text;
+}
+
+function resetSubmitButtonText(form) {
+  if (!form) return;
+
+  const button = form.querySelector('button[type="submit"]');
+  if (!button) return;
+
+  if (form.id === "essay-form") button.textContent = "Add Essay";
+  if (form.id === "mcq-form") button.textContent = "Add MCQ Session";
+  if (form.id === "flashcard-form") button.textContent = "Add Flashcard Session";
+  if (form.id === "lecture-form") button.textContent = "Add Lecture Review";
+}
+
+function setFormValue(id, value) {
+  const element = document.getElementById(id);
+  if (!element) return;
+  element.value = value ?? "";
+}
+
+function goToView(viewId) {
+  if (window.activateBccView) {
+    window.activateBccView(viewId);
+  }
+}
+
+window.startEditEntry = startEditEntry;
+window.cancelEditEntry = cancelEditEntry;
+
+
 function resetForm(form) {
   form.reset();
   setupRatingDropdowns();
   populateSubjectDropdowns();
   populateSourceDropdowns();
+  clearEditNotice(form);
+  resetSubmitButtonText(form);
 }
 
 function createReviewsForItem(item) {
@@ -503,7 +692,7 @@ function importBackup(event) {
 
       essays = Array.isArray(backup.essays) ? backup.essays : [];
       mcqs = Array.isArray(backup.mcqs) ? backup.mcqs : [];
-      flashcards = migrateFlashcards(Array.isArray(backup.flashcards) ? backup.flashcards : []);
+      flashcards = Array.isArray(backup.flashcards) ? backup.flashcards : [];
       lectures = Array.isArray(backup.lectures) ? backup.lectures : [];
       reviews = Array.isArray(backup.reviews) ? backup.reviews : [];
       sessionHistory = Array.isArray(backup.sessionHistory) ? backup.sessionHistory : [];
@@ -625,6 +814,7 @@ function renderEssays() {
         ${escapeHtml(getSubjectName(essay.subject))} · ${escapeHtml(essay.source || "No source")} · ${escapeHtml(essay.pageNumber || "No page number")} · ${escapeHtml(essay.questionNumber || "No question number")}
       </div>
       <div class="bcc-rating">Rating: ${essay.rating}/10 · Next Review: ${formatDate(getNextReviewDate(essay.id, "essay"))}</div>
+      <button class="bcc-small-button" type="button" onclick="startEditEntry('essay', '${escapeHtml(essay.id)}')">Edit</button>
       ${essay.notes ? `<div class="bcc-item-notes">${escapeHtml(essay.notes)}</div>` : ""}
     </div>
   `).join("");
@@ -648,6 +838,7 @@ function renderMcqs() {
         ${escapeHtml(mcq.source || "No source")} · ${Number(mcq.correctCount) || 0} correct · ${getMcqAccuracy(mcq)}%
       </div>
       <div class="bcc-rating">Rating: ${mcq.rating}/10 · Next Review: ${formatDate(getNextReviewDate(mcq.id, "mcq"))}</div>
+      <button class="bcc-small-button" type="button" onclick="startEditEntry('mcq', '${escapeHtml(mcq.id)}')">Edit</button>
       ${mcq.notes ? `<div class="bcc-item-notes">${escapeHtml(mcq.notes)}</div>` : ""}
     </div>
   `).join("");
@@ -668,9 +859,10 @@ function renderFlashcards() {
     <div class="bcc-item">
       <div class="bcc-item-title">${escapeHtml(getFlashcardTitle(card))}</div>
       <div class="bcc-item-meta">
-        ${escapeHtml(card.source || "No source")} · ${getFlashcardDetail(card)}
+        ${escapeHtml(card.source || "No source")} · ${Number(card.count) || 0} cards reviewed · ${Number(card.newCount) || 0} new cards
       </div>
       <div class="bcc-rating">Rating: ${card.rating}/10 · Next Review: ${formatDate(getNextReviewDate(card.id, "flashcard"))}</div>
+      <button class="bcc-small-button" type="button" onclick="startEditEntry('flashcard', '${escapeHtml(card.id)}')">Edit</button>
       ${card.notes ? `<div class="bcc-item-notes">${escapeHtml(card.notes)}</div>` : ""}
     </div>
   `).join("");
@@ -694,6 +886,7 @@ function renderLectures() {
         ${escapeHtml(getSubjectName(lecture.subject))} · ${escapeHtml(lecture.source || "AIL")} · ${Number(lecture.minutes) || 0} min
       </div>
       <div class="bcc-rating">Rating: ${lecture.rating}/10 · Next Review: ${formatDate(getNextReviewDate(lecture.id, "lecture"))}</div>
+      <button class="bcc-small-button" type="button" onclick="startEditEntry('lecture', '${escapeHtml(lecture.id)}')">Edit</button>
       ${lecture.notes ? `<div class="bcc-item-notes">${escapeHtml(lecture.notes)}</div>` : ""}
     </div>
   `).join("");
@@ -932,23 +1125,6 @@ function getFlashcardTotal() {
   return flashcards.reduce((total, card) => total + (Number(card.count) || 0), 0);
 }
 
-function getFlashcardDetail(card) {
-  if (!card) return "0 cards reviewed";
-
-  const range = card.cardRange ? `Cards ${card.cardRange}` : "";
-  const count = Number(card.count) || 0;
-
-  if (range && count > 0) {
-    return `${range} · ${count} cards reviewed`;
-  }
-
-  if (range) {
-    return range;
-  }
-
-  return `${count} cards reviewed`;
-}
-
 function getTodayLectureMinutes() {
   const today = todayString();
   return lectures
@@ -979,7 +1155,6 @@ function getNextReviewDate(itemId, itemType) {
 
   return pendingReviews.length > 0 ? pendingReviews[0].dueDate : "";
 }
-
 function countReviewedItems(type) {
   const reviewedItems = new Set();
 
@@ -991,7 +1166,6 @@ function countReviewedItems(type) {
 
   return reviewedItems.size;
 }
-
 function findItem(id, type) {
   if (type === "essay") return essays.find((item) => item.id === id);
   if (type === "mcq") return mcqs.find((item) => item.id === id);
@@ -1029,7 +1203,9 @@ function getReviewDetailLine(item, type) {
   if (!item) return "";
 
   if (type === "flashcard") {
-    return getFlashcardDetail(item);
+    const source = item.source || "Flashcards";
+    const range = item.cardRange ? `Cards ${item.cardRange}` : `${Number(item.count) || 0} cards`;
+    return `${source} · ${range}`;
   }
 
   if (type === "mcq") {
@@ -1166,7 +1342,6 @@ function getCountFromRange(start, end) {
 
   return endNumber - startNumber + 1;
 }
-
 function getCountFromCardRange(range) {
   const match = String(range || "").match(/(\d+)\s*[-–]\s*(\d+)/);
 
@@ -1181,7 +1356,6 @@ function getCountFromCardRange(range) {
 
   return end - start + 1;
 }
-
 function getSubjectName(subjectId) {
   const subject = subjects.find((item) => item.id === subjectId);
   return subject ? subject.name : subjectId || "";
