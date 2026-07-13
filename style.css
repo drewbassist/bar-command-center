@@ -15,9 +15,18 @@ body {
   min-height: 100vh;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .bcc-header {
+  min-height: 72px;
   padding: 14px 26px 10px;
   border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
 }
 
 .bcc-title {
@@ -29,6 +38,75 @@ body {
   margin-top: 2px;
   font-size: 12px;
   color: #666666;
+}
+
+.bcc-cloud-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  text-align: right;
+}
+
+.bcc-signed-in-email {
+  font-size: 11px;
+  color: #555555;
+}
+
+.bcc-cloud-save-status {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #777777;
+}
+
+.bcc-cloud-save-status[data-state="saved"] {
+  color: #1f6f36;
+}
+
+.bcc-cloud-save-status[data-state="error"] {
+  color: #9a1c1c;
+}
+
+.bcc-header-button,
+.bcc-secondary-button {
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #222222;
+  padding: 7px 11px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.bcc-auth-screen {
+  min-height: calc(100vh - 72px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.bcc-auth-panel {
+  width: min(420px, 100%);
+  border: 1px solid #e5e5e5;
+  padding: 22px;
+}
+
+.bcc-auth-panel p {
+  margin: 0 0 16px;
+  color: #666666;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.bcc-auth-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bcc-auth-message {
+  min-height: 18px;
+  font-size: 12px;
+  color: #9a1c1c;
 }
 
 .bcc-nav {
@@ -160,6 +238,12 @@ h2 {
   border-radius: 0;
 }
 
+.bcc-form .bcc-secondary-button {
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #222222;
+}
+
 .bcc-list-empty {
   font-size: 12px;
   color: #777777;
@@ -194,6 +278,16 @@ h2 {
 .bcc-rating {
   margin-top: 4px;
   font-size: 12px;
+}
+
+.bcc-small-button {
+  margin-top: 5px;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #222222;
+  padding: 5px 9px;
+  font-size: 11px;
+  cursor: pointer;
 }
 
 .bcc-cycle-map {
@@ -248,6 +342,12 @@ h2 {
   background: #2f2f2f;
 }
 
+.bcc-today-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .bcc-backup-actions {
   display: flex;
   gap: 12px;
@@ -268,8 +368,6 @@ h2 {
 #import-backup-input {
   display: none;
 }
-
-/* Review matrix */
 
 .bcc-review-row {
   padding: 18px 0;
@@ -329,10 +427,15 @@ h2 {
 @media (max-width: 760px) {
   .bcc-header {
     padding: 16px 18px 10px;
+    align-items: flex-start;
   }
 
   .bcc-title {
     font-size: 24px;
+  }
+
+  .bcc-cloud-controls {
+    align-items: flex-end;
   }
 
   .bcc-nav {
@@ -362,6 +465,18 @@ h2 {
   }
 }
 
+@media (max-width: 520px) {
+  .bcc-header {
+    display: block;
+  }
+
+  .bcc-cloud-controls {
+    margin-top: 10px;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
 @media (max-width: 460px) {
   .bcc-grid {
     grid-template-columns: 1fr;
@@ -375,7 +490,8 @@ h2 {
     width: 100%;
   }
 
-  .bcc-backup-actions {
+  .bcc-backup-actions,
+  .bcc-auth-actions {
     display: grid;
     grid-template-columns: 1fr;
   }
