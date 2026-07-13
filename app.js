@@ -1,5 +1,13 @@
 const reviewIntervals = [1, 3, 7, 30];
 
+const SUPABASE_URL = "https://rudhrifkjhretilqdncy.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_TGTjuqPmo8AOx_P2OpxnOw_NGT-1Z9l";
+
+let supabaseClient = null;
+let currentUser = null;
+let cloudSaveTimer = null;
+let appControlsReady = false;
+
 let subjects = [];
 let essaySources = [];
 let mcqSources = [];
@@ -22,20 +30,34 @@ let editingEntry = null;
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
+  initializeSupabase();
+  setupAuthControls();
   await loadData();
-
-  setupNavigation();
-  setupViewJumpButtons();
-  setupRatingDropdowns();
-  populateSubjectDropdowns();
-  populateSourceDropdowns();
-  setupForms();
-  setupSessionButton();
-
-  setupStudyModeSelector();
-  setupBackupButtons();
-
+  setupAppControlsOnce();
   renderAll();
+
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    setAuthMessage(error.message);
+    showSignedOutState();
+  } else if (data.session) {
+    await openSignedInApp(data.session.user);
+  } else {
+    showSignedOutState();
+  }
+
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_OUT" || !session) {
+      currentUser = null;
+      showSignedOutState();
+      return;
+    }
+
+    if (event === "SIGNED_IN" && session.user?.id !== currentUser?.id) {
+      window.setTimeout(() => openSignedInApp(session.user), 0);
+    }
+  });
 }
 
 async function loadData() {
@@ -52,7 +74,7 @@ async function loadData() {
   essays = loadLocalData("bcc_essays", await loadJson("essays.json", []));
   mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
   flashcards = loadLocalData("bcc_flashcards", await loadJson("flashcards.json", []));
-  lectures = loadLocalData("bcc_lectures", await loadJson("lectures.json", []));
+  lectures = loadLocalData("bcc_lectures", []);
   reviews = loadLocalData("bcc_reviews", await loadJson("reviews.json", []));
   sessionHistory = loadLocalData("bcc_session_history", []);
 
@@ -93,6 +115,11 @@ function loadLocalData(key, fallback) {
 }
 
 function saveData() {
+  saveLocalData();
+  scheduleCloudSave();
+}
+
+function saveLocalData() {
   localStorage.setItem("bcc_essays", JSON.stringify(essays));
   localStorage.setItem("bcc_mcqs", JSON.stringify(mcqs));
   localStorage.setItem("bcc_flashcards", JSON.stringify(flashcards));
@@ -101,6 +128,270 @@ function saveData() {
   localStorage.setItem("bcc_session_history", JSON.stringify(sessionHistory));
   localStorage.setItem("bcc_current_session", String(currentSession));
   localStorage.setItem("bcc_study_mode", currentStudyMode);
+}
+
+function getCompleteBarOSData() {
+  return {
+    version: 1,
+    essays,
+    mcqs,
+    flashcards,
+    lectures,
+    reviews,
+    sessionHistory,
+    currentSession,
+    currentStudyMode
+  };
+}
+
+function applyCompleteBarOSData(data) {
+  essays = Array.isArray(data?.essays) ? data.essays : [];
+  mcqs = Array.isArray(data?.mcqs) ? data.mcqs : [];
+  flashcards = Array.isArray(data?.flashcards) ? data.flashcards : [];
+  lectures = Array.isArray(data?.lectures) ? data.lectures : [];
+  reviews = Array.isArray(data?.reviews) ? data.reviews : [];
+  sessionHistory = Array.isArray(data?.sessionHistory) ? data.sessionHistory : [];
+  currentSession = Number(data?.currentSession || 1);
+  currentStudyMode = data?.currentStudyMode || currentStudyMode || "full";
+
+  if (!Number.isFinite(currentSession) || currentSession < 1) {
+    currentSession = 1;
+  }
+}
+
+function scheduleCloudSave() {
+  if (!currentUser || !supabaseClient) return;
+
+  setCloudStatus("Saving to cloud…", "saving");
+  window.clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = window.setTimeout(saveCloudData, 350);
+}
+
+async function saveCloudData() {
+  if (!currentUser || !supabaseClient) return;
+
+  const payload = {
+    user_id: currentUser.id,
+    data: getCompleteBarOSData(),
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabaseClient
+    .from("baros_data")
+    .upsert(payload, { onConflict: "user_id" });
+
+  if (error) {
+    console.error("Cloud save failed:", error);
+    setCloudStatus("Saved locally · Cloud save failed", "error");
+    return;
+  }
+
+  setCloudStatus(`Cloud saved ${formatTime(new Date())}`, "saved");
+}
+
+async function loadCloudData() {
+  if (!currentUser || !supabaseClient) return;
+
+  setCloudStatus("Loading cloud data…", "saving");
+
+  const { data, error } = await supabaseClient
+    .from("baros_data")
+    .select("data, updated_at")
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Cloud load failed:", error);
+    setCloudStatus("Using local data · Cloud unavailable", "error");
+    return;
+  }
+
+  if (data?.data) {
+    applyCompleteBarOSData(data.data);
+    saveLocalData();
+    setCloudStatus(
+      data.updated_at
+        ? `Cloud loaded · Saved ${formatDateTime(data.updated_at)}`
+        : "Cloud loaded",
+      "saved"
+    );
+    return;
+  }
+
+  await saveCloudData();
+}
+
+function initializeSupabase() {
+  if (!window.supabase?.createClient) {
+    throw new Error("Supabase client library did not load.");
+  }
+
+  supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    }
+  );
+}
+
+function setupAuthControls() {
+  const authForm = document.getElementById("auth-form");
+  const createAccountButton = document.getElementById("create-account-button");
+  const signOutButton = document.getElementById("sign-out-button");
+
+  if (authForm) {
+    authForm.addEventListener("submit", handleSignIn);
+  }
+
+  if (createAccountButton) {
+    createAccountButton.addEventListener("click", handleCreateAccount);
+  }
+
+  if (signOutButton) {
+    signOutButton.addEventListener("click", handleSignOut);
+  }
+}
+
+function setupAppControlsOnce() {
+  if (appControlsReady) return;
+
+  setupNavigation();
+  setupViewJumpButtons();
+  setupRatingDropdowns();
+  populateSubjectDropdowns();
+  populateSourceDropdowns();
+  setupForms();
+  setupSessionButton();
+  setupStudyModeSelector();
+  setupBackupButtons();
+
+  appControlsReady = true;
+}
+
+async function handleSignIn(event) {
+  event.preventDefault();
+
+  const email = getValue("auth-email");
+  const password = getValue("auth-password");
+
+  setAuthMessage("Signing in…", false);
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    setAuthMessage(error.message);
+  }
+}
+
+async function handleCreateAccount() {
+  const email = getValue("auth-email");
+  const password = getValue("auth-password");
+
+  if (!email || !password) {
+    setAuthMessage("Enter an email and password first.");
+    return;
+  }
+
+  setAuthMessage("Creating account…", false);
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) {
+    setAuthMessage(error.message);
+    return;
+  }
+
+  if (data.session) {
+    setAuthMessage("Account created.", false);
+  } else {
+    setAuthMessage("Account created. Check your email to confirm it, then sign in.", false);
+  }
+}
+
+async function handleSignOut() {
+  window.clearTimeout(cloudSaveTimer);
+  await saveCloudData();
+  await supabaseClient.auth.signOut();
+}
+
+async function openSignedInApp(user) {
+  if (!user) return;
+
+  currentUser = user;
+  setAuthMessage("", false);
+  setText("signed-in-email", user.email || "");
+  showSignedInState();
+
+  await loadCloudData();
+  renderAll();
+}
+
+function showSignedInState() {
+  const authScreen = document.getElementById("auth-screen");
+  const appShell = document.getElementById("app-shell");
+  const cloudControls = document.getElementById("cloud-controls");
+
+  if (authScreen) authScreen.hidden = true;
+  if (appShell) appShell.hidden = false;
+  if (cloudControls) cloudControls.hidden = false;
+}
+
+function showSignedOutState() {
+  const authScreen = document.getElementById("auth-screen");
+  const appShell = document.getElementById("app-shell");
+  const cloudControls = document.getElementById("cloud-controls");
+
+  if (authScreen) authScreen.hidden = false;
+  if (appShell) appShell.hidden = true;
+  if (cloudControls) cloudControls.hidden = true;
+}
+
+function setAuthMessage(message, isError = true) {
+  const element = document.getElementById("auth-message");
+  if (!element) return;
+
+  element.textContent = message || "";
+  element.style.color = isError ? "#9a1c1c" : "#555555";
+}
+
+function setCloudStatus(message, state = "") {
+  const element = document.getElementById("cloud-save-status");
+  if (!element) return;
+
+  element.textContent = message;
+  element.dataset.state = state;
+}
+
+function formatTime(date) {
+  return date.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit"
+  });
+}
+
+function formatDateTime(value) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "";
+
+  return date.toLocaleString([], {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  });
 }
 
 function setupNavigation() {
@@ -661,7 +952,8 @@ function exportBackup() {
     lectures,
     reviews,
     sessionHistory,
-    currentSession
+    currentSession,
+    currentStudyMode
   };
 
   const file = new Blob([JSON.stringify(backup, null, 2)], {
@@ -697,6 +989,7 @@ function importBackup(event) {
       reviews = Array.isArray(backup.reviews) ? backup.reviews : [];
       sessionHistory = Array.isArray(backup.sessionHistory) ? backup.sessionHistory : [];
       currentSession = Number(backup.currentSession || 1);
+      currentStudyMode = backup.currentStudyMode || currentStudyMode || "full";
 
       if (!Number.isFinite(currentSession) || currentSession < 1) {
         currentSession = 1;
@@ -859,7 +1152,7 @@ function renderFlashcards() {
     <div class="bcc-item">
       <div class="bcc-item-title">${escapeHtml(getFlashcardTitle(card))}</div>
       <div class="bcc-item-meta">
-        ${escapeHtml(card.source || "No source")} · ${Number(card.count) || 0} cards reviewed · ${Number(card.newCount) || 0} new cards
+        ${escapeHtml(card.source || "No source")} · ${Number(card.count) || 0} cards reviewed
       </div>
       <div class="bcc-rating">Rating: ${card.rating}/10 · Next Review: ${formatDate(getNextReviewDate(card.id, "flashcard"))}</div>
       <button class="bcc-small-button" type="button" onclick="startEditEntry('flashcard', '${escapeHtml(card.id)}')">Edit</button>
