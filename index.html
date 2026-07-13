@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,307 +15,270 @@
 
 <body>
   <header class="bcc-header">
-    <div class="bcc-title">Drew's BarOS</div>
-    <div class="bcc-subtitle">California Bar Study Operating System</div>
+    <div>
+      <div class="bcc-title">Drew's BarOS</div>
+      <div class="bcc-subtitle">California Bar Study Operating System</div>
+    </div>
+
+    <div id="cloud-controls" class="bcc-cloud-controls" hidden>
+      <div>
+        <div id="signed-in-email" class="bcc-signed-in-email"></div>
+        <div id="cloud-save-status" class="bcc-cloud-save-status">Cloud ready</div>
+      </div>
+      <button id="sign-out-button" type="button" class="bcc-header-button">Sign Out</button>
+    </div>
   </header>
 
-  <nav class="bcc-nav">
-    <button class="bcc-nav-button" data-view="dashboard">Today</button>
-    <button class="bcc-nav-button" data-view="essays">Essays</button>
-    <button class="bcc-nav-button" data-view="mcqs">MCQs</button>
-    <button class="bcc-nav-button" data-view="flashcards">Flashcards</button>
-    <button class="bcc-nav-button" data-view="reviews">Reviews</button>
-    <button class="bcc-nav-button" data-view="stats">Progress</button>
-  </nav>
+  <section id="auth-screen" class="bcc-auth-screen">
+    <div class="bcc-auth-panel">
+      <h1>Sign in to BarOS</h1>
+      <p>Your study data will be stored in Supabase and cached in this browser.</p>
 
-  <main class="bcc-main">
-    <section id="dashboard" class="bcc-view">
-      <div class="bcc-panel">
-        <h2>Quick Log</h2>
+      <form id="auth-form" class="bcc-form">
+        <label>
+          Email
+          <input id="auth-email" type="email" autocomplete="email" required />
+        </label>
 
-        <div class="bcc-today-actions">
-          <button class="bcc-session-button" data-view-jump="essays">Log Essay</button>
-          <button class="bcc-session-button" data-view-jump="mcqs">Log MCQ Session</button>
-          <button class="bcc-session-button" data-view-jump="flashcards">Log Flashcard Session</button>
+        <label>
+          Password
+          <input id="auth-password" type="password" autocomplete="current-password" required />
+        </label>
+
+        <div class="bcc-auth-actions">
+          <button type="submit">Sign In</button>
+          <button id="create-account-button" type="button" class="bcc-secondary-button">Create Account</button>
         </div>
-      </div>
 
-      <div class="bcc-panel">
-        <h2>Today's Totals</h2>
+        <div id="auth-message" class="bcc-auth-message"></div>
+      </form>
+    </div>
+  </section>
 
+  <div id="app-shell" hidden>
+    <nav class="bcc-nav">
+      <button class="bcc-nav-button" data-view="dashboard">Today</button>
+      <button class="bcc-nav-button" data-view="essays">Essays</button>
+      <button class="bcc-nav-button" data-view="mcqs">MCQs</button>
+      <button class="bcc-nav-button" data-view="flashcards">Flashcards</button>
+      <button class="bcc-nav-button" data-view="reviews">Reviews</button>
+      <button class="bcc-nav-button" data-view="stats">Progress</button>
+    </nav>
+
+    <main class="bcc-main">
+      <section id="dashboard" class="bcc-view">
+        <div class="bcc-panel">
+          <h2>Quick Log</h2>
+
+          <div class="bcc-today-actions">
+            <button class="bcc-session-button" data-view-jump="essays">Log Essay</button>
+            <button class="bcc-session-button" data-view-jump="mcqs">Log MCQ Session</button>
+            <button class="bcc-session-button" data-view-jump="flashcards">Log Flashcard Session</button>
+          </div>
+        </div>
+
+        <div class="bcc-panel">
+          <h2>Today's Totals</h2>
+
+          <div class="bcc-grid">
+            <div class="bcc-card">
+              <div class="bcc-card-label">Essays</div>
+              <div class="bcc-card-number" id="dashboard-essays-target">0</div>
+            </div>
+
+            <div class="bcc-card">
+              <div class="bcc-card-label">MCQs</div>
+              <div class="bcc-card-number" id="dashboard-mcqs-target">0</div>
+            </div>
+
+            <div class="bcc-card">
+              <div class="bcc-card-label">Flashcards</div>
+              <div class="bcc-card-number" id="dashboard-flashcards-target">0</div>
+            </div>
+
+            <div class="bcc-card">
+              <div class="bcc-card-label">Reviews Due</div>
+              <div class="bcc-card-number" id="dashboard-reviews-due">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bcc-panel">
+          <h2>Minimums</h2>
+
+          <div class="bcc-list">
+            <div class="bcc-item">
+              <div class="bcc-item-title">Essays</div>
+              <div class="bcc-item-meta">
+                <span id="dashboard-essays-target-minimum">0</span> /
+                <span id="dashboard-essays-goal">0</span>
+                completed today
+              </div>
+            </div>
+
+            <div class="bcc-item">
+              <div class="bcc-item-title">MCQs</div>
+              <div class="bcc-item-meta">
+                <span id="dashboard-mcqs-target-minimum">0</span> /
+                <span id="dashboard-mcqs-goal">0</span>
+                completed today
+              </div>
+            </div>
+
+            <div class="bcc-item">
+              <div class="bcc-item-title">Flashcards</div>
+              <div class="bcc-item-meta">
+                <span id="dashboard-flashcards-target-minimum">0</span> /
+                <span id="dashboard-flashcards-goal">0</span>
+                completed today
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bcc-panel">
+          <h2>Due Today</h2>
+          <div id="today-list" class="bcc-list-empty">No due items yet.</div>
+        </div>
+      </section>
+
+      <section id="essays" class="bcc-view">
+        <div class="bcc-panel">
+          <h2>Log Essay</h2>
+
+          <form id="essay-form" class="bcc-form">
+            <label>Subject<select id="essay-subject"></select></label>
+            <label>Source<select id="essay-source"></select></label>
+            <label>Title<input id="essay-title" type="text" /></label>
+            <label>Page Number<input id="essay-page-number" type="text" /></label>
+            <label>Question Number<input id="essay-question-number" type="text" /></label>
+            <label>Rating<select id="essay-rating"></select></label>
+            <label>Notes<textarea id="essay-notes"></textarea></label>
+            <button type="submit">Save Essay</button>
+          </form>
+        </div>
+
+        <div class="bcc-panel">
+          <h2>Recent Essays</h2>
+          <div id="essay-list" class="bcc-list-empty">No essays added yet.</div>
+        </div>
+      </section>
+
+      <section id="mcqs" class="bcc-view">
+        <div class="bcc-panel">
+          <h2>Log MCQ Session</h2>
+
+          <form id="mcq-form" class="bcc-form">
+            <label>Subject<select id="mcq-subject"></select></label>
+            <label>Source<select id="mcq-source"></select></label>
+            <label>Questions Completed<input id="mcq-count" type="number" min="0" /></label>
+            <label>Correct<input id="mcq-correct-count" type="number" min="0" /></label>
+            <label>Rating<select id="mcq-rating"></select></label>
+            <label>Notes<textarea id="mcq-notes"></textarea></label>
+            <button type="submit">Save MCQ Session</button>
+          </form>
+        </div>
+
+        <div class="bcc-panel">
+          <h2>Recent MCQ Sessions</h2>
+          <div id="mcq-list" class="bcc-list-empty">No MCQ sessions added yet.</div>
+        </div>
+      </section>
+
+      <section id="flashcards" class="bcc-view">
+        <div class="bcc-panel">
+          <h2>Log Flashcard Session</h2>
+
+          <form id="flashcard-form" class="bcc-form">
+            <label>Subject<select id="flashcard-subject"></select></label>
+            <label>Source<select id="flashcard-source"></select></label>
+            <label>Card Range<input id="flashcard-card-range" type="text" /></label>
+            <label>Rating<select id="flashcard-rating"></select></label>
+            <label>Notes<textarea id="flashcard-notes"></textarea></label>
+            <button type="submit">Save Flashcard Session</button>
+          </form>
+        </div>
+
+        <div class="bcc-panel">
+          <h2>Recent Flashcard Sessions</h2>
+          <div id="flashcard-list" class="bcc-list-empty">No flashcard sessions added yet.</div>
+        </div>
+      </section>
+
+      <section id="reviews" class="bcc-view">
+        <div class="bcc-panel">
+          <h2>Review Queue</h2>
+          <div id="review-list" class="bcc-list-empty">No reviews scheduled yet.</div>
+        </div>
+      </section>
+
+      <section id="stats" class="bcc-view">
         <div class="bcc-grid">
           <div class="bcc-card">
-            <div class="bcc-card-label">Essays</div>
-            <div class="bcc-card-number" id="dashboard-essays-target">0</div>
+            <div class="bcc-card-label">Essays Done</div>
+            <div class="bcc-card-number" id="stats-essays">0</div>
           </div>
 
           <div class="bcc-card">
-            <div class="bcc-card-label">MCQs</div>
-            <div class="bcc-card-number" id="dashboard-mcqs-target">0</div>
+            <div class="bcc-card-label">MCQs Done</div>
+            <div class="bcc-card-number" id="stats-mcqs">0</div>
           </div>
 
           <div class="bcc-card">
-            <div class="bcc-card-label">Flashcards</div>
-            <div class="bcc-card-number" id="dashboard-flashcards-target">0</div>
+            <div class="bcc-card-label">Flashcards Done</div>
+            <div class="bcc-card-number" id="stats-flashcards">0</div>
           </div>
 
           <div class="bcc-card">
-            <div class="bcc-card-label">Reviews Due</div>
-            <div class="bcc-card-number" id="dashboard-reviews-due">0</div>
+            <div class="bcc-card-label">Pending Reviews</div>
+            <div class="bcc-card-number" id="stats-reviews">0</div>
           </div>
         </div>
-      </div>
 
-      <div class="bcc-panel">
-        <h2>Minimums</h2>
+        <div class="bcc-panel">
+          <h2>Study Progress</h2>
 
-        <div class="bcc-list">
           <div class="bcc-item">
             <div class="bcc-item-title">Essays</div>
             <div class="bcc-item-meta">
-              <span id="dashboard-essays-target-minimum">0</span> /
-              <span id="dashboard-essays-goal">0</span>
-              completed today
+              <span id="stats-essay-sets-done">0</span> done •
+              <span id="stats-essay-sets-reviewed">0</span> reviewed
             </div>
           </div>
 
           <div class="bcc-item">
             <div class="bcc-item-title">MCQs</div>
             <div class="bcc-item-meta">
-              <span id="dashboard-mcqs-target-minimum">0</span> /
-              <span id="dashboard-mcqs-goal">0</span>
-              completed today
+              <span id="stats-mcq-sets-done">0</span> done •
+              <span id="stats-mcq-sets-reviewed">0</span> reviewed
             </div>
           </div>
 
           <div class="bcc-item">
             <div class="bcc-item-title">Flashcards</div>
             <div class="bcc-item-meta">
-              <span id="dashboard-flashcards-target-minimum">0</span> /
-              <span id="dashboard-flashcards-goal">0</span>
-              completed today
+              <span id="stats-flashcard-sets-done">0</span> done •
+              <span id="stats-flashcard-sets-reviewed">0</span> reviewed
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="bcc-panel">
-        <h2>Due Today</h2>
-        <div id="today-list" class="bcc-list-empty">No due items yet.</div>
-      </div>
-    </section>
+        <div class="bcc-panel">
+          <h2>Backup</h2>
 
-    <section id="essays" class="bcc-view">
-      <div class="bcc-panel">
-        <h2>Log Essay</h2>
+          <div class="bcc-backup-actions">
+            <button id="export-backup-button" class="bcc-session-button">Export Backup</button>
 
-        <form id="essay-form" class="bcc-form">
-          <label>
-            Subject
-            <select id="essay-subject"></select>
-          </label>
+            <label class="bcc-session-button" for="import-backup-input">Import Backup</label>
 
-          <label>
-            Source
-            <select id="essay-source"></select>
-          </label>
-
-          <label>
-            Title
-            <input id="essay-title" type="text" />
-          </label>
-
-          <label>
-            Page Number
-            <input id="essay-page-number" type="text" />
-          </label>
-
-          <label>
-            Question Number
-            <input id="essay-question-number" type="text" />
-          </label>
-
-          <label>
-            Rating
-            <select id="essay-rating"></select>
-          </label>
-
-          <label>
-            Notes
-            <textarea id="essay-notes"></textarea>
-          </label>
-
-          <button type="submit">Save Essay</button>
-        </form>
-      </div>
-
-      <div class="bcc-panel">
-        <h2>Recent Essays</h2>
-        <div id="essay-list" class="bcc-list-empty">No essays added yet.</div>
-      </div>
-    </section>
-
-    <section id="mcqs" class="bcc-view">
-      <div class="bcc-panel">
-        <h2>Log MCQ Session</h2>
-
-        <form id="mcq-form" class="bcc-form">
-          <label>
-            Subject
-            <select id="mcq-subject"></select>
-          </label>
-
-          <label>
-            Source
-            <select id="mcq-source"></select>
-          </label>
-
-          <label>
-            Questions Completed
-            <input id="mcq-count" type="number" min="0" />
-          </label>
-
-          <label>
-            Correct
-            <input id="mcq-correct-count" type="number" min="0" />
-          </label>
-
-          <label>
-            Rating
-            <select id="mcq-rating"></select>
-          </label>
-
-          <label>
-            Notes
-            <textarea id="mcq-notes"></textarea>
-          </label>
-
-          <button type="submit">Save MCQ Session</button>
-        </form>
-      </div>
-
-      <div class="bcc-panel">
-        <h2>Recent MCQ Sessions</h2>
-        <div id="mcq-list" class="bcc-list-empty">No MCQ sessions added yet.</div>
-      </div>
-    </section>
-
-    <section id="flashcards" class="bcc-view">
-      <div class="bcc-panel">
-        <h2>Log Flashcard Session</h2>
-
-        <form id="flashcard-form" class="bcc-form">
-          <label>
-            Subject
-            <select id="flashcard-subject"></select>
-          </label>
-
-          <label>
-            Source
-            <select id="flashcard-source"></select>
-          </label>
-
-          <label>
-            Card Range
-            <input id="flashcard-card-range" type="text" />
-          </label>
-
-          <label>
-            Rating
-            <select id="flashcard-rating"></select>
-          </label>
-
-          <label>
-            Notes
-            <textarea id="flashcard-notes"></textarea>
-          </label>
-
-          <button type="submit">Save Flashcard Session</button>
-        </form>
-      </div>
-
-      <div class="bcc-panel">
-        <h2>Recent Flashcard Sessions</h2>
-        <div id="flashcard-list" class="bcc-list-empty">No flashcard sessions added yet.</div>
-      </div>
-    </section>
-
-    <section id="reviews" class="bcc-view">
-      <div class="bcc-panel">
-        <h2>Review Queue</h2>
-        <div id="review-list" class="bcc-list-empty">No reviews scheduled yet.</div>
-      </div>
-    </section>
-
-    <section id="stats" class="bcc-view">
-      <div class="bcc-grid">
-        <div class="bcc-card">
-          <div class="bcc-card-label">Essays Done</div>
-          <div class="bcc-card-number" id="stats-essays">0</div>
-        </div>
-
-        <div class="bcc-card">
-          <div class="bcc-card-label">MCQs Done</div>
-          <div class="bcc-card-number" id="stats-mcqs">0</div>
-        </div>
-
-        <div class="bcc-card">
-          <div class="bcc-card-label">Flashcards Done</div>
-          <div class="bcc-card-number" id="stats-flashcards">0</div>
-        </div>
-
-        <div class="bcc-card">
-          <div class="bcc-card-label">Pending Reviews</div>
-          <div class="bcc-card-number" id="stats-reviews">0</div>
-        </div>
-      </div>
-
-      <div class="bcc-panel">
-        <h2>Study Progress</h2>
-
-        <div class="bcc-item">
-          <div class="bcc-item-title">Essays</div>
-          <div class="bcc-item-meta">
-            <span id="stats-essay-sets-done">0</span> done •
-            <span id="stats-essay-sets-reviewed">0</span> reviewed
+            <input id="import-backup-input" type="file" accept=".json" />
           </div>
         </div>
+      </section>
+    </main>
+  </div>
 
-        <div class="bcc-item">
-          <div class="bcc-item-title">MCQs</div>
-          <div class="bcc-item-meta">
-            <span id="stats-mcq-sets-done">0</span> done •
-            <span id="stats-mcq-sets-reviewed">0</span> reviewed
-          </div>
-        </div>
-
-        <div class="bcc-item">
-          <div class="bcc-item-title">Flashcards</div>
-          <div class="bcc-item-meta">
-            <span id="stats-flashcard-sets-done">0</span> done •
-            <span id="stats-flashcard-sets-reviewed">0</span> reviewed
-          </div>
-        </div>
-      </div>
-
-      <div class="bcc-panel">
-        <h2>Backup</h2>
-
-        <div class="bcc-backup-actions">
-          <button id="export-backup-button" class="bcc-session-button">
-            Export Backup
-          </button>
-
-          <label class="bcc-session-button" for="import-backup-input">
-            Import Backup
-          </label>
-
-          <input id="import-backup-input" type="file" accept=".json" />
-        </div>
-      </div>
-    </section>
-  </main>
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
 </html>
