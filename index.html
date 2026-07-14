@@ -218,7 +218,7 @@
         <div id="study-log-setup-panel" class="bcc-panel">
           <h2>Study Log Setup</h2>
           <p class="bcc-help-text">
-            Create one active course period. Week ranges are generated automatically from the start date.
+            Set up one course period. The complete weekly grid appears below before you save it.
           </p>
 
           <form id="study-log-setup-form" class="bcc-form bcc-study-log-setup-grid">
@@ -257,6 +257,15 @@
               <button id="study-log-reset-button" type="button" class="bcc-secondary-button">Reset Study Log</button>
             </div>
           </form>
+
+          <div class="bcc-study-log-preview-heading">
+            <h2>Study Log Preview</h2>
+            <p class="bcc-help-text">
+              The full weekly grid updates immediately as you change the setup fields.
+            </p>
+          </div>
+
+          <div id="study-log-full-grid" class="bcc-study-log-full-grid"></div>
         </div>
 
         <div id="study-log-active-area" hidden>
@@ -337,14 +346,6 @@
           <div class="bcc-panel">
             <h2>Recent Entries</h2>
             <div id="study-log-entry-list" class="bcc-list-empty">No study time entered yet.</div>
-          </div>
-
-          <div class="bcc-panel">
-            <h2>Full Weekly Study Grid</h2>
-            <p class="bcc-help-text">
-              Each week shows all eight required categories from the school form.
-            </p>
-            <div id="study-log-full-grid" class="bcc-study-log-full-grid"></div>
           </div>
 
           <div class="bcc-panel">
