@@ -726,3 +726,22 @@ h2 {
     border-bottom: 1px solid #111111;
   }
 }
+
+
+.bcc-study-log-preview-heading {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #e5e5e5;
+}
+
+#study-log-setup-panel .bcc-study-log-full-grid {
+  margin-top: 12px;
+}
+
+#study-log-setup-panel .bcc-study-log-week-card {
+  background: #ffffff;
+}
+
+#study-log-active-area[hidden] + * {
+  display: none;
+}
