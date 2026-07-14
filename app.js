@@ -104,10 +104,6 @@ async function loadData() {
   );
 
   rebuildCustomizableLists();
-  studyGoals = {
-    ...studyGoals,
-    ...(data?.studyGoals && typeof data.studyGoals === "object" ? data.studyGoals : {})
-  };
 
   studyGoals = {
     ...await loadJson("studyGoals.json", {}),
@@ -227,6 +223,11 @@ function applyCompleteBarOSData(data) {
   customMcqSources = normalizeCustomSourceList(data?.customMcqSources || []);
   customFlashcardSources = normalizeCustomSourceList(data?.customFlashcardSources || []);
   rebuildCustomizableLists();
+
+  studyGoals = {
+    ...studyGoals,
+    ...(data?.studyGoals && typeof data.studyGoals === "object" ? data.studyGoals : {})
+  };
 
   if (!Number.isFinite(currentSession) || currentSession < 1) {
     currentSession = 1;
