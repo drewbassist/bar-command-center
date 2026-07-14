@@ -1195,3 +1195,50 @@ h2 {
     width: 100%;
   }
 }
+
+
+/* BarOS version footer */
+.bcc-footer {
+  padding: 14px 20px 20px;
+  text-align: center;
+  font-size: 11px;
+  color: #888888;
+}
+
+/* Matching week and hour steppers */
+.bcc-hour-stepper {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  height: 38px;
+}
+
+.bcc-hour-stepper input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  border: 1px solid #cccccc !important;
+  border-left: none !important;
+  border-right: none !important;
+  padding: 7px 8px;
+  text-align: center;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bcc-hour-stepper .bcc-stepper-button {
+  flex: 0 0 40px;
+  width: 40px !important;
+  height: 38px !important;
+  min-width: 40px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #111111;
+  font-size: 18px;
+  line-height: 36px;
+  text-align: center;
+}
