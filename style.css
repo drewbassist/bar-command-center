@@ -1288,3 +1288,328 @@ h2 {
     align-items: stretch;
   }
 }
+
+
+/* v1.0.4 compact review settings */
+.bcc-review-settings-layout{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+.bcc-review-recommendation{
+  order:2;
+  border:none;
+  background:transparent;
+  padding:0;
+}
+.bcc-review-frequency-form{
+  order:1;
+}
+.bcc-review-frequency-actions{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+
+/* BarOS v1.1.0 interface system */
+:root {
+  --bcc-border: #dedede;
+  --bcc-soft: #f7f7f7;
+  --bcc-muted: #666666;
+  --bcc-control-height: 40px;
+}
+
+.bcc-main {
+  max-width: 1440px;
+  padding-top: 18px;
+}
+
+.bcc-panel {
+  border-color: var(--bcc-border);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+
+.bcc-panel h2 {
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.bcc-card {
+  border-color: var(--bcc-border);
+  min-height: 92px;
+  padding: 16px 18px;
+}
+
+.bcc-card-number {
+  margin-top: 8px;
+}
+
+.bcc-form input,
+.bcc-form select,
+.bcc-form textarea,
+.bcc-inline-add-form input,
+.bcc-settings-goals-grid input,
+.bcc-compact-review-form input {
+  border-color: #cfcfcf;
+  border-radius: 0;
+}
+
+.bcc-form input,
+.bcc-form select,
+.bcc-inline-add-form input,
+.bcc-settings-goals-grid input,
+.bcc-compact-review-form input {
+  min-height: var(--bcc-control-height);
+}
+
+.bcc-entry-form {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.bcc-entry-form label {
+  min-width: 0;
+}
+
+.bcc-entry-form .bcc-field-wide {
+  grid-column: 1 / -1;
+}
+
+.bcc-entry-form textarea {
+  min-height: 76px;
+}
+
+.bcc-entry-form > button[type="submit"] {
+  min-height: var(--bcc-control-height);
+  align-self: end;
+}
+
+.bcc-essay-form label:nth-child(1),
+.bcc-essay-form label:nth-child(2) {
+  grid-column: span 3;
+}
+
+.bcc-essay-form label:nth-child(4),
+.bcc-essay-form label:nth-child(5),
+.bcc-essay-form label:nth-child(6) {
+  grid-column: span 2;
+}
+
+.bcc-mcq-form label:nth-child(1),
+.bcc-mcq-form label:nth-child(2) {
+  grid-column: span 3;
+}
+
+.bcc-mcq-form label:nth-child(3),
+.bcc-mcq-form label:nth-child(4),
+.bcc-mcq-form label:nth-child(5) {
+  grid-column: span 2;
+}
+
+.bcc-flashcard-form label:nth-child(1),
+.bcc-flashcard-form label:nth-child(2) {
+  grid-column: span 3;
+}
+
+.bcc-flashcard-form label:nth-child(3),
+.bcc-flashcard-form label:nth-child(4) {
+  grid-column: span 3;
+}
+
+.bcc-settings-header {
+  margin: 0 0 14px;
+}
+
+.bcc-settings-header h1 {
+  margin-bottom: 4px;
+}
+
+.bcc-settings-header p {
+  margin: 0;
+  color: var(--bcc-muted);
+  font-size: 13px;
+}
+
+.bcc-settings-goals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.bcc-settings-goals-grid label,
+.bcc-compact-review-form > label {
+  display: grid;
+  gap: 5px;
+  font-size: 12px;
+  color: #444444;
+}
+
+.bcc-settings-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bcc-settings-actions button,
+.bcc-compact-review-form button {
+  min-height: var(--bcc-control-height);
+  border: 1px solid #111111;
+  background: #111111;
+  color: #ffffff;
+  padding: 8px 15px;
+  cursor: pointer;
+}
+
+.bcc-settings-actions .bcc-secondary-button,
+.bcc-compact-review-form .bcc-secondary-button {
+  border-color: #cccccc;
+  background: #ffffff;
+  color: #111111;
+}
+
+.bcc-compact-review-form {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto;
+  gap: 9px 12px;
+  align-items: end;
+}
+
+.bcc-compact-review-form > label {
+  grid-column: 1;
+}
+
+.bcc-compact-review-form > input {
+  grid-column: 1;
+  width: 100%;
+  padding: 8px 10px;
+}
+
+.bcc-compact-review-form > .bcc-settings-actions {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.bcc-review-recommended-line,
+.bcc-compact-review-form .bcc-help-text,
+.bcc-compact-review-form .bcc-auth-message {
+  grid-column: 1 / -1;
+}
+
+.bcc-review-recommended-line {
+  font-size: 12px;
+  color: #444444;
+}
+
+.bcc-progress-panel {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.bcc-progress-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 9px;
+  font-size: 12px;
+}
+
+.bcc-progress-track {
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+  background: #ececec;
+}
+
+.bcc-progress-fill {
+  width: 0;
+  height: 100%;
+  background: #111111;
+  transition: width 180ms ease;
+}
+
+.bcc-account-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+}
+
+.bcc-account-label {
+  font-size: 11px;
+  color: var(--bcc-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.bcc-account-value {
+  margin-top: 4px;
+  font-size: 15px;
+}
+
+#settings .bcc-customization-grid {
+  gap: 12px;
+}
+
+#settings .bcc-customization-section {
+  background: var(--bcc-soft);
+}
+
+#settings .bcc-backup-actions .bcc-session-button {
+  min-height: var(--bcc-control-height);
+  height: auto;
+}
+
+@media (max-width: 1000px) {
+  .bcc-entry-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bcc-entry-form label,
+  .bcc-entry-form .bcc-field-wide,
+  .bcc-essay-form label:nth-child(n),
+  .bcc-mcq-form label:nth-child(n),
+  .bcc-flashcard-form label:nth-child(n) {
+    grid-column: span 1;
+  }
+
+  .bcc-entry-form .bcc-field-wide {
+    grid-column: 1 / -1;
+  }
+
+  .bcc-settings-goals-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bcc-settings-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .bcc-entry-form,
+  .bcc-settings-goals-grid,
+  .bcc-compact-review-form {
+    grid-template-columns: 1fr;
+  }
+
+  .bcc-entry-form .bcc-field-wide,
+  .bcc-compact-review-form > label,
+  .bcc-compact-review-form > input,
+  .bcc-compact-review-form > .bcc-settings-actions,
+  .bcc-review-recommended-line,
+  .bcc-compact-review-form .bcc-help-text,
+  .bcc-compact-review-form .bcc-auth-message {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .bcc-account-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
