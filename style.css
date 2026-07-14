@@ -1242,3 +1242,49 @@ h2 {
   line-height: 36px;
   text-align: center;
 }
+
+
+/* Uniform spaced-repetition settings block */
+.bcc-review-settings-layout {
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 24px;
+  padding: 16px 18px;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #111111;
+  background: #f7f7f7;
+  align-items: center;
+}
+
+.bcc-review-recommendation {
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-left: none;
+  background: transparent;
+}
+
+.bcc-review-frequency-form {
+  padding: 0;
+  background: transparent;
+}
+
+.bcc-review-frequency-control-row {
+  align-items: stretch;
+}
+
+.bcc-review-frequency-control-row input,
+.bcc-review-frequency-control-row button {
+  height: 40px;
+}
+
+#review-frequency-help {
+  margin-top: 2px;
+}
+
+@media (max-width: 900px) {
+  .bcc-review-settings-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    align-items: stretch;
+  }
+}
