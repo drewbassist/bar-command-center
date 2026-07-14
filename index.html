@@ -291,7 +291,7 @@
 
               <div class="bcc-study-log-toolbar">
                 <button id="study-log-edit-setup-button" type="button" class="bcc-small-button">Edit Setup</button>
-                <button id="study-log-print-button" type="button" class="bcc-small-button">Download / Print Log</button>
+                <button id="study-log-print-button" type="button" class="bcc-small-button">Download Excel Log</button>
               </div>
             </div>
           </div>
@@ -337,6 +337,14 @@
           <div class="bcc-panel">
             <h2>Recent Entries</h2>
             <div id="study-log-entry-list" class="bcc-list-empty">No study time entered yet.</div>
+          </div>
+
+          <div class="bcc-panel">
+            <h2>Full Weekly Study Grid</h2>
+            <p class="bcc-help-text">
+              Each week shows all eight required categories from the school form.
+            </p>
+            <div id="study-log-full-grid" class="bcc-study-log-full-grid"></div>
           </div>
 
           <div class="bcc-panel">
@@ -431,6 +439,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
