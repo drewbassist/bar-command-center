@@ -69,16 +69,6 @@
     <main class="bcc-main">
       <section id="dashboard" class="bcc-view">
         <div class="bcc-panel">
-          <h2>Quick Log</h2>
-
-          <div class="bcc-today-actions">
-            <button class="bcc-session-button" data-view-jump="essays">Log Essay</button>
-            <button class="bcc-session-button" data-view-jump="mcqs">Log MCQ Session</button>
-            <button class="bcc-session-button" data-view-jump="flashcards">Log Flashcard Session</button>
-          </div>
-        </div>
-
-        <div class="bcc-panel">
           <h2>Today's Totals</h2>
 
           <div class="bcc-grid">
@@ -210,36 +200,43 @@
         <div class="bcc-panel">
           <h2>Spaced-Repetition Schedule</h2>
 
-          <div class="bcc-review-recommendation">
-            Recommended schedule: <strong>Day 1, Day 3, Day 7, and Day 30</strong>
+          <div class="bcc-review-settings-layout">
+            <div class="bcc-review-recommendation">
+              <div class="bcc-review-setting-label">Recommended</div>
+              <div class="bcc-review-setting-value">1, 3, 7, 30 days</div>
+            </div>
+
+            <form id="review-frequency-form" class="bcc-review-frequency-form">
+              <label for="review-frequency-input">Your Review Days</label>
+
+              <div class="bcc-review-frequency-control-row">
+                <input
+                  id="review-frequency-input"
+                  type="text"
+                  inputmode="numeric"
+                  value="1, 3, 7, 30"
+                  aria-describedby="review-frequency-help"
+                />
+
+                <button type="submit">Save Schedule</button>
+
+                <button
+                  id="review-frequency-reset-button"
+                  type="button"
+                  class="bcc-secondary-button"
+                >
+                  Use Recommended
+                </button>
+              </div>
+
+              <div id="review-frequency-help" class="bcc-help-text">
+                Enter positive day numbers separated by commas. The schedule applies to new entries.
+                Existing review dates remain unchanged.
+              </div>
+
+              <div id="review-frequency-message" class="bcc-auth-message"></div>
+            </form>
           </div>
-
-          <form id="review-frequency-form" class="bcc-review-frequency-form">
-            <label>
-              Your Review Days
-              <input
-                id="review-frequency-input"
-                type="text"
-                inputmode="numeric"
-                value="1, 3, 7, 30"
-                aria-describedby="review-frequency-help"
-              />
-            </label>
-
-            <div id="review-frequency-help" class="bcc-help-text">
-              Enter positive day numbers separated by commas. Changes apply to newly logged essays,
-              MCQ sessions, and flashcard sessions. Existing review dates remain unchanged.
-            </div>
-
-            <div class="bcc-review-frequency-actions">
-              <button type="submit">Save Review Schedule</button>
-              <button id="review-frequency-reset-button" type="button" class="bcc-secondary-button">
-                Use Recommended
-              </button>
-            </div>
-
-            <div id="review-frequency-message" class="bcc-auth-message"></div>
-          </form>
         </div>
 
         <div class="bcc-panel">
@@ -256,7 +253,7 @@
             Set up one course period. The complete weekly grid appears below before you save it.
           </p>
 
-          <form id="study-log-setup-form" class="bcc-form bcc-study-log-setup-grid">
+          <form id="study-log-setup-form" class="bcc-study-log-setup-grid">
             <label>
               Student Name
               <input id="study-log-student-name" type="text" required />
@@ -292,13 +289,13 @@
             </label>
 
             <div class="bcc-study-log-setup-actions">
-              <button type="submit">Create Study Log</button>
+              <button type="submit" class="bcc-primary-button">Create Study Log</button>
               <button id="study-log-reset-button" type="button" class="bcc-secondary-button">Reset Study Log</button>
             </div>
           </form>
 
           <div class="bcc-study-log-preview-heading">
-            <h2>Study Log Preview</h2>
+            <h2>Weekly Grid Preview</h2>
             <p class="bcc-help-text">
               The full weekly grid updates immediately. After creating the Study Log, every daily cell becomes editable.
             </p>
