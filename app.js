@@ -1,4 +1,5 @@
-const reviewIntervals = [1, 3, 7, 30];
+const recommendedReviewIntervals = [1, 3, 7, 30];
+let reviewIntervals = [...recommendedReviewIntervals];
 
 const SUPABASE_URL = "https://rudhrifkjhretilqdncy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_TGTjuqPmo8AOx_P2OpxnOw_NGT-1Z9l";
@@ -12,6 +13,16 @@ let subjects = [];
 let essaySources = [];
 let mcqSources = [];
 let flashcardSources = [];
+
+let baseSubjects = [];
+let baseEssaySources = [];
+let baseMcqSources = [];
+let baseFlashcardSources = [];
+
+let customSubjects = [];
+let customEssaySources = [];
+let customMcqSources = [];
+let customFlashcardSources = [];
 
 let studyGoals = {};
 let studyCycle = [];
@@ -39,7 +50,6 @@ const studyLogActivityIds = [
 ];
 
 let studyLog = createEmptyStudyLog();
-let editingStudyLogEntryId = null;
 
 document.addEventListener("DOMContentLoaded", init);
 
@@ -75,10 +85,25 @@ async function init() {
 }
 
 async function loadData() {
-  subjects = await loadJson("subjects.json", []);
-  essaySources = await loadJson("essaySources.json", []);
-  mcqSources = await loadJson("mcqSources.json", []);
-  flashcardSources = await loadJson("flashcardSources.json", []);
+  baseSubjects = await loadJson("subjects.json", []);
+  baseEssaySources = await loadJson("essaySources.json", []);
+  baseMcqSources = await loadJson("mcqSources.json", []);
+  baseFlashcardSources = await loadJson("flashcardSources.json", []);
+
+  customSubjects = normalizeCustomSubjects(
+    loadLocalData("bcc_custom_subjects", [])
+  );
+  customEssaySources = normalizeCustomSourceList(
+    loadLocalData("bcc_custom_essay_sources", [])
+  );
+  customMcqSources = normalizeCustomSourceList(
+    loadLocalData("bcc_custom_mcq_sources", [])
+  );
+  customFlashcardSources = normalizeCustomSourceList(
+    loadLocalData("bcc_custom_flashcard_sources", [])
+  );
+
+  rebuildCustomizableLists();
 
   studyGoals = await loadJson("studyGoals.json", {});
   studyCycle = await loadJson("studyCycle.json", []);
@@ -91,6 +116,9 @@ async function loadData() {
   lectures = loadLocalData("bcc_lectures", []);
   reviews = loadLocalData("bcc_reviews", await loadJson("reviews.json", []));
   sessionHistory = loadLocalData("bcc_session_history", []);
+  reviewIntervals = normalizeReviewIntervals(
+    loadLocalData("bcc_review_intervals", recommendedReviewIntervals)
+  );
   studyLog = normalizeStudyLog(loadLocalData("bcc_study_log", createEmptyStudyLog()));
 
   currentSession = Number(localStorage.getItem("bcc_current_session") || "1");
@@ -144,6 +172,11 @@ function saveLocalData() {
   localStorage.setItem("bcc_current_session", String(currentSession));
   localStorage.setItem("bcc_study_mode", currentStudyMode);
   localStorage.setItem("bcc_study_log", JSON.stringify(studyLog));
+  localStorage.setItem("bcc_review_intervals", JSON.stringify(reviewIntervals));
+  localStorage.setItem("bcc_custom_subjects", JSON.stringify(customSubjects));
+  localStorage.setItem("bcc_custom_essay_sources", JSON.stringify(customEssaySources));
+  localStorage.setItem("bcc_custom_mcq_sources", JSON.stringify(customMcqSources));
+  localStorage.setItem("bcc_custom_flashcard_sources", JSON.stringify(customFlashcardSources));
 }
 
 function getCompleteBarOSData() {
@@ -157,7 +190,12 @@ function getCompleteBarOSData() {
     sessionHistory,
     currentSession,
     currentStudyMode,
-    studyLog
+    studyLog,
+    reviewIntervals,
+    customSubjects,
+    customEssaySources,
+    customMcqSources,
+    customFlashcardSources
   };
 }
 
@@ -171,6 +209,15 @@ function applyCompleteBarOSData(data) {
   currentSession = Number(data?.currentSession || 1);
   currentStudyMode = data?.currentStudyMode || currentStudyMode || "full";
   studyLog = normalizeStudyLog(data?.studyLog);
+  reviewIntervals = normalizeReviewIntervals(
+    data?.reviewIntervals || recommendedReviewIntervals
+  );
+
+  customSubjects = normalizeCustomSubjects(data?.customSubjects || []);
+  customEssaySources = normalizeCustomSourceList(data?.customEssaySources || []);
+  customMcqSources = normalizeCustomSourceList(data?.customMcqSources || []);
+  customFlashcardSources = normalizeCustomSourceList(data?.customFlashcardSources || []);
+  rebuildCustomizableLists();
 
   if (!Number.isFinite(currentSession) || currentSession < 1) {
     currentSession = 1;
@@ -288,6 +335,8 @@ function setupAppControlsOnce() {
   setupStudyModeSelector();
   setupBackupButtons();
   setupStudyLog();
+  setupReviewFrequencyControls();
+  setupCustomizationControls();
 
   appControlsReady = true;
 }
@@ -602,6 +651,293 @@ function populateDropdown(id, items) {
     dropdown.appendChild(option);
   });
 }
+
+
+function normalizeCustomSubjects(value) {
+  if (!Array.isArray(value)) return [];
+
+  const seenIds = new Set();
+  const seenNames = new Set();
+
+  return value
+    .map((item) => {
+      if (typeof item === "string") {
+        return {
+          id: createCustomSubjectId(item),
+          name: item.trim()
+        };
+      }
+
+      return {
+        id: String(item?.id || createCustomSubjectId(item?.name || "")),
+        name: String(item?.name || "").trim()
+      };
+    })
+    .filter((item) => {
+      const normalizedName = item.name.toLowerCase();
+
+      if (!item.name || seenIds.has(item.id) || seenNames.has(normalizedName)) {
+        return false;
+      }
+
+      seenIds.add(item.id);
+      seenNames.add(normalizedName);
+      return true;
+    });
+}
+
+function normalizeCustomSourceList(value) {
+  if (!Array.isArray(value)) return [];
+
+  const seen = new Set();
+
+  return value
+    .map((item) => String(item || "").trim())
+    .filter((item) => {
+      const key = item.toLowerCase();
+
+      if (!item || seen.has(key)) return false;
+
+      seen.add(key);
+      return true;
+    });
+}
+
+function createCustomSubjectId(name) {
+  const slug = String(name || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+  return `custom_${slug || createId("subject")}`;
+}
+
+function mergeSubjects(baseItems, customItems) {
+  const result = [];
+  const seen = new Set();
+
+  [...baseItems, ...customItems].forEach((item) => {
+    const id = String(item?.id || "");
+    const name = String(item?.name || "").trim();
+    const key = name.toLowerCase();
+
+    if (!id || !name || seen.has(key)) return;
+
+    seen.add(key);
+    result.push({ id, name });
+  });
+
+  return result;
+}
+
+function mergeSourceLists(baseItems, customItems) {
+  const result = [];
+  const seen = new Set();
+
+  [...baseItems, ...customItems].forEach((item) => {
+    const value = String(item || "").trim();
+    const key = value.toLowerCase();
+
+    if (!value || seen.has(key)) return;
+
+    seen.add(key);
+    result.push(value);
+  });
+
+  return result;
+}
+
+function rebuildCustomizableLists() {
+  subjects = mergeSubjects(baseSubjects, customSubjects);
+  essaySources = mergeSourceLists(baseEssaySources, customEssaySources);
+  mcqSources = mergeSourceLists(baseMcqSources, customMcqSources);
+  flashcardSources = mergeSourceLists(baseFlashcardSources, customFlashcardSources);
+}
+
+function setupCustomizationControls() {
+  const configurations = [
+    {
+      formId: "custom-subject-form",
+      inputId: "custom-subject-input",
+      type: "subject"
+    },
+    {
+      formId: "custom-essay-source-form",
+      inputId: "custom-essay-source-input",
+      type: "essay"
+    },
+    {
+      formId: "custom-mcq-source-form",
+      inputId: "custom-mcq-source-input",
+      type: "mcq"
+    },
+    {
+      formId: "custom-flashcard-source-form",
+      inputId: "custom-flashcard-source-input",
+      type: "flashcard"
+    }
+  ];
+
+  configurations.forEach(({ formId, inputId, type }) => {
+    const form = document.getElementById(formId);
+
+    if (!form) return;
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      addCustomItem(type, getValue(inputId));
+      setFormValue(inputId, "");
+    });
+  });
+}
+
+function addCustomItem(type, rawValue) {
+  const value = String(rawValue || "").trim();
+
+  if (!value) {
+    setCustomizationMessage("Enter a name first.", true);
+    return;
+  }
+
+  if (type === "subject") {
+    const exists = subjects.some(
+      (item) => item.name.toLowerCase() === value.toLowerCase()
+    );
+
+    if (exists) {
+      setCustomizationMessage("That course or subject already exists.", true);
+      return;
+    }
+
+    customSubjects.push({
+      id: createCustomSubjectId(value),
+      name: value
+    });
+  } else {
+    const sourceList = getCustomSourceList(type);
+    const completeList = getCompleteSourceList(type);
+
+    const exists = completeList.some(
+      (item) => item.toLowerCase() === value.toLowerCase()
+    );
+
+    if (exists) {
+      setCustomizationMessage("That source already exists.", true);
+      return;
+    }
+
+    sourceList.push(value);
+  }
+
+  rebuildCustomizableLists();
+  saveData();
+  populateSubjectDropdowns();
+  populateSourceDropdowns();
+  renderCustomizationControls();
+  setCustomizationMessage(`${value} added.`);
+}
+
+function removeCustomItem(type, identifier) {
+  if (type === "subject") {
+    customSubjects = customSubjects.filter((item) => item.id !== identifier);
+  } else {
+    const list = getCustomSourceList(type);
+    const index = list.findIndex((item) => item === identifier);
+
+    if (index >= 0) list.splice(index, 1);
+  }
+
+  rebuildCustomizableLists();
+  saveData();
+  populateSubjectDropdowns();
+  populateSourceDropdowns();
+  renderCustomizationControls();
+  setCustomizationMessage("Custom item removed.");
+}
+
+function getCustomSourceList(type) {
+  if (type === "essay") return customEssaySources;
+  if (type === "mcq") return customMcqSources;
+  return customFlashcardSources;
+}
+
+function getCompleteSourceList(type) {
+  if (type === "essay") return essaySources;
+  if (type === "mcq") return mcqSources;
+  return flashcardSources;
+}
+
+function renderCustomizationControls() {
+  renderCustomItemList(
+    "custom-subject-list",
+    customSubjects.map((item) => ({
+      id: item.id,
+      label: item.name
+    })),
+    "subject"
+  );
+
+  renderCustomItemList(
+    "custom-essay-source-list",
+    customEssaySources.map((item) => ({
+      id: item,
+      label: item
+    })),
+    "essay"
+  );
+
+  renderCustomItemList(
+    "custom-mcq-source-list",
+    customMcqSources.map((item) => ({
+      id: item,
+      label: item
+    })),
+    "mcq"
+  );
+
+  renderCustomItemList(
+    "custom-flashcard-source-list",
+    customFlashcardSources.map((item) => ({
+      id: item,
+      label: item
+    })),
+    "flashcard"
+  );
+}
+
+function renderCustomItemList(containerId, items, type) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  if (items.length === 0) {
+    container.innerHTML = '<div class="bcc-list-empty">No custom entries yet.</div>';
+    return;
+  }
+
+  container.innerHTML = items.map((item) => `
+    <div class="bcc-custom-item">
+      <span>${escapeHtml(item.label)}</span>
+      <button
+        type="button"
+        class="bcc-small-button"
+        onclick="removeCustomItem('${escapeHtml(type)}', '${escapeHtml(item.id)}')"
+      >
+        Remove
+      </button>
+    </div>
+  `).join("");
+}
+
+function setCustomizationMessage(message, isError = false) {
+  const element = document.getElementById("customization-message");
+  if (!element) return;
+
+  element.textContent = message || "";
+  element.style.color = isError ? "#9a1c1c" : "#1f6f36";
+}
+
+window.removeCustomItem = removeCustomItem;
 
 function setupForms() {
   const essayForm = document.getElementById("essay-form");
@@ -937,6 +1273,97 @@ function resetForm(form) {
   resetSubmitButtonText(form);
 }
 
+
+function normalizeReviewIntervals(value) {
+  const source = Array.isArray(value) ? value : recommendedReviewIntervals;
+
+  const normalized = [...new Set(
+    source
+      .map((item) => Number(item))
+      .filter((item) => Number.isInteger(item) && item > 0 && item <= 3650)
+  )].sort((a, b) => a - b);
+
+  return normalized.length > 0
+    ? normalized
+    : [...recommendedReviewIntervals];
+}
+
+function setupReviewFrequencyControls() {
+  const form = document.getElementById("review-frequency-form");
+  const resetButton = document.getElementById("review-frequency-reset-button");
+
+  if (form) {
+    form.addEventListener("submit", handleReviewFrequencySubmit);
+  }
+
+  if (resetButton) {
+    resetButton.addEventListener("click", () => {
+      reviewIntervals = [...recommendedReviewIntervals];
+      saveData();
+      renderReviewFrequencyControls();
+      setReviewFrequencyMessage("Recommended schedule restored.");
+    });
+  }
+}
+
+function handleReviewFrequencySubmit(event) {
+  event.preventDefault();
+
+  const input = document.getElementById("review-frequency-input");
+  if (!input) return;
+
+  const parts = String(input.value || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  const numbers = parts.map((value) => Number(value));
+
+  const isValid =
+    numbers.length > 0 &&
+    numbers.every((value) =>
+      Number.isInteger(value) &&
+      value > 0 &&
+      value <= 3650
+    );
+
+  if (!isValid) {
+    setReviewFrequencyMessage(
+      "Enter positive whole numbers separated by commas, such as 1, 3, 7, 30.",
+      true
+    );
+    return;
+  }
+
+  reviewIntervals = normalizeReviewIntervals(numbers);
+  saveData();
+  renderReviewFrequencyControls();
+  setReviewFrequencyMessage(
+    `Review schedule saved: ${formatReviewIntervalList(reviewIntervals)}.`
+  );
+}
+
+function renderReviewFrequencyControls() {
+  const input = document.getElementById("review-frequency-input");
+  if (!input) return;
+
+  input.value = reviewIntervals.join(", ");
+}
+
+function setReviewFrequencyMessage(message, isError = false) {
+  const element = document.getElementById("review-frequency-message");
+  if (!element) return;
+
+  element.textContent = message || "";
+  element.style.color = isError ? "#9a1c1c" : "#1f6f36";
+}
+
+function formatReviewIntervalList(intervals) {
+  return intervals
+    .map((day) => `Day ${day}`)
+    .join(", ");
+}
+
 function createReviewsForItem(item) {
   reviewIntervals.forEach((interval, index) => {
     reviews.push({
@@ -973,7 +1400,12 @@ function exportBackup() {
     sessionHistory,
     currentSession,
     currentStudyMode,
-    studyLog
+    studyLog,
+    reviewIntervals,
+    customSubjects,
+    customEssaySources,
+    customMcqSources,
+    customFlashcardSources
   };
 
   const file = new Blob([JSON.stringify(backup, null, 2)], {
@@ -1011,6 +1443,14 @@ function importBackup(event) {
       currentSession = Number(backup.currentSession || 1);
       currentStudyMode = backup.currentStudyMode || currentStudyMode || "full";
       studyLog = normalizeStudyLog(backup.studyLog);
+      reviewIntervals = normalizeReviewIntervals(
+        backup.reviewIntervals || recommendedReviewIntervals
+      );
+      customSubjects = normalizeCustomSubjects(backup.customSubjects || []);
+      customEssaySources = normalizeCustomSourceList(backup.customEssaySources || []);
+      customMcqSources = normalizeCustomSourceList(backup.customMcqSources || []);
+      customFlashcardSources = normalizeCustomSourceList(backup.customFlashcardSources || []);
+      rebuildCustomizableLists();
 
       if (!Number.isFinite(currentSession) || currentSession < 1) {
         currentSession = 1;
@@ -1037,6 +1477,8 @@ function renderAll() {
   renderFlashcards();
   renderLectures();
   renderReviews();
+  renderReviewFrequencyControls();
+  renderCustomizationControls();
   renderDashboard();
   renderStudyLog();
   renderStats();
@@ -1715,11 +2157,12 @@ function normalizeStudyLogEntry(entry) {
 
 function setupStudyLog() {
   const setupForm = document.getElementById("study-log-setup-form");
-  const entryForm = document.getElementById("study-log-entry-form");
   const resetButton = document.getElementById("study-log-reset-button");
+  const weeksMinusButton = document.getElementById("study-log-weeks-minus");
+  const weeksPlusButton = document.getElementById("study-log-weeks-plus");
   const editSetupButton = document.getElementById("study-log-edit-setup-button");
-  const printButton = document.getElementById("study-log-print-button");
-  const cancelEntryButton = document.getElementById("study-log-entry-cancel");
+  const downloadButton = document.getElementById("study-log-print-button");
+  const grid = document.getElementById("study-log-full-grid");
 
   if (setupForm) {
     setupForm.addEventListener("submit", handleStudyLogSetupSubmit);
@@ -1740,14 +2183,25 @@ function setupStudyLog() {
     });
   }
 
-  if (entryForm) entryForm.addEventListener("submit", handleStudyLogEntrySubmit);
   if (resetButton) resetButton.addEventListener("click", resetStudyLog);
-  if (editSetupButton) editSetupButton.addEventListener("click", editStudyLogSetup);
-  if (printButton) printButton.addEventListener("click", downloadStudyLogXlsx);
-  if (cancelEntryButton) cancelEntryButton.addEventListener("click", cancelStudyLogEntryEdit);
 
-  populateStudyLogActivityDropdown();
-  setDefaultStudyLogEntryDate();
+  if (weeksMinusButton) {
+    weeksMinusButton.addEventListener("click", () => adjustStudyLogWeeks(-1));
+  }
+
+  if (weeksPlusButton) {
+    weeksPlusButton.addEventListener("click", () => adjustStudyLogWeeks(1));
+  }
+
+  if (editSetupButton) editSetupButton.addEventListener("click", editStudyLogSetup);
+  if (downloadButton) downloadButton.addEventListener("click", downloadStudyLogXlsx);
+
+  if (grid) {
+    grid.addEventListener("focusin", handleStudyLogCellFocus);
+    grid.addEventListener("change", handleStudyLogCellChange);
+    grid.addEventListener("keydown", handleStudyLogCellKeydown);
+  }
+
   renderStudyLogPreviewFromForm();
 }
 
@@ -1758,6 +2212,20 @@ function populateStudyLogActivityDropdown() {
   select.innerHTML = studyLogActivityIds.map((activityId) => {
     return `<option value="${escapeHtml(activityId)}">${escapeHtml(getStudyLogActivityLabel(activityId))}</option>`;
   }).join("");
+}
+
+
+function adjustStudyLogWeeks(amount) {
+  const input = document.getElementById("study-log-weeks");
+  if (!input) return;
+
+  const currentValue = Number(input.value) || 1;
+  const minimum = Number(input.min) || 1;
+  const maximum = Number(input.max) || 52;
+  const nextValue = Math.min(maximum, Math.max(minimum, currentValue + amount));
+
+  input.value = String(nextValue);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
 function handleStudyLogSetupSubmit(event) {
@@ -1807,7 +2275,6 @@ function resetStudyLog() {
   if (!confirmed) return;
 
   studyLog = createEmptyStudyLog();
-  editingStudyLogEntryId = null;
   saveData();
   fillStudyLogSetupForm();
   renderAll();
@@ -1849,56 +2316,87 @@ function setDefaultStudyLogEntryDate() {
   }
 }
 
-function handleStudyLogEntrySubmit(event) {
-  event.preventDefault();
+function handleStudyLogCellFocus(event) {
+  const input = event.target.closest(".bcc-study-time-input");
+  if (!input || input.disabled) return;
 
-  if (!studyLog.configured) {
-    setStudyLogMessage("Create the Study Log setup first.");
+  if (input.value === "0:00") {
+    input.select();
+  }
+}
+
+function handleStudyLogCellKeydown(event) {
+  const input = event.target.closest(".bcc-study-time-input");
+  if (!input || input.disabled) return;
+
+  if (event.key === "Enter") {
+    event.preventDefault();
+    input.blur();
+  }
+
+  if (event.key === "Escape") {
+    input.value = input.dataset.originalValue || "0:00";
+    input.blur();
+  }
+}
+
+function handleStudyLogCellChange(event) {
+  const input = event.target.closest(".bcc-study-time-input");
+  if (!input || input.disabled || !studyLog.configured) return;
+
+  const date = input.dataset.date;
+  const activity = input.dataset.activity;
+  const parsedMinutes = parseStudyTimeInput(input.value);
+
+  if (parsedMinutes === null) {
+    input.value = input.dataset.originalValue || "0:00";
+    setStudyLogMessage("Use H:MM, such as 2:30.");
     return;
   }
 
-  const date = getValue("study-log-entry-date");
-  const activity = getValue("study-log-entry-activity");
-  const hours = Math.max(0, Number(getValue("study-log-entry-hours")) || 0);
-  const minuteRemainder = Math.max(0, Math.min(59, Number(getValue("study-log-entry-minutes")) || 0));
-  const totalMinutes = Math.round(hours * 60 + minuteRemainder);
-  const notes = getValue("study-log-entry-notes");
+  setStudyLogCellMinutes(date, activity, parsedMinutes);
+  input.value = formatMinutes(parsedMinutes);
+  input.dataset.originalValue = input.value;
 
-  if (!date) {
-    setStudyLogMessage("Choose a date.");
-    return;
+  saveData();
+  renderAll();
+  setStudyLogMessage("Study time saved.");
+}
+
+function parseStudyTimeInput(value) {
+  const text = String(value || "").trim();
+
+  if (text === "") return 0;
+
+  if (/^\d+$/.test(text)) {
+    return Number(text) * 60;
   }
 
-  if (!isDateInsideStudyLog(date)) {
-    const range = getStudyLogOverallRange();
-    setStudyLogMessage(`Date must be within ${formatDate(range.start)} through ${formatDate(range.end)}.`);
-    return;
+  const match = text.match(/^(\d+)\s*:\s*(\d{1,2})$/);
+  if (!match) return null;
+
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes) || minutes > 59) {
+    return null;
   }
 
-  if (totalMinutes <= 0) {
-    setStudyLogMessage("Enter at least one minute.");
-    return;
-  }
+  return hours * 60 + minutes;
+}
 
-  if (editingStudyLogEntryId) {
-    const existing = studyLog.entries.find((entry) => entry.id === editingStudyLogEntryId);
+function setStudyLogCellMinutes(date, activity, minutes) {
+  studyLog.entries = studyLog.entries.filter((entry) => {
+    return !(entry.date === date && entry.activity === activity);
+  });
 
-    if (existing) {
-      Object.assign(existing, {
-        date,
-        activity,
-        minutes: totalMinutes,
-        notes,
-        editedAt: new Date().toISOString()
-      });
-    }
-  } else {
+  if (minutes > 0) {
     studyLog.entries.push({
       id: createId("study_log"),
       date,
       activity,
-      minutes: totalMinutes,
-      notes,
+      minutes,
+      notes: "",
       createdAt: new Date().toISOString(),
       editedAt: ""
     });
@@ -1907,77 +2405,6 @@ function handleStudyLogEntrySubmit(event) {
   studyLog.entries.sort((a, b) => {
     return b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt);
   });
-
-  editingStudyLogEntryId = null;
-  saveData();
-  resetStudyLogEntryForm();
-  renderAll();
-  setStudyLogMessage("");
-}
-
-function startStudyLogEntryEdit(entryId) {
-  const entry = studyLog.entries.find((item) => item.id === entryId);
-  if (!entry) return;
-
-  editingStudyLogEntryId = entryId;
-
-  setFormValue("study-log-entry-date", entry.date);
-  setFormValue("study-log-entry-activity", entry.activity);
-  setFormValue("study-log-entry-hours", Math.floor(entry.minutes / 60));
-  setFormValue("study-log-entry-minutes", entry.minutes % 60);
-  setFormValue("study-log-entry-notes", entry.notes);
-
-  const submitButton = document.getElementById("study-log-entry-submit");
-  const cancelButton = document.getElementById("study-log-entry-cancel");
-
-  if (submitButton) submitButton.textContent = "Save Edit";
-  if (cancelButton) cancelButton.hidden = false;
-
-  const form = document.getElementById("study-log-entry-form");
-  if (form) form.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function cancelStudyLogEntryEdit() {
-  editingStudyLogEntryId = null;
-  resetStudyLogEntryForm();
-  setStudyLogMessage("");
-}
-
-function resetStudyLogEntryForm() {
-  const form = document.getElementById("study-log-entry-form");
-  if (form) form.reset();
-
-  const submitButton = document.getElementById("study-log-entry-submit");
-  const cancelButton = document.getElementById("study-log-entry-cancel");
-
-  if (submitButton) submitButton.textContent = "Save Time Entry";
-  if (cancelButton) cancelButton.hidden = true;
-
-  populateStudyLogActivityDropdown();
-  setDefaultStudyLogEntryDate();
-  setFormValue("study-log-entry-hours", 0);
-  setFormValue("study-log-entry-minutes", 0);
-}
-
-function deleteStudyLogEntry(entryId) {
-  const entry = studyLog.entries.find((item) => item.id === entryId);
-  if (!entry) return;
-
-  const confirmed = window.confirm(
-    `Delete ${getStudyLogActivityLabel(entry.activity)} on ${formatDate(entry.date)}?`
-  );
-
-  if (!confirmed) return;
-
-  studyLog.entries = studyLog.entries.filter((item) => item.id !== entryId);
-
-  if (editingStudyLogEntryId === entryId) {
-    editingStudyLogEntryId = null;
-    resetStudyLogEntryForm();
-  }
-
-  saveData();
-  renderAll();
 }
 
 function renderStudyLog() {
@@ -1995,6 +2422,7 @@ function renderStudyLog() {
     const totals = calculateStudyLogTotals();
     const range = getStudyLogOverallRange();
 
+    setText("study-log-required-hours-summary", Number(studyLog.requiredHours).toFixed(2));
     setText("study-log-total-hours", formatDecimalHours(totals.totalMinutes));
     setText("study-log-hours-remaining", Math.max(0, studyLog.requiredHours - totals.totalHours).toFixed(2));
     setText("study-log-completion-percent", `${totals.percentage.toFixed(2)}%`);
@@ -2007,7 +2435,6 @@ function renderStudyLog() {
     );
 
     populateStudyLogActivityDropdown();
-    renderStudyLogEntries();
     renderStudyLogWeeklyTotals();
     renderStudyLogActivityTotals();
     setDefaultStudyLogEntryDate();
@@ -2094,6 +2521,7 @@ function renderStudyLogFullGrid() {
   if (!container) return;
 
   const weeks = calculateStudyLogWeeks();
+  const isEditable = Boolean(studyLog.configured);
 
   container.innerHTML = weeks.map((week) => {
     const dates = Array.from({ length: 7 }, (_, dayIndex) => addDays(week.startDate, dayIndex));
@@ -2104,7 +2532,23 @@ function renderStudyLogFullGrid() {
           .filter((entry) => entry.date === date && entry.activity === activityId)
           .reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
 
-        return `<td>${escapeHtml(formatMinutes(minutes))}</td>`;
+        const formatted = formatMinutes(minutes);
+
+        return `
+          <td>
+            <input
+              class="bcc-study-time-input"
+              type="text"
+              inputmode="numeric"
+              value="${escapeHtml(formatted)}"
+              data-original-value="${escapeHtml(formatted)}"
+              data-date="${escapeHtml(date)}"
+              data-activity="${escapeHtml(activityId)}"
+              aria-label="${escapeHtml(getStudyLogActivityLabel(activityId))}, ${escapeHtml(formatDate(date))}"
+              ${isEditable ? "" : "disabled"}
+            />
+          </td>
+        `;
       }).join("");
 
       const rowMinutes = studyLog.entries
@@ -2119,7 +2563,7 @@ function renderStudyLogFullGrid() {
         <tr>
           <th>${escapeHtml(getStudyLogActivityLabel(activityId))}</th>
           ${dailyCells}
-          <td>${formatDecimalHours(rowMinutes)}</td>
+          <td class="bcc-study-row-total">${formatDecimalHours(rowMinutes)}</td>
         </tr>
       `;
     }).join("");
@@ -2149,9 +2593,7 @@ function renderStudyLogFullGrid() {
                 <th>Total</th>
               </tr>
             </thead>
-            <tbody>
-              ${rows}
-            </tbody>
+            <tbody>${rows}</tbody>
           </table>
         </div>
       </div>
@@ -2681,9 +3123,6 @@ async function downloadStudyLogXlsx() {
     setStudyLogMessage("Could not create the Excel study log.");
   }
 }
-
-window.startStudyLogEntryEdit = startStudyLogEntryEdit;
-window.deleteStudyLogEntry = deleteStudyLogEntry;
 
 function getSubjectName(subjectId) {
   const subject = subjects.find((item) => item.id === subjectId);
