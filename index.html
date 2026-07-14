@@ -260,6 +260,11 @@
             </label>
 
             <label>
+              School
+              <input id="study-log-school" type="text" />
+            </label>
+
+            <label>
               Subject
               <input id="study-log-subject" type="text" required />
             </label>
@@ -280,7 +285,11 @@
 
             <label>
               Required Hours
-              <input id="study-log-required-hours" type="number" min="0" step="0.25" value="299" required />
+              <div class="bcc-hour-stepper">
+                <button id="study-log-hours-minus" type="button" class="bcc-stepper-button" aria-label="Subtract one required hour">−</button>
+                <input id="study-log-required-hours" type="number" min="0" max="5000" step="1" value="299" required />
+                <button id="study-log-hours-plus" type="button" class="bcc-stepper-button" aria-label="Add one required hour">+</button>
+              </div>
             </label>
 
             <label>
@@ -528,6 +537,8 @@
       </section>
     </main>
   </div>
+
+  <footer class="bcc-footer">BarOS v1.0.3</footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
