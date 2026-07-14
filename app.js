@@ -1725,7 +1725,7 @@ function setupStudyLog() {
   if (entryForm) entryForm.addEventListener("submit", handleStudyLogEntrySubmit);
   if (resetButton) resetButton.addEventListener("click", resetStudyLog);
   if (editSetupButton) editSetupButton.addEventListener("click", editStudyLogSetup);
-  if (printButton) printButton.addEventListener("click", printStudyLog);
+  if (printButton) printButton.addEventListener("click", downloadStudyLogXlsx);
   if (cancelEntryButton) cancelEntryButton.addEventListener("click", cancelStudyLogEntryEdit);
 
   populateStudyLogActivityDropdown();
@@ -1981,6 +1981,7 @@ function renderStudyLog() {
 
   populateStudyLogActivityDropdown();
   renderStudyLogEntries();
+  renderStudyLogFullGrid();
   renderStudyLogWeeklyTotals();
   renderStudyLogActivityTotals();
   setDefaultStudyLogEntryDate();
@@ -2012,6 +2013,77 @@ function renderStudyLogEntries() {
         <div class="bcc-entry-button-row">
           <button type="button" class="bcc-small-button" onclick="startStudyLogEntryEdit('${escapeHtml(entry.id)}')">Edit</button>
           <button type="button" class="bcc-small-button" onclick="deleteStudyLogEntry('${escapeHtml(entry.id)}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+
+function renderStudyLogFullGrid() {
+  const container = document.getElementById("study-log-full-grid");
+  if (!container) return;
+
+  const weeks = calculateStudyLogWeeks();
+
+  container.innerHTML = weeks.map((week) => {
+    const dates = Array.from({ length: 7 }, (_, dayIndex) => addDays(week.startDate, dayIndex));
+
+    const rows = studyLogActivityIds.map((activityId) => {
+      const dailyCells = dates.map((date) => {
+        const minutes = studyLog.entries
+          .filter((entry) => entry.date === date && entry.activity === activityId)
+          .reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
+
+        return `<td>${escapeHtml(formatMinutes(minutes))}</td>`;
+      }).join("");
+
+      const rowMinutes = studyLog.entries
+        .filter((entry) =>
+          entry.date >= week.startDate &&
+          entry.date <= week.endDate &&
+          entry.activity === activityId
+        )
+        .reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
+
+      return `
+        <tr>
+          <th>${escapeHtml(getStudyLogActivityLabel(activityId))}</th>
+          ${dailyCells}
+          <td>${formatDecimalHours(rowMinutes)}</td>
+        </tr>
+      `;
+    }).join("");
+
+    return `
+      <div class="bcc-study-log-week-card">
+        <div class="bcc-study-log-week-summary">
+          <div><strong>Week ${week.weekNumber}</strong></div>
+          <div>${escapeHtml(formatDateShort(week.startDate))}–${escapeHtml(formatDateShort(week.endDate))}</div>
+          <div><span>Total Hrs / Wk</span><strong>${week.weekHours.toFixed(2)}</strong></div>
+          <div><span>Total Hours</span><strong>${week.cumulativeHours.toFixed(2)}</strong></div>
+          <div><span>Total %</span><strong>${week.percentage.toFixed(2)}%</strong></div>
+        </div>
+
+        <div class="bcc-study-log-table-wrap">
+          <table class="bcc-study-log-matrix">
+            <thead>
+              <tr>
+                <th>Activity</th>
+                <th>Sun</th>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
         </div>
       </div>
     `;
@@ -2194,144 +2266,351 @@ function formatDateShort(dateString) {
   });
 }
 
-function printStudyLog() {
+async function downloadStudyLogXlsx() {
   if (!studyLog.configured) return;
 
-  const printWindow = window.open("", "_blank");
-
-  if (!printWindow) {
-    setStudyLogMessage("Allow pop-ups to download or print the Study Log.");
+  if (!window.ExcelJS) {
+    setStudyLogMessage("Excel export library did not load. Refresh the page and try again.");
     return;
   }
 
-  const weeks = calculateStudyLogWeeks();
-  const totals = calculateStudyLogTotals();
-  const activityLabels = studyLogActivityIds.map((id) => ({
-    id,
-    label: getStudyLogActivityLabel(id)
-  }));
+  setStudyLogMessage("Creating editable Excel study log…");
 
-  const weekSections = weeks.map((week) => {
-    const dates = Array.from({ length: 7 }, (_, dayIndex) => addDays(week.startDate, dayIndex));
+  try {
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = "Drew's BarOS";
+    workbook.created = new Date();
 
-    const activityRows = activityLabels.map(({ id, label }) => {
-      const dailyCells = dates.map((date) => {
-        const minutes = studyLog.entries
-          .filter((entry) => entry.date === date && entry.activity === id)
-          .reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
+    const worksheet = workbook.addWorksheet("Study Log", {
+      pageSetup: {
+        paperSize: 1,
+        orientation: "portrait",
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 0,
+        margins: {
+          left: 0.25,
+          right: 0.25,
+          top: 0.35,
+          bottom: 0.35,
+          header: 0.15,
+          footer: 0.15
+        }
+      },
+      views: [{ state: "frozen", ySplit: 5 }]
+    });
 
-        return `<td>${escapeHtml(formatMinutes(minutes))}</td>`;
-      }).join("");
+    worksheet.properties.defaultRowHeight = 16;
+    worksheet.columns = [
+      { key: "activity", width: 24 },
+      { key: "sun", width: 10 },
+      { key: "mon", width: 10 },
+      { key: "tue", width: 10 },
+      { key: "wed", width: 10 },
+      { key: "thu", width: 10 },
+      { key: "fri", width: 10 },
+      { key: "sat", width: 10 },
+      { key: "total", width: 12 }
+    ];
 
-      const rowMinutes = studyLog.entries
-        .filter((entry) => entry.date >= week.startDate && entry.date <= week.endDate && entry.activity === id)
-        .reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
+    const thinBorder = {
+      top: { style: "thin", color: { argb: "FF222222" } },
+      left: { style: "thin", color: { argb: "FF222222" } },
+      bottom: { style: "thin", color: { argb: "FF222222" } },
+      right: { style: "thin", color: { argb: "FF222222" } }
+    };
 
-      return `
-        <tr>
-          <th>${escapeHtml(label)}</th>
-          ${dailyCells}
-          <td>${formatDecimalHours(rowMinutes)}</td>
-        </tr>
-      `;
-    }).join("");
+    const blueFill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF9FD4E4" }
+    };
 
-    return `
-      <section class="week">
-        <table>
-          <thead>
-            <tr class="week-summary">
-              <th colspan="3">Week ${week.weekNumber}</th>
-              <th colspan="3">${escapeHtml(formatDateShort(week.startDate))}–${escapeHtml(formatDateShort(week.endDate))}</th>
-              <th>Total Hrs / Wk</th>
-              <th>Total Hours</th>
-              <th>Total %</th>
-            </tr>
-            <tr class="week-summary-values">
-              <th colspan="6"></th>
-              <td>${week.weekHours.toFixed(2)}</td>
-              <td>${week.cumulativeHours.toFixed(2)}</td>
-              <td>${week.percentage.toFixed(2)}%</td>
-            </tr>
-            <tr>
-              <th>Activity</th>
-              <th>Sun</th>
-              <th>Mon</th>
-              <th>Tue</th>
-              <th>Wed</th>
-              <th>Thu</th>
-              <th>Fri</th>
-              <th>Sat</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>${activityRows}</tbody>
-        </table>
-      </section>
-    `;
-  }).join("");
+    const lightFill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFF2F2F2" }
+    };
 
-  const range = getStudyLogOverallRange();
+    worksheet.mergeCells("A1:I1");
+    worksheet.getCell("A1").value = "Student Study Log";
+    worksheet.getCell("A1").font = { name: "Arial", size: 18, bold: true };
+    worksheet.getCell("A1").alignment = { horizontal: "center", vertical: "middle" };
+    worksheet.getRow(1).height = 28;
 
-  const html = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>${escapeHtml(studyLog.subject)} Study Log</title>
-  <style>
-    @page { size: letter portrait; margin: 0.35in; }
-    body { font-family: Arial, sans-serif; color: #111; margin: 0; font-size: 10px; }
-    header { border: 2px solid #111; padding: 8px; margin-bottom: 8px; }
-    h1 { font-size: 21px; text-align: center; margin: 0 0 8px; }
-    .summary { display: grid; grid-template-columns: 2fr 1fr 1fr; border-top: 1px solid #111; }
-    .summary > div { padding: 6px; border-right: 1px solid #111; }
-    .summary > div:last-child { border-right: none; }
-    .week { break-inside: avoid; margin-bottom: 9px; }
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    th, td { border: 1px solid #222; padding: 3px 2px; text-align: center; }
-    tbody th { text-align: right; width: 24%; }
-    .week-summary th { background: #9fd4e4; font-size: 11px; }
-    .week-summary-values td { font-weight: bold; }
-    .certification { break-inside: avoid; border: 1px solid #111; padding: 10px; margin-top: 12px; font-size: 10px; line-height: 1.35; }
-    .signature { margin-top: 25px; display: grid; grid-template-columns: 1fr 220px; gap: 25px; }
-    .line { border-bottom: 1px solid #111; height: 18px; }
-    .print-controls { margin-bottom: 12px; text-align: right; }
-    .print-controls button { padding: 8px 14px; }
-    @media print { .print-controls { display: none; } }
-  </style>
-</head>
-<body>
-  <div class="print-controls"><button onclick="window.print()">Print / Save as PDF</button></div>
+    worksheet.mergeCells("A2:D2");
+    worksheet.getCell("A2").value = studyLog.studentName || "Student Name";
+    worksheet.getCell("A2").font = { name: "Arial", size: 12, bold: true };
 
-  <header>
-    <h1>Student Study Log</h1>
-    <div class="summary">
-      <div><strong>${escapeHtml(studyLog.studentName)}</strong><br>${escapeHtml(studyLog.subject)}</div>
-      <div><strong>${studyLog.numberOfWeeks} Weeks</strong><br>${escapeHtml(formatDateShort(range.start))}–${escapeHtml(formatDateShort(range.end))}</div>
-      <div><strong>${Number(studyLog.requiredHours).toFixed(2)} Required Hours</strong><br>${totals.totalHours.toFixed(2)} Hours · ${totals.percentage.toFixed(2)}%</div>
-    </div>
-  </header>
+    worksheet.mergeCells("E2:F2");
+    worksheet.getCell("E2").value = studyLog.subject || "Subject";
+    worksheet.getCell("E2").font = { name: "Arial", size: 12, bold: true };
 
-  ${weekSections}
+    worksheet.mergeCells("G2:I2");
+    worksheet.getCell("G2").value = `${studyLog.numberOfWeeks} Weeks · ${Number(studyLog.requiredHours).toFixed(2)} Required Hours`;
+    worksheet.getCell("G2").font = { name: "Arial", size: 11, bold: true };
+    worksheet.getCell("G2").alignment = { horizontal: "right" };
 
-  <div class="certification">
-    <h2>Electronic Signature Agreement and Certification</h2>
-    <p>
-      By signing this Study Log electronically, the student certifies that the information provided is true,
-      correct, and an accurate accounting of the study activities recorded for this course period.
-    </p>
-    <div class="signature">
-      <div>Signature<div class="line"></div></div>
-      <div>Date<div class="line"></div></div>
-    </div>
-  </div>
-</body>
-</html>`;
+    worksheet.mergeCells("A3:D3");
+    worksheet.getCell("A3").value = "Hours Completed";
+    worksheet.mergeCells("E3:F3");
+    worksheet.getCell("E3").value = "Hours Remaining";
+    worksheet.mergeCells("G3:I3");
+    worksheet.getCell("G3").value = "Completion";
 
-  printWindow.document.open();
-  printWindow.document.write(html);
-  printWindow.document.close();
-  printWindow.focus();
+    ["A3", "E3", "G3"].forEach((address) => {
+      const cell = worksheet.getCell(address);
+      cell.fill = blueFill;
+      cell.font = { name: "Arial", size: 10, bold: true };
+      cell.alignment = { horizontal: "center" };
+      cell.border = thinBorder;
+    });
+
+    worksheet.mergeCells("A4:D4");
+    worksheet.mergeCells("E4:F4");
+    worksheet.mergeCells("G4:I4");
+
+    const weeks = calculateStudyLogWeeks();
+    const weekRowRefs = [];
+    let row = 6;
+
+    weeks.forEach((week, weekIndex) => {
+      const summaryRow = row;
+      const valuesRow = row + 1;
+      const headerRow = row + 2;
+      const firstActivityRow = row + 3;
+      const lastActivityRow = row + 10;
+
+      worksheet.mergeCells(`A${summaryRow}:B${summaryRow}`);
+      worksheet.getCell(`A${summaryRow}`).value = `Week ${week.weekNumber}`;
+
+      worksheet.mergeCells(`C${summaryRow}:E${summaryRow}`);
+      worksheet.getCell(`C${summaryRow}`).value =
+        `${formatDateShort(week.startDate)} - ${formatDateShort(week.endDate)}`;
+
+      worksheet.getCell(`F${summaryRow}`).value = "Total Hrs / Wk";
+      worksheet.getCell(`G${summaryRow}`).value = "Total Hours";
+      worksheet.mergeCells(`H${summaryRow}:I${summaryRow}`);
+      worksheet.getCell(`H${summaryRow}`).value = "Total %";
+
+      for (let col = 1; col <= 9; col += 1) {
+        const cell = worksheet.getCell(summaryRow, col);
+        cell.fill = blueFill;
+        cell.font = { name: "Arial", size: 10, bold: true };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.border = thinBorder;
+      }
+
+      worksheet.getCell(`F${valuesRow}`).value = {
+        formula: `SUM(I${firstActivityRow}:I${lastActivityRow})`,
+        result: week.weekHours
+      };
+
+      const previousCumulativeCell = weekIndex === 0
+        ? `F${valuesRow}`
+        : weekRowRefs[weekIndex - 1].cumulative;
+
+      worksheet.getCell(`G${valuesRow}`).value = {
+        formula: weekIndex === 0
+          ? `F${valuesRow}`
+          : `${previousCumulativeCell}+F${valuesRow}`,
+        result: week.cumulativeHours
+      };
+
+      worksheet.mergeCells(`H${valuesRow}:I${valuesRow}`);
+      worksheet.getCell(`H${valuesRow}`).value = {
+        formula: studyLog.requiredHours > 0
+          ? `G${valuesRow}/$I$2`
+          : "0",
+        result: studyLog.requiredHours > 0 ? week.cumulativeHours / studyLog.requiredHours : 0
+      };
+
+      worksheet.getCell("I2").value = Number(studyLog.requiredHours);
+
+      [`F${valuesRow}`, `G${valuesRow}`].forEach((address) => {
+        const cell = worksheet.getCell(address);
+        cell.numFmt = "0.00";
+        cell.font = { bold: true };
+        cell.alignment = { horizontal: "center" };
+        cell.border = thinBorder;
+      });
+
+      worksheet.getCell(`H${valuesRow}`).numFmt = "0.00%";
+      worksheet.getCell(`H${valuesRow}`).font = { bold: true };
+      worksheet.getCell(`H${valuesRow}`).alignment = { horizontal: "center" };
+      worksheet.getCell(`H${valuesRow}`).border = thinBorder;
+
+      for (let col = 1; col <= 5; col += 1) {
+        worksheet.getCell(valuesRow, col).border = thinBorder;
+      }
+
+      const dayHeaders = ["Activity", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Total"];
+      dayHeaders.forEach((label, index) => {
+        const cell = worksheet.getCell(headerRow, index + 1);
+        cell.value = label;
+        cell.fill = lightFill;
+        cell.font = { name: "Arial", size: 10, bold: true };
+        cell.alignment = { horizontal: "center" };
+        cell.border = thinBorder;
+      });
+
+      const dates = Array.from({ length: 7 }, (_, dayIndex) =>
+        addDays(week.startDate, dayIndex)
+      );
+
+      studyLogActivityIds.forEach((activityId, activityIndex) => {
+        const activityRow = firstActivityRow + activityIndex;
+        const activityCell = worksheet.getCell(activityRow, 1);
+
+        activityCell.value = getStudyLogActivityLabel(activityId);
+        activityCell.font = { name: "Arial", size: 10, bold: true };
+        activityCell.alignment = { horizontal: "right" };
+        activityCell.border = thinBorder;
+
+        dates.forEach((date, dayIndex) => {
+          const minutes = studyLog.entries
+            .filter((entry) => entry.date === date && entry.activity === activityId)
+            .reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
+
+          const cell = worksheet.getCell(activityRow, dayIndex + 2);
+          cell.value = minutes > 0 ? minutes / 1440 : 0;
+          cell.numFmt = "[h]:mm";
+          cell.alignment = { horizontal: "center" };
+          cell.border = thinBorder;
+
+          if (activityIndex % 2 === 0) {
+            cell.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FFF7F7F7" }
+            };
+          }
+        });
+
+        const totalCell = worksheet.getCell(activityRow, 9);
+        totalCell.value = {
+          formula: `SUM(B${activityRow}:H${activityRow})*24`,
+          result: studyLog.entries
+            .filter((entry) =>
+              entry.date >= week.startDate &&
+              entry.date <= week.endDate &&
+              entry.activity === activityId
+            )
+            .reduce((sum, entry) => sum + Number(entry.minutes || 0), 0) / 60
+        };
+        totalCell.numFmt = "0.00";
+        totalCell.alignment = { horizontal: "center" };
+        totalCell.border = thinBorder;
+      });
+
+      weekRowRefs.push({
+        weekly: `F${valuesRow}`,
+        cumulative: `G${valuesRow}`,
+        percentage: `H${valuesRow}`
+      });
+
+      row += 12;
+    });
+
+    const lastWeek = weekRowRefs[weekRowRefs.length - 1];
+
+    worksheet.getCell("A4").value = {
+      formula: lastWeek ? lastWeek.cumulative : "0",
+      result: calculateStudyLogTotals().totalHours
+    };
+    worksheet.getCell("A4").numFmt = "0.00";
+
+    worksheet.getCell("E4").value = {
+      formula: `MAX(0,$I$2-${lastWeek ? lastWeek.cumulative : "0"})`,
+      result: Math.max(0, studyLog.requiredHours - calculateStudyLogTotals().totalHours)
+    };
+    worksheet.getCell("E4").numFmt = "0.00";
+
+    worksheet.getCell("G4").value = {
+      formula: studyLog.requiredHours > 0
+        ? `${lastWeek ? lastWeek.cumulative : "0"}/$I$2`
+        : "0",
+      result: studyLog.requiredHours > 0
+        ? calculateStudyLogTotals().totalHours / studyLog.requiredHours
+        : 0
+    };
+    worksheet.getCell("G4").numFmt = "0.00%";
+
+    ["A4", "E4", "G4"].forEach((address) => {
+      const cell = worksheet.getCell(address);
+      cell.font = { name: "Arial", size: 13, bold: true };
+      cell.alignment = { horizontal: "center" };
+      cell.border = thinBorder;
+    });
+
+    const certificationStart = row + 1;
+
+    worksheet.mergeCells(`A${certificationStart}:I${certificationStart}`);
+    worksheet.getCell(`A${certificationStart}`).value =
+      "Electronic Signature Agreement and Certification";
+    worksheet.getCell(`A${certificationStart}`).font = {
+      name: "Arial",
+      size: 12,
+      bold: true
+    };
+    worksheet.getCell(`A${certificationStart}`).fill = lightFill;
+    worksheet.getCell(`A${certificationStart}`).border = thinBorder;
+
+    worksheet.mergeCells(`A${certificationStart + 1}:I${certificationStart + 4}`);
+    worksheet.getCell(`A${certificationStart + 1}`).value =
+      "By signing this Study Log electronically, the student certifies under penalty of perjury that the information provided is true and correct and is an accurate representation and accounting of all law school study activities for the course period.";
+    worksheet.getCell(`A${certificationStart + 1}`).alignment = {
+      wrapText: true,
+      vertical: "top"
+    };
+    worksheet.getCell(`A${certificationStart + 1}`).border = thinBorder;
+
+    worksheet.mergeCells(`A${certificationStart + 6}:F${certificationStart + 6}`);
+    worksheet.getCell(`A${certificationStart + 6}`).value = "Signature:";
+    worksheet.mergeCells(`G${certificationStart + 6}:I${certificationStart + 6}`);
+    worksheet.getCell(`G${certificationStart + 6}`).value = "Date:";
+
+    worksheet.getCell(`A${certificationStart + 6}`).border = {
+      bottom: { style: "thin", color: { argb: "FF222222" } }
+    };
+    worksheet.getCell(`G${certificationStart + 6}`).border = {
+      bottom: { style: "thin", color: { argb: "FF222222" } }
+    };
+
+    worksheet.autoFilter = {
+      from: "A5",
+      to: "I5"
+    };
+
+    worksheet.headerFooter.oddFooter =
+      `&L${studyLog.studentName || "Student"}&C${studyLog.subject || "Study Log"}&RPage &P of &N`;
+
+    const safeSubject = (studyLog.subject || "study-log")
+      .replace(/[^a-z0-9]+/gi, "-")
+      .replace(/^-+|-+$/g, "")
+      .toLowerCase();
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob(
+      [buffer],
+      { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = `${safeSubject || "study-log"}-${studyLog.startDate || todayString()}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    setStudyLogMessage("Editable Excel study log downloaded.");
+  } catch (error) {
+    console.error("Excel export failed:", error);
+    setStudyLogMessage("Could not create the Excel study log.");
+  }
 }
 
 window.startStudyLogEntryEdit = startStudyLogEntryEdit;
