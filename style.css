@@ -644,3 +644,85 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
+
+
+.bcc-study-log-full-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.bcc-study-log-week-card {
+  border: 1px solid #cfcfcf;
+  background: #ffffff;
+}
+
+.bcc-study-log-week-summary {
+  display: grid;
+  grid-template-columns: 1.1fr 1.6fr repeat(3, minmax(120px, 1fr));
+  align-items: stretch;
+  border-bottom: 1px solid #111111;
+  background: #9fd4e4;
+}
+
+.bcc-study-log-week-summary > div {
+  padding: 8px 10px;
+  border-right: 1px solid #111111;
+  font-size: 12px;
+}
+
+.bcc-study-log-week-summary > div:last-child {
+  border-right: none;
+}
+
+.bcc-study-log-week-summary span {
+  display: block;
+  font-size: 10px;
+  color: #333333;
+}
+
+.bcc-study-log-week-summary strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+}
+
+.bcc-study-log-matrix {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.bcc-study-log-matrix th,
+.bcc-study-log-matrix td {
+  border: 1px solid #d2d2d2;
+  padding: 5px 6px;
+  text-align: center;
+  font-size: 11px;
+}
+
+.bcc-study-log-matrix thead th {
+  background: #f2f2f2;
+  font-weight: 600;
+}
+
+.bcc-study-log-matrix tbody th {
+  width: 180px;
+  text-align: right;
+  background: #fafafa;
+  font-weight: 600;
+}
+
+.bcc-study-log-matrix tbody tr:nth-child(odd) td {
+  background: #f7f7f7;
+}
+
+@media (max-width: 760px) {
+  .bcc-study-log-week-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .bcc-study-log-week-summary > div {
+    border-bottom: 1px solid #111111;
+  }
+}
