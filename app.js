@@ -2118,6 +2118,7 @@ function createEmptyStudyLog() {
   return {
     configured: false,
     studentName: "",
+    school: "",
     subject: "",
     startDate: "",
     numberOfWeeks: 18,
@@ -2134,6 +2135,7 @@ function normalizeStudyLog(value) {
   return {
     configured: Boolean(source.configured),
     studentName: String(source.studentName || ""),
+    school: String(source.school || ""),
     subject: String(source.subject || ""),
     startDate: String(source.startDate || ""),
     numberOfWeeks: Math.max(1, Number(source.numberOfWeeks || 18)),
@@ -2160,6 +2162,8 @@ function setupStudyLog() {
   const resetButton = document.getElementById("study-log-reset-button");
   const weeksMinusButton = document.getElementById("study-log-weeks-minus");
   const weeksPlusButton = document.getElementById("study-log-weeks-plus");
+  const hoursMinusButton = document.getElementById("study-log-hours-minus");
+  const hoursPlusButton = document.getElementById("study-log-hours-plus");
   const editSetupButton = document.getElementById("study-log-edit-setup-button");
   const downloadButton = document.getElementById("study-log-print-button");
   const grid = document.getElementById("study-log-full-grid");
@@ -2169,6 +2173,7 @@ function setupStudyLog() {
 
     [
       "study-log-student-name",
+      "study-log-school",
       "study-log-subject",
       "study-log-start-date",
       "study-log-weeks",
@@ -2191,6 +2196,14 @@ function setupStudyLog() {
 
   if (weeksPlusButton) {
     weeksPlusButton.addEventListener("click", () => adjustStudyLogWeeks(1));
+  }
+
+  if (hoursMinusButton) {
+    hoursMinusButton.addEventListener("click", () => adjustStudyLogRequiredHours(-1));
+  }
+
+  if (hoursPlusButton) {
+    hoursPlusButton.addEventListener("click", () => adjustStudyLogRequiredHours(1));
   }
 
   if (editSetupButton) editSetupButton.addEventListener("click", editStudyLogSetup);
@@ -2228,6 +2241,19 @@ function adjustStudyLogWeeks(amount) {
   input.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
+function adjustStudyLogRequiredHours(amount) {
+  const input = document.getElementById("study-log-required-hours");
+  if (!input) return;
+
+  const currentValue = Number(input.value) || 0;
+  const minimum = Number(input.min) || 0;
+  const maximum = Number(input.max) || 5000;
+  const nextValue = Math.min(maximum, Math.max(minimum, currentValue + amount));
+
+  input.value = String(nextValue);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
 function handleStudyLogSetupSubmit(event) {
   event.preventDefault();
 
@@ -2244,6 +2270,7 @@ function handleStudyLogSetupSubmit(event) {
     ...studyLog,
     configured: true,
     studentName: getValue("study-log-student-name"),
+    school: getValue("study-log-school"),
     subject: getValue("study-log-subject"),
     startDate,
     numberOfWeeks,
@@ -2282,6 +2309,7 @@ function resetStudyLog() {
 
 function fillStudyLogSetupForm() {
   setFormValue("study-log-student-name", studyLog.studentName);
+  setFormValue("study-log-school", studyLog.school);
   setFormValue("study-log-subject", studyLog.subject);
 
   const startDateInput = document.getElementById("study-log-start-date");
@@ -2431,7 +2459,7 @@ function renderStudyLog() {
     setText("study-log-heading", `${studyLog.subject || "Study Log"} · ${studyLog.studentName || "Student"}`);
     setText(
       "study-log-period-meta",
-      `${studyLog.numberOfWeeks} weeks · ${formatDate(range.start)}–${formatDate(range.end)} · ${Number(studyLog.requiredHours).toFixed(2)} required hours`
+      `${studyLog.school ? `${studyLog.school} · ` : ""}${studyLog.numberOfWeeks} weeks · ${formatDate(range.start)}–${formatDate(range.end)} · ${Number(studyLog.requiredHours).toFixed(2)} required hours`
     );
 
     populateStudyLogActivityDropdown();
@@ -2453,6 +2481,7 @@ function renderStudyLogPreviewFromForm() {
   const previewStudyLog = {
     ...studyLog,
     studentName: preview.studentName,
+    school: preview.school,
     subject: preview.subject,
     startDate: preview.startDate,
     numberOfWeeks: preview.numberOfWeeks,
@@ -2475,6 +2504,7 @@ function getStudyLogPreviewSettings() {
 
   return {
     studentName: getValue("study-log-student-name"),
+    school: getValue("study-log-school"),
     subject: getValue("study-log-subject") || "Subject",
     startDate,
     numberOfWeeks,
@@ -2849,18 +2879,22 @@ async function downloadStudyLogXlsx() {
     worksheet.getCell("A1").alignment = { horizontal: "center", vertical: "middle" };
     worksheet.getRow(1).height = 28;
 
-    worksheet.mergeCells("A2:D2");
+    worksheet.mergeCells("A2:C2");
     worksheet.getCell("A2").value = studyLog.studentName || "Student Name";
     worksheet.getCell("A2").font = { name: "Arial", size: 12, bold: true };
 
-    worksheet.mergeCells("E2:F2");
-    worksheet.getCell("E2").value = studyLog.subject || "Subject";
+    worksheet.mergeCells("D2:F2");
+    worksheet.getCell("D2").value = studyLog.school || "School";
+    worksheet.getCell("D2").font = { name: "Arial", size: 11, bold: true };
+
+    worksheet.mergeCells("G2:H2");
+    worksheet.getCell("G2").value = studyLog.subject || "Subject";
     worksheet.getCell("E2").font = { name: "Arial", size: 12, bold: true };
 
-    worksheet.mergeCells("G2:I2");
-    worksheet.getCell("G2").value = `${studyLog.numberOfWeeks} Weeks · ${Number(studyLog.requiredHours).toFixed(2)} Required Hours`;
-    worksheet.getCell("G2").font = { name: "Arial", size: 11, bold: true };
-    worksheet.getCell("G2").alignment = { horizontal: "right" };
+    worksheet.getCell("I2").value = Number(studyLog.requiredHours);
+    worksheet.getCell("I2").numFmt = '0.00';
+    worksheet.getCell("I2").font = { name: "Arial", size: 11, bold: true };
+    worksheet.getCell("I2").alignment = { horizontal: "right" };
 
     worksheet.mergeCells("A3:D3");
     worksheet.getCell("A3").value = "Hours Completed";
@@ -3094,7 +3128,7 @@ async function downloadStudyLogXlsx() {
     };
 
     worksheet.headerFooter.oddFooter =
-      `&L${studyLog.studentName || "Student"}&C${studyLog.subject || "Study Log"}&RPage &P of &N`;
+      `&L${studyLog.studentName || "Student"}${studyLog.school ? ` · ${studyLog.school}` : ""}&C${studyLog.subject || "Study Log"}&RPage &P of &N`;
 
     const safeSubject = (studyLog.subject || "study-log")
       .replace(/[^a-z0-9]+/gi, "-")
