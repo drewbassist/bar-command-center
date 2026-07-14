@@ -1721,7 +1721,25 @@ function setupStudyLog() {
   const printButton = document.getElementById("study-log-print-button");
   const cancelEntryButton = document.getElementById("study-log-entry-cancel");
 
-  if (setupForm) setupForm.addEventListener("submit", handleStudyLogSetupSubmit);
+  if (setupForm) {
+    setupForm.addEventListener("submit", handleStudyLogSetupSubmit);
+
+    [
+      "study-log-student-name",
+      "study-log-subject",
+      "study-log-start-date",
+      "study-log-weeks",
+      "study-log-required-hours",
+      "study-log-other-label"
+    ].forEach((id) => {
+      const input = document.getElementById(id);
+      if (!input) return;
+
+      input.addEventListener("input", renderStudyLogPreviewFromForm);
+      input.addEventListener("change", renderStudyLogPreviewFromForm);
+    });
+  }
+
   if (entryForm) entryForm.addEventListener("submit", handleStudyLogEntrySubmit);
   if (resetButton) resetButton.addEventListener("click", resetStudyLog);
   if (editSetupButton) editSetupButton.addEventListener("click", editStudyLogSetup);
@@ -1730,6 +1748,7 @@ function setupStudyLog() {
 
   populateStudyLogActivityDropdown();
   setDefaultStudyLogEntryDate();
+  renderStudyLogPreviewFromForm();
 }
 
 function populateStudyLogActivityDropdown() {
@@ -1768,6 +1787,7 @@ function handleStudyLogSetupSubmit(event) {
   populateStudyLogActivityDropdown();
   saveData();
   renderAll();
+  renderStudyLogPreviewFromForm();
   setStudyLogMessage("");
 }
 
@@ -1796,7 +1816,14 @@ function resetStudyLog() {
 function fillStudyLogSetupForm() {
   setFormValue("study-log-student-name", studyLog.studentName);
   setFormValue("study-log-subject", studyLog.subject);
-  setFormValue("study-log-start-date", studyLog.startDate);
+
+  const startDateInput = document.getElementById("study-log-start-date");
+  if (startDateInput && !startDateInput.value) {
+    startDateInput.value = studyLog.startDate || todayString();
+  } else if (studyLog.startDate) {
+    setFormValue("study-log-start-date", studyLog.startDate);
+  }
+
   setFormValue("study-log-weeks", studyLog.numberOfWeeks || 18);
   setFormValue("study-log-required-hours", studyLog.requiredHours || 299);
   setFormValue("study-log-other-label", studyLog.otherLabel || "Other");
@@ -1959,32 +1986,74 @@ function renderStudyLog() {
 
   if (!setupPanel || !activeArea) return;
 
-  fillStudyLogSetupForm();
-  setupPanel.hidden = studyLog.configured;
+  setupPanel.hidden = false;
   activeArea.hidden = !studyLog.configured;
 
-  if (!studyLog.configured) return;
+  if (studyLog.configured) {
+    fillStudyLogSetupForm();
 
-  const totals = calculateStudyLogTotals();
-  const range = getStudyLogOverallRange();
+    const totals = calculateStudyLogTotals();
+    const range = getStudyLogOverallRange();
 
-  setText("study-log-total-hours", formatDecimalHours(totals.totalMinutes));
-  setText("study-log-hours-remaining", Math.max(0, studyLog.requiredHours - totals.totalHours).toFixed(2));
-  setText("study-log-completion-percent", `${totals.percentage.toFixed(2)}%`);
-  setText("study-log-needed-per-week", totals.neededPerRemainingWeek.toFixed(2));
+    setText("study-log-total-hours", formatDecimalHours(totals.totalMinutes));
+    setText("study-log-hours-remaining", Math.max(0, studyLog.requiredHours - totals.totalHours).toFixed(2));
+    setText("study-log-completion-percent", `${totals.percentage.toFixed(2)}%`);
+    setText("study-log-needed-per-week", totals.neededPerRemainingWeek.toFixed(2));
 
-  setText("study-log-heading", `${studyLog.subject || "Study Log"} · ${studyLog.studentName || "Student"}`);
-  setText(
-    "study-log-period-meta",
-    `${studyLog.numberOfWeeks} weeks · ${formatDate(range.start)}–${formatDate(range.end)} · ${Number(studyLog.requiredHours).toFixed(2)} required hours`
-  );
+    setText("study-log-heading", `${studyLog.subject || "Study Log"} · ${studyLog.studentName || "Student"}`);
+    setText(
+      "study-log-period-meta",
+      `${studyLog.numberOfWeeks} weeks · ${formatDate(range.start)}–${formatDate(range.end)} · ${Number(studyLog.requiredHours).toFixed(2)} required hours`
+    );
 
+    populateStudyLogActivityDropdown();
+    renderStudyLogEntries();
+    renderStudyLogWeeklyTotals();
+    renderStudyLogActivityTotals();
+    setDefaultStudyLogEntryDate();
+  }
+
+  renderStudyLogPreviewFromForm();
+}
+
+function renderStudyLogPreviewFromForm() {
+  const container = document.getElementById("study-log-full-grid");
+  if (!container) return;
+
+  const preview = getStudyLogPreviewSettings();
+  const previousStudyLog = studyLog;
+
+  const previewStudyLog = {
+    ...studyLog,
+    studentName: preview.studentName,
+    subject: preview.subject,
+    startDate: preview.startDate,
+    numberOfWeeks: preview.numberOfWeeks,
+    requiredHours: preview.requiredHours,
+    otherLabel: preview.otherLabel,
+    entries: studyLog.configured ? studyLog.entries : []
+  };
+
+  studyLog = previewStudyLog;
   populateStudyLogActivityDropdown();
-  renderStudyLogEntries();
   renderStudyLogFullGrid();
-  renderStudyLogWeeklyTotals();
-  renderStudyLogActivityTotals();
-  setDefaultStudyLogEntryDate();
+  studyLog = previousStudyLog;
+  populateStudyLogActivityDropdown();
+}
+
+function getStudyLogPreviewSettings() {
+  const startDate = getValue("study-log-start-date") || todayString();
+  const numberOfWeeks = Math.max(1, Number(getValue("study-log-weeks")) || 18);
+  const requiredHours = Math.max(0, Number(getValue("study-log-required-hours")) || 299);
+
+  return {
+    studentName: getValue("study-log-student-name"),
+    subject: getValue("study-log-subject") || "Subject",
+    startDate,
+    numberOfWeeks,
+    requiredHours,
+    otherLabel: getValue("study-log-other-label") || "Other"
+  };
 }
 
 function renderStudyLogEntries() {
