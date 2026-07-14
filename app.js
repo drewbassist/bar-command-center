@@ -104,8 +104,15 @@ async function loadData() {
   );
 
   rebuildCustomizableLists();
+  studyGoals = {
+    ...studyGoals,
+    ...(data?.studyGoals && typeof data.studyGoals === "object" ? data.studyGoals : {})
+  };
 
-  studyGoals = await loadJson("studyGoals.json", {});
+  studyGoals = {
+    ...await loadJson("studyGoals.json", {}),
+    ...loadLocalData("bcc_study_goals", {})
+  };
   studyCycle = await loadJson("studyCycle.json", []);
   studyModes = await loadJson("studyModes.json", {});
   currentStudyMode = localStorage.getItem("bcc_study_mode") || "full";
@@ -177,6 +184,7 @@ function saveLocalData() {
   localStorage.setItem("bcc_custom_essay_sources", JSON.stringify(customEssaySources));
   localStorage.setItem("bcc_custom_mcq_sources", JSON.stringify(customMcqSources));
   localStorage.setItem("bcc_custom_flashcard_sources", JSON.stringify(customFlashcardSources));
+  localStorage.setItem("bcc_study_goals", JSON.stringify(studyGoals));
 }
 
 function getCompleteBarOSData() {
@@ -195,7 +203,8 @@ function getCompleteBarOSData() {
     customSubjects,
     customEssaySources,
     customMcqSources,
-    customFlashcardSources
+    customFlashcardSources,
+    studyGoals
   };
 }
 
@@ -308,6 +317,7 @@ function setupAuthControls() {
   const authForm = document.getElementById("auth-form");
   const createAccountButton = document.getElementById("create-account-button");
   const signOutButton = document.getElementById("sign-out-button");
+  const settingsSignOutButton = document.getElementById("settings-sign-out-button");
 
   if (authForm) {
     authForm.addEventListener("submit", handleSignIn);
@@ -319,6 +329,10 @@ function setupAuthControls() {
 
   if (signOutButton) {
     signOutButton.addEventListener("click", handleSignOut);
+  }
+
+  if (settingsSignOutButton) {
+    settingsSignOutButton.addEventListener("click", handleSignOut);
   }
 }
 
@@ -337,6 +351,7 @@ function setupAppControlsOnce() {
   setupStudyLog();
   setupReviewFrequencyControls();
   setupCustomizationControls();
+  setupSettingsControls();
 
   appControlsReady = true;
 }
@@ -939,6 +954,47 @@ function setCustomizationMessage(message, isError = false) {
 
 window.removeCustomItem = removeCustomItem;
 
+
+function setupSettingsControls() {
+  const form = document.getElementById("daily-goals-form");
+  if (!form) return;
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    studyGoals = {
+      ...studyGoals,
+      essaysPerDay: Math.max(0, Number(getValue("settings-essay-goal")) || 0),
+      mcqsPerDay: Math.max(0, Number(getValue("settings-mcq-goal")) || 0),
+      flashcardsPerDay: Math.max(0, Number(getValue("settings-flashcard-goal")) || 0)
+    };
+
+    saveData();
+    renderAll();
+    setSettingsMessage("Daily minimums saved.");
+  });
+}
+
+function renderSettingsControls() {
+  setFormValue("settings-essay-goal", getEssayGoal());
+  setFormValue("settings-mcq-goal", getMcqGoal());
+  setFormValue("settings-flashcard-goal", getFlashcardGoal());
+
+  setText("settings-account-email", currentUser?.email || "");
+  setText(
+    "settings-cloud-status",
+    document.getElementById("cloud-save-status")?.textContent || "Cloud ready"
+  );
+}
+
+function setSettingsMessage(message, isError = false) {
+  const element = document.getElementById("daily-goals-message");
+  if (!element) return;
+
+  element.textContent = message || "";
+  element.style.color = isError ? "#9a1c1c" : "#1f6f36";
+}
+
 function setupForms() {
   const essayForm = document.getElementById("essay-form");
   const mcqForm = document.getElementById("mcq-form");
@@ -1405,7 +1461,8 @@ function exportBackup() {
     customSubjects,
     customEssaySources,
     customMcqSources,
-    customFlashcardSources
+    customFlashcardSources,
+    studyGoals
   };
 
   const file = new Blob([JSON.stringify(backup, null, 2)], {
@@ -1451,6 +1508,10 @@ function importBackup(event) {
       customMcqSources = normalizeCustomSourceList(backup.customMcqSources || []);
       customFlashcardSources = normalizeCustomSourceList(backup.customFlashcardSources || []);
       rebuildCustomizableLists();
+      studyGoals = {
+        ...studyGoals,
+        ...(backup.studyGoals && typeof backup.studyGoals === "object" ? backup.studyGoals : {})
+      };
 
       if (!Number.isFinite(currentSession) || currentSession < 1) {
         currentSession = 1;
@@ -1479,6 +1540,7 @@ function renderAll() {
   renderReviews();
   renderReviewFrequencyControls();
   renderCustomizationControls();
+  renderSettingsControls();
   renderDashboard();
   renderStudyLog();
   renderStats();
@@ -1788,6 +1850,29 @@ function renderStats() {
 
   const panel=document.getElementById("session-stats-panel");
   if(panel) panel.remove();
+  const today = todayString();
+  const todayEssayCount = essays.filter((item) => item.date === today).length;
+  const todayMcqCount = mcqs
+    .filter((item) => item.date === today)
+    .reduce((total, item) => total + getMcqCountValue(item), 0);
+  const todayFlashcardCount = flashcards
+    .filter((item) => item.date === today)
+    .reduce((total, item) => total + (Number(item.count) || 0), 0);
+
+  const goalPairs = [
+    [todayEssayCount, getEssayGoal()],
+    [todayMcqCount, getMcqGoal()],
+    [todayFlashcardCount, getFlashcardGoal()]
+  ].filter(([, goal]) => goal > 0);
+
+  const overallPercent = goalPairs.length
+    ? goalPairs.reduce((sum, [done, goal]) => sum + Math.min(1, done / goal), 0) / goalPairs.length * 100
+    : 0;
+
+  setText("stats-overall-progress-label", `${Math.round(overallPercent)}%`);
+  const overallBar = document.getElementById("stats-overall-progress-bar");
+  if (overallBar) overallBar.style.width = `${Math.min(100, Math.max(0, overallPercent))}%`;
+
 }
 
 function getReviewGroups() {
@@ -2454,6 +2539,9 @@ function renderStudyLog() {
     setText("study-log-total-hours", formatDecimalHours(totals.totalMinutes));
     setText("study-log-hours-remaining", Math.max(0, studyLog.requiredHours - totals.totalHours).toFixed(2));
     setText("study-log-completion-percent", `${totals.percentage.toFixed(2)}%`);
+    setText("study-log-progress-label", `${totals.percentage.toFixed(2)}%`);
+    const studyProgressBar = document.getElementById("study-log-progress-bar");
+    if (studyProgressBar) studyProgressBar.style.width = `${Math.min(100, Math.max(0, totals.percentage))}%`;
     setText("study-log-needed-per-week", totals.neededPerRemainingWeek.toFixed(2));
 
     setText("study-log-heading", `${studyLog.subject || "Study Log"} · ${studyLog.studentName || "Student"}`);
