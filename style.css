@@ -967,3 +967,231 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Final UI polish */
+
+/* Reviews */
+.bcc-review-settings-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.bcc-review-recommendation {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #111111;
+  background: #f7f7f7;
+}
+
+.bcc-review-setting-label {
+  font-size: 11px;
+  color: #666666;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bcc-review-setting-value {
+  margin-top: 5px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.bcc-review-frequency-form {
+  display: grid;
+  gap: 8px;
+  max-width: none;
+}
+
+.bcc-review-frequency-form > label {
+  display: block;
+  font-size: 12px;
+  color: #444444;
+}
+
+.bcc-review-frequency-control-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto auto;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.bcc-review-frequency-control-row input {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid #cccccc;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bcc-review-frequency-control-row button {
+  min-height: 38px;
+  border: 1px solid #111111;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.bcc-review-frequency-control-row button[type="submit"] {
+  background: #111111;
+  color: #ffffff;
+}
+
+.bcc-review-frequency-control-row .bcc-secondary-button {
+  background: #ffffff;
+  color: #111111;
+  border-color: #cccccc;
+}
+
+/* Study Log */
+.bcc-study-log-setup-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 16px;
+  align-items: end;
+}
+
+.bcc-study-log-setup-grid > label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  font-size: 12px;
+  color: #444444;
+}
+
+.bcc-study-log-setup-grid > label > input {
+  width: 100%;
+  height: 38px;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #111111;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bcc-week-stepper {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  width: 100%;
+  height: 38px;
+}
+
+.bcc-week-stepper input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  border: 1px solid #cccccc !important;
+  border-left: none !important;
+  border-right: none !important;
+  padding: 7px 8px;
+  text-align: center;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bcc-week-stepper .bcc-stepper-button {
+  flex: 0 0 40px;
+  width: 40px !important;
+  height: 38px !important;
+  min-width: 40px;
+  margin: 0 !important;
+  padding: 0 !important;
+  justify-self: auto !important;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #111111;
+  font-size: 18px;
+  line-height: 36px;
+  text-align: center;
+}
+
+.bcc-study-log-setup-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.bcc-study-log-setup-actions button {
+  min-height: 38px;
+  margin: 0;
+  padding: 8px 15px;
+  border: 1px solid #111111;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.bcc-study-log-setup-actions .bcc-primary-button {
+  background: #111111;
+  color: #ffffff;
+}
+
+.bcc-study-log-setup-actions .bcc-secondary-button {
+  background: #ffffff;
+  color: #111111;
+  border-color: #cccccc;
+}
+
+.bcc-study-log-preview-heading {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.bcc-study-log-preview-heading h2 {
+  margin-bottom: 4px;
+}
+
+.bcc-study-log-week-card {
+  overflow: hidden;
+}
+
+.bcc-study-log-week-summary {
+  grid-template-columns: 0.8fr 1.35fr repeat(3, minmax(105px, 1fr));
+}
+
+.bcc-study-log-week-summary > div {
+  min-height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .bcc-review-settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .bcc-review-frequency-control-row {
+    grid-template-columns: 1fr;
+  }
+
+  .bcc-study-log-setup-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .bcc-study-log-setup-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bcc-study-log-setup-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .bcc-study-log-setup-actions button {
+    width: 100%;
+  }
+}
