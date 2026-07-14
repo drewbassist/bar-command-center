@@ -62,6 +62,7 @@
       <button class="bcc-nav-button" data-view="mcqs">MCQs</button>
       <button class="bcc-nav-button" data-view="flashcards">Flashcards</button>
       <button class="bcc-nav-button" data-view="reviews">Reviews</button>
+      <button class="bcc-nav-button" data-view="study-log">Study Log</button>
       <button class="bcc-nav-button" data-view="stats">Progress</button>
     </nav>
 
@@ -209,6 +210,157 @@
         <div class="bcc-panel">
           <h2>Review Queue</h2>
           <div id="review-list" class="bcc-list-empty">No reviews scheduled yet.</div>
+        </div>
+      </section>
+
+
+      <section id="study-log" class="bcc-view">
+        <div id="study-log-setup-panel" class="bcc-panel">
+          <h2>Study Log Setup</h2>
+          <p class="bcc-help-text">
+            Create one active course period. Week ranges are generated automatically from the start date.
+          </p>
+
+          <form id="study-log-setup-form" class="bcc-form bcc-study-log-setup-grid">
+            <label>
+              Student Name
+              <input id="study-log-student-name" type="text" required />
+            </label>
+
+            <label>
+              Subject
+              <input id="study-log-subject" type="text" required />
+            </label>
+
+            <label>
+              Start Date
+              <input id="study-log-start-date" type="date" required />
+            </label>
+
+            <label>
+              Number of Weeks
+              <input id="study-log-weeks" type="number" min="1" max="52" value="18" required />
+            </label>
+
+            <label>
+              Required Hours
+              <input id="study-log-required-hours" type="number" min="0" step="0.25" value="299" required />
+            </label>
+
+            <label>
+              Other Activity Label
+              <input id="study-log-other-label" type="text" value="Other" />
+            </label>
+
+            <div class="bcc-study-log-setup-actions">
+              <button type="submit">Create Study Log</button>
+              <button id="study-log-reset-button" type="button" class="bcc-secondary-button">Reset Study Log</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="study-log-active-area" hidden>
+          <div class="bcc-grid bcc-study-log-summary-grid">
+            <div class="bcc-card">
+              <div class="bcc-card-label">Hours Completed</div>
+              <div class="bcc-card-number" id="study-log-total-hours">0.00</div>
+            </div>
+
+            <div class="bcc-card">
+              <div class="bcc-card-label">Hours Remaining</div>
+              <div class="bcc-card-number" id="study-log-hours-remaining">0.00</div>
+            </div>
+
+            <div class="bcc-card">
+              <div class="bcc-card-label">Completion</div>
+              <div class="bcc-card-number" id="study-log-completion-percent">0.00%</div>
+            </div>
+
+            <div class="bcc-card">
+              <div class="bcc-card-label">Needed Per Remaining Week</div>
+              <div class="bcc-card-number" id="study-log-needed-per-week">0.00</div>
+            </div>
+          </div>
+
+          <div class="bcc-panel">
+            <div class="bcc-study-log-heading-row">
+              <div>
+                <h2 id="study-log-heading">Study Log</h2>
+                <div id="study-log-period-meta" class="bcc-item-meta"></div>
+              </div>
+
+              <div class="bcc-study-log-toolbar">
+                <button id="study-log-edit-setup-button" type="button" class="bcc-small-button">Edit Setup</button>
+                <button id="study-log-print-button" type="button" class="bcc-small-button">Download / Print Log</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bcc-panel">
+            <h2>Log Study Time</h2>
+
+            <form id="study-log-entry-form" class="bcc-form bcc-study-log-entry-grid">
+              <label>
+                Date
+                <input id="study-log-entry-date" type="date" required />
+              </label>
+
+              <label>
+                Activity
+                <select id="study-log-entry-activity" required></select>
+              </label>
+
+              <label>
+                Hours
+                <input id="study-log-entry-hours" type="number" min="0" step="1" value="0" required />
+              </label>
+
+              <label>
+                Minutes
+                <input id="study-log-entry-minutes" type="number" min="0" max="59" step="1" value="0" required />
+              </label>
+
+              <label class="bcc-study-log-notes-field">
+                Notes
+                <input id="study-log-entry-notes" type="text" />
+              </label>
+
+              <div class="bcc-study-log-entry-actions">
+                <button id="study-log-entry-submit" type="submit">Save Time Entry</button>
+                <button id="study-log-entry-cancel" type="button" class="bcc-secondary-button" hidden>Cancel Edit</button>
+              </div>
+            </form>
+
+            <div id="study-log-entry-message" class="bcc-auth-message"></div>
+          </div>
+
+          <div class="bcc-panel">
+            <h2>Recent Entries</h2>
+            <div id="study-log-entry-list" class="bcc-list-empty">No study time entered yet.</div>
+          </div>
+
+          <div class="bcc-panel">
+            <h2>Weekly Totals</h2>
+            <div class="bcc-study-log-table-wrap">
+              <table class="bcc-study-log-table">
+                <thead>
+                  <tr>
+                    <th>Week</th>
+                    <th>Date Range</th>
+                    <th>This Week</th>
+                    <th>Cumulative</th>
+                    <th>Total %</th>
+                  </tr>
+                </thead>
+                <tbody id="study-log-weekly-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bcc-panel">
+            <h2>Totals by Activity</h2>
+            <div id="study-log-activity-totals" class="bcc-study-log-activity-grid"></div>
+          </div>
         </div>
       </section>
 
