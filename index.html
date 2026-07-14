@@ -64,6 +64,7 @@
       <button class="bcc-nav-button" data-view="reviews">Reviews</button>
       <button class="bcc-nav-button" data-view="study-log">Study Log</button>
       <button class="bcc-nav-button" data-view="stats">Progress</button>
+      <button class="bcc-nav-button" data-view="settings">Settings</button>
     </nav>
 
     <main class="bcc-main">
@@ -137,14 +138,14 @@
         <div class="bcc-panel">
           <h2>Log Essay</h2>
 
-          <form id="essay-form" class="bcc-form">
+          <form id="essay-form" class="bcc-form bcc-entry-form bcc-essay-form">
             <label>Subject<select id="essay-subject"></select></label>
             <label>Source<select id="essay-source"></select></label>
-            <label>Title<input id="essay-title" type="text" /></label>
+            <label class="bcc-field-wide">Title<input id="essay-title" type="text" /></label>
             <label>Page Number<input id="essay-page-number" type="text" /></label>
             <label>Question Number<input id="essay-question-number" type="text" /></label>
             <label>Rating<select id="essay-rating"></select></label>
-            <label>Notes<textarea id="essay-notes"></textarea></label>
+            <label class="bcc-field-wide">Notes<textarea id="essay-notes"></textarea></label>
             <button type="submit">Save Essay</button>
           </form>
         </div>
@@ -159,13 +160,13 @@
         <div class="bcc-panel">
           <h2>Log MCQ Session</h2>
 
-          <form id="mcq-form" class="bcc-form">
+          <form id="mcq-form" class="bcc-form bcc-entry-form bcc-mcq-form">
             <label>Subject<select id="mcq-subject"></select></label>
             <label>Source<select id="mcq-source"></select></label>
             <label>Questions Completed<input id="mcq-count" type="number" min="0" /></label>
             <label>Correct<input id="mcq-correct-count" type="number" min="0" /></label>
             <label>Rating<select id="mcq-rating"></select></label>
-            <label>Notes<textarea id="mcq-notes"></textarea></label>
+            <label class="bcc-field-wide">Notes<textarea id="mcq-notes"></textarea></label>
             <button type="submit">Save MCQ Session</button>
           </form>
         </div>
@@ -180,12 +181,12 @@
         <div class="bcc-panel">
           <h2>Log Flashcard Session</h2>
 
-          <form id="flashcard-form" class="bcc-form">
+          <form id="flashcard-form" class="bcc-form bcc-entry-form bcc-flashcard-form">
             <label>Subject<select id="flashcard-subject"></select></label>
             <label>Source<select id="flashcard-source"></select></label>
             <label>Card Range<input id="flashcard-card-range" type="text" /></label>
             <label>Rating<select id="flashcard-rating"></select></label>
-            <label>Notes<textarea id="flashcard-notes"></textarea></label>
+            <label class="bcc-field-wide">Notes<textarea id="flashcard-notes"></textarea></label>
             <button type="submit">Save Flashcard Session</button>
           </form>
         </div>
@@ -197,48 +198,6 @@
       </section>
 
       <section id="reviews" class="bcc-view">
-        <div class="bcc-panel">
-          <h2>Spaced-Repetition Schedule</h2>
-
-          <div class="bcc-review-settings-layout">
-            <div class="bcc-review-recommendation">
-              <div class="bcc-review-setting-label">Recommended</div>
-              <div class="bcc-review-setting-value">1, 3, 7, 30 days</div>
-            </div>
-
-            <form id="review-frequency-form" class="bcc-review-frequency-form">
-              <label for="review-frequency-input">Your Review Days</label>
-
-              <div class="bcc-review-frequency-control-row">
-                <input
-                  id="review-frequency-input"
-                  type="text"
-                  inputmode="numeric"
-                  value="1, 3, 7, 30"
-                  aria-describedby="review-frequency-help"
-                />
-
-                <button type="submit">Save Schedule</button>
-
-                <button
-                  id="review-frequency-reset-button"
-                  type="button"
-                  class="bcc-secondary-button"
-                >
-                  Use Recommended
-                </button>
-              </div>
-
-              <div id="review-frequency-help" class="bcc-help-text">
-                Enter positive day numbers separated by commas. The schedule applies to new entries.
-                Existing review dates remain unchanged.
-              </div>
-
-              <div id="review-frequency-message" class="bcc-auth-message"></div>
-            </form>
-          </div>
-        </div>
-
         <div class="bcc-panel">
           <h2>Review Queue</h2>
           <div id="review-list" class="bcc-list-empty">No reviews scheduled yet.</div>
@@ -338,6 +297,16 @@
             <div class="bcc-card">
               <div class="bcc-card-label">Needed Per Remaining Week</div>
               <div class="bcc-card-number" id="study-log-needed-per-week">0.00</div>
+            </div>
+          </div>
+
+          <div class="bcc-panel bcc-progress-panel">
+            <div class="bcc-progress-heading">
+              <span>Course-hour progress</span>
+              <strong id="study-log-progress-label">0.00%</strong>
+            </div>
+            <div class="bcc-progress-track" aria-hidden="true">
+              <div id="study-log-progress-bar" class="bcc-progress-fill"></div>
             </div>
           </div>
 
@@ -446,6 +415,16 @@
           </div>
         </div>
 
+        <div class="bcc-panel bcc-progress-panel">
+          <div class="bcc-progress-heading">
+            <span>Today's minimums completed</span>
+            <strong id="stats-overall-progress-label">0%</strong>
+          </div>
+          <div class="bcc-progress-track" aria-hidden="true">
+            <div id="stats-overall-progress-bar" class="bcc-progress-fill"></div>
+          </div>
+        </div>
+
         <div class="bcc-panel">
           <h2>Study Progress</h2>
 
@@ -474,6 +453,65 @@
           </div>
         </div>
 
+
+      </section>
+
+      <section id="settings" class="bcc-view">
+        <div class="bcc-settings-header">
+          <div>
+            <h1>Settings</h1>
+            <p>Manage goals, review timing, courses, sources, backups, and account access.</p>
+          </div>
+        </div>
+
+        <div class="bcc-panel">
+          <h2>Daily Minimums</h2>
+          <form id="daily-goals-form" class="bcc-settings-goals-grid">
+            <label>
+              Essays per day
+              <input id="settings-essay-goal" type="number" min="0" step="1" />
+            </label>
+            <label>
+              MCQs per day
+              <input id="settings-mcq-goal" type="number" min="0" step="1" />
+            </label>
+            <label>
+              Flashcards per day
+              <input id="settings-flashcard-goal" type="number" min="0" step="1" />
+            </label>
+            <div class="bcc-settings-actions">
+              <button type="submit">Save Minimums</button>
+            </div>
+          </form>
+          <div id="daily-goals-message" class="bcc-auth-message"></div>
+        </div>
+
+        <div class="bcc-panel">
+          <h2>Spaced Repetition</h2>
+          <form id="review-frequency-form" class="bcc-compact-review-form">
+            <label for="review-frequency-input">Review Days</label>
+            <input
+              id="review-frequency-input"
+              type="text"
+              inputmode="numeric"
+              value="1, 3, 7, 30"
+              aria-describedby="review-frequency-help"
+            />
+            <div class="bcc-settings-actions">
+              <button type="submit">Save Schedule</button>
+              <button id="review-frequency-reset-button" type="button" class="bcc-secondary-button">
+                Use Recommended
+              </button>
+            </div>
+            <div class="bcc-review-recommended-line">
+              Recommended: <strong>1, 3, 7, 30 days</strong>
+            </div>
+            <div id="review-frequency-help" class="bcc-help-text">
+              Positive whole-number days separated by commas. New entries use this schedule; existing review dates do not change.
+            </div>
+            <div id="review-frequency-message" class="bcc-auth-message"></div>
+          </form>
+        </div>
 
         <div class="bcc-panel">
           <h2>Customize Courses and Sources</h2>
@@ -523,6 +561,7 @@
           <div id="customization-message" class="bcc-auth-message"></div>
         </div>
 
+
         <div class="bcc-panel">
           <h2>Backup</h2>
 
@@ -534,11 +573,25 @@
             <input id="import-backup-input" type="file" accept=".json" />
           </div>
         </div>
+
+
+        <div class="bcc-panel">
+          <h2>Account</h2>
+          <div class="bcc-account-row">
+            <div>
+              <div class="bcc-account-label">Signed in as</div>
+              <div id="settings-account-email" class="bcc-account-value"></div>
+              <div id="settings-cloud-status" class="bcc-item-meta"></div>
+            </div>
+            <button id="settings-sign-out-button" type="button" class="bcc-secondary-button">Sign Out</button>
+          </div>
+        </div>
       </section>
+
     </main>
   </div>
 
-  <footer class="bcc-footer">BarOS v1.0.3</footer>
+  <footer class="bcc-footer">BarOS v1.1.0</footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
