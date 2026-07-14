@@ -27,6 +27,20 @@ let sessionHistory = [];
 let currentSession = 1;
 let editingEntry = null;
 
+const studyLogActivityIds = [
+  "live_lectures",
+  "archived_lectures",
+  "chat_sessions",
+  "study_groups",
+  "case_readings",
+  "outline_prep",
+  "essay_prep",
+  "other"
+];
+
+let studyLog = createEmptyStudyLog();
+let editingStudyLogEntryId = null;
+
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
@@ -77,6 +91,7 @@ async function loadData() {
   lectures = loadLocalData("bcc_lectures", []);
   reviews = loadLocalData("bcc_reviews", await loadJson("reviews.json", []));
   sessionHistory = loadLocalData("bcc_session_history", []);
+  studyLog = normalizeStudyLog(loadLocalData("bcc_study_log", createEmptyStudyLog()));
 
   currentSession = Number(localStorage.getItem("bcc_current_session") || "1");
 
@@ -128,6 +143,7 @@ function saveLocalData() {
   localStorage.setItem("bcc_session_history", JSON.stringify(sessionHistory));
   localStorage.setItem("bcc_current_session", String(currentSession));
   localStorage.setItem("bcc_study_mode", currentStudyMode);
+  localStorage.setItem("bcc_study_log", JSON.stringify(studyLog));
 }
 
 function getCompleteBarOSData() {
@@ -140,7 +156,8 @@ function getCompleteBarOSData() {
     reviews,
     sessionHistory,
     currentSession,
-    currentStudyMode
+    currentStudyMode,
+    studyLog
   };
 }
 
@@ -153,6 +170,7 @@ function applyCompleteBarOSData(data) {
   sessionHistory = Array.isArray(data?.sessionHistory) ? data.sessionHistory : [];
   currentSession = Number(data?.currentSession || 1);
   currentStudyMode = data?.currentStudyMode || currentStudyMode || "full";
+  studyLog = normalizeStudyLog(data?.studyLog);
 
   if (!Number.isFinite(currentSession) || currentSession < 1) {
     currentSession = 1;
@@ -269,6 +287,7 @@ function setupAppControlsOnce() {
   setupSessionButton();
   setupStudyModeSelector();
   setupBackupButtons();
+  setupStudyLog();
 
   appControlsReady = true;
 }
@@ -953,7 +972,8 @@ function exportBackup() {
     reviews,
     sessionHistory,
     currentSession,
-    currentStudyMode
+    currentStudyMode,
+    studyLog
   };
 
   const file = new Blob([JSON.stringify(backup, null, 2)], {
@@ -990,6 +1010,7 @@ function importBackup(event) {
       sessionHistory = Array.isArray(backup.sessionHistory) ? backup.sessionHistory : [];
       currentSession = Number(backup.currentSession || 1);
       currentStudyMode = backup.currentStudyMode || currentStudyMode || "full";
+      studyLog = normalizeStudyLog(backup.studyLog);
 
       if (!Number.isFinite(currentSession) || currentSession < 1) {
         currentSession = 1;
@@ -1017,6 +1038,7 @@ function renderAll() {
   renderLectures();
   renderReviews();
   renderDashboard();
+  renderStudyLog();
   renderStats();
 }
 
@@ -1649,6 +1671,672 @@ function getCountFromCardRange(range) {
 
   return end - start + 1;
 }
+
+function createEmptyStudyLog() {
+  return {
+    configured: false,
+    studentName: "",
+    subject: "",
+    startDate: "",
+    numberOfWeeks: 18,
+    requiredHours: 299,
+    otherLabel: "Other",
+    entries: []
+  };
+}
+
+function normalizeStudyLog(value) {
+  const base = createEmptyStudyLog();
+  const source = value && typeof value === "object" ? value : {};
+
+  return {
+    configured: Boolean(source.configured),
+    studentName: String(source.studentName || ""),
+    subject: String(source.subject || ""),
+    startDate: String(source.startDate || ""),
+    numberOfWeeks: Math.max(1, Number(source.numberOfWeeks || 18)),
+    requiredHours: Math.max(0, Number(source.requiredHours || 299)),
+    otherLabel: String(source.otherLabel || "Other"),
+    entries: Array.isArray(source.entries) ? source.entries.map(normalizeStudyLogEntry) : []
+  };
+}
+
+function normalizeStudyLogEntry(entry) {
+  return {
+    id: String(entry?.id || createId("study_log")),
+    date: String(entry?.date || ""),
+    activity: studyLogActivityIds.includes(entry?.activity) ? entry.activity : "other",
+    minutes: Math.max(0, Number(entry?.minutes || 0)),
+    notes: String(entry?.notes || ""),
+    createdAt: String(entry?.createdAt || new Date().toISOString()),
+    editedAt: entry?.editedAt ? String(entry.editedAt) : ""
+  };
+}
+
+function setupStudyLog() {
+  const setupForm = document.getElementById("study-log-setup-form");
+  const entryForm = document.getElementById("study-log-entry-form");
+  const resetButton = document.getElementById("study-log-reset-button");
+  const editSetupButton = document.getElementById("study-log-edit-setup-button");
+  const printButton = document.getElementById("study-log-print-button");
+  const cancelEntryButton = document.getElementById("study-log-entry-cancel");
+
+  if (setupForm) setupForm.addEventListener("submit", handleStudyLogSetupSubmit);
+  if (entryForm) entryForm.addEventListener("submit", handleStudyLogEntrySubmit);
+  if (resetButton) resetButton.addEventListener("click", resetStudyLog);
+  if (editSetupButton) editSetupButton.addEventListener("click", editStudyLogSetup);
+  if (printButton) printButton.addEventListener("click", printStudyLog);
+  if (cancelEntryButton) cancelEntryButton.addEventListener("click", cancelStudyLogEntryEdit);
+
+  populateStudyLogActivityDropdown();
+  setDefaultStudyLogEntryDate();
+}
+
+function populateStudyLogActivityDropdown() {
+  const select = document.getElementById("study-log-entry-activity");
+  if (!select) return;
+
+  select.innerHTML = studyLogActivityIds.map((activityId) => {
+    return `<option value="${escapeHtml(activityId)}">${escapeHtml(getStudyLogActivityLabel(activityId))}</option>`;
+  }).join("");
+}
+
+function handleStudyLogSetupSubmit(event) {
+  event.preventDefault();
+
+  const startDate = getValue("study-log-start-date");
+  const numberOfWeeks = Math.max(1, Number(getValue("study-log-weeks")) || 1);
+  const requiredHours = Math.max(0, Number(getValue("study-log-required-hours")) || 0);
+
+  if (!startDate) {
+    setStudyLogMessage("Choose a start date.");
+    return;
+  }
+
+  studyLog = {
+    ...studyLog,
+    configured: true,
+    studentName: getValue("study-log-student-name"),
+    subject: getValue("study-log-subject"),
+    startDate,
+    numberOfWeeks,
+    requiredHours,
+    otherLabel: getValue("study-log-other-label") || "Other",
+    entries: Array.isArray(studyLog.entries) ? studyLog.entries : []
+  };
+
+  populateStudyLogActivityDropdown();
+  saveData();
+  renderAll();
+  setStudyLogMessage("");
+}
+
+function editStudyLogSetup() {
+  fillStudyLogSetupForm();
+  const panel = document.getElementById("study-log-setup-panel");
+  if (panel) panel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function resetStudyLog() {
+  if (!studyLog.configured && studyLog.entries.length === 0) return;
+
+  const confirmed = window.confirm(
+    "Reset the entire Study Log? This will permanently remove its setup and all time entries."
+  );
+
+  if (!confirmed) return;
+
+  studyLog = createEmptyStudyLog();
+  editingStudyLogEntryId = null;
+  saveData();
+  fillStudyLogSetupForm();
+  renderAll();
+}
+
+function fillStudyLogSetupForm() {
+  setFormValue("study-log-student-name", studyLog.studentName);
+  setFormValue("study-log-subject", studyLog.subject);
+  setFormValue("study-log-start-date", studyLog.startDate);
+  setFormValue("study-log-weeks", studyLog.numberOfWeeks || 18);
+  setFormValue("study-log-required-hours", studyLog.requiredHours || 299);
+  setFormValue("study-log-other-label", studyLog.otherLabel || "Other");
+}
+
+function setDefaultStudyLogEntryDate() {
+  const input = document.getElementById("study-log-entry-date");
+  if (!input || input.value) return;
+
+  const today = todayString();
+
+  if (!studyLog.configured) {
+    input.value = today;
+    return;
+  }
+
+  const endDate = addDays(studyLog.startDate, studyLog.numberOfWeeks * 7 - 1);
+
+  if (today >= studyLog.startDate && today <= endDate) {
+    input.value = today;
+  } else {
+    input.value = studyLog.startDate;
+  }
+}
+
+function handleStudyLogEntrySubmit(event) {
+  event.preventDefault();
+
+  if (!studyLog.configured) {
+    setStudyLogMessage("Create the Study Log setup first.");
+    return;
+  }
+
+  const date = getValue("study-log-entry-date");
+  const activity = getValue("study-log-entry-activity");
+  const hours = Math.max(0, Number(getValue("study-log-entry-hours")) || 0);
+  const minuteRemainder = Math.max(0, Math.min(59, Number(getValue("study-log-entry-minutes")) || 0));
+  const totalMinutes = Math.round(hours * 60 + minuteRemainder);
+  const notes = getValue("study-log-entry-notes");
+
+  if (!date) {
+    setStudyLogMessage("Choose a date.");
+    return;
+  }
+
+  if (!isDateInsideStudyLog(date)) {
+    const range = getStudyLogOverallRange();
+    setStudyLogMessage(`Date must be within ${formatDate(range.start)} through ${formatDate(range.end)}.`);
+    return;
+  }
+
+  if (totalMinutes <= 0) {
+    setStudyLogMessage("Enter at least one minute.");
+    return;
+  }
+
+  if (editingStudyLogEntryId) {
+    const existing = studyLog.entries.find((entry) => entry.id === editingStudyLogEntryId);
+
+    if (existing) {
+      Object.assign(existing, {
+        date,
+        activity,
+        minutes: totalMinutes,
+        notes,
+        editedAt: new Date().toISOString()
+      });
+    }
+  } else {
+    studyLog.entries.push({
+      id: createId("study_log"),
+      date,
+      activity,
+      minutes: totalMinutes,
+      notes,
+      createdAt: new Date().toISOString(),
+      editedAt: ""
+    });
+  }
+
+  studyLog.entries.sort((a, b) => {
+    return b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt);
+  });
+
+  editingStudyLogEntryId = null;
+  saveData();
+  resetStudyLogEntryForm();
+  renderAll();
+  setStudyLogMessage("");
+}
+
+function startStudyLogEntryEdit(entryId) {
+  const entry = studyLog.entries.find((item) => item.id === entryId);
+  if (!entry) return;
+
+  editingStudyLogEntryId = entryId;
+
+  setFormValue("study-log-entry-date", entry.date);
+  setFormValue("study-log-entry-activity", entry.activity);
+  setFormValue("study-log-entry-hours", Math.floor(entry.minutes / 60));
+  setFormValue("study-log-entry-minutes", entry.minutes % 60);
+  setFormValue("study-log-entry-notes", entry.notes);
+
+  const submitButton = document.getElementById("study-log-entry-submit");
+  const cancelButton = document.getElementById("study-log-entry-cancel");
+
+  if (submitButton) submitButton.textContent = "Save Edit";
+  if (cancelButton) cancelButton.hidden = false;
+
+  const form = document.getElementById("study-log-entry-form");
+  if (form) form.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function cancelStudyLogEntryEdit() {
+  editingStudyLogEntryId = null;
+  resetStudyLogEntryForm();
+  setStudyLogMessage("");
+}
+
+function resetStudyLogEntryForm() {
+  const form = document.getElementById("study-log-entry-form");
+  if (form) form.reset();
+
+  const submitButton = document.getElementById("study-log-entry-submit");
+  const cancelButton = document.getElementById("study-log-entry-cancel");
+
+  if (submitButton) submitButton.textContent = "Save Time Entry";
+  if (cancelButton) cancelButton.hidden = true;
+
+  populateStudyLogActivityDropdown();
+  setDefaultStudyLogEntryDate();
+  setFormValue("study-log-entry-hours", 0);
+  setFormValue("study-log-entry-minutes", 0);
+}
+
+function deleteStudyLogEntry(entryId) {
+  const entry = studyLog.entries.find((item) => item.id === entryId);
+  if (!entry) return;
+
+  const confirmed = window.confirm(
+    `Delete ${getStudyLogActivityLabel(entry.activity)} on ${formatDate(entry.date)}?`
+  );
+
+  if (!confirmed) return;
+
+  studyLog.entries = studyLog.entries.filter((item) => item.id !== entryId);
+
+  if (editingStudyLogEntryId === entryId) {
+    editingStudyLogEntryId = null;
+    resetStudyLogEntryForm();
+  }
+
+  saveData();
+  renderAll();
+}
+
+function renderStudyLog() {
+  const setupPanel = document.getElementById("study-log-setup-panel");
+  const activeArea = document.getElementById("study-log-active-area");
+
+  if (!setupPanel || !activeArea) return;
+
+  fillStudyLogSetupForm();
+  setupPanel.hidden = studyLog.configured;
+  activeArea.hidden = !studyLog.configured;
+
+  if (!studyLog.configured) return;
+
+  const totals = calculateStudyLogTotals();
+  const range = getStudyLogOverallRange();
+
+  setText("study-log-total-hours", formatDecimalHours(totals.totalMinutes));
+  setText("study-log-hours-remaining", Math.max(0, studyLog.requiredHours - totals.totalHours).toFixed(2));
+  setText("study-log-completion-percent", `${totals.percentage.toFixed(2)}%`);
+  setText("study-log-needed-per-week", totals.neededPerRemainingWeek.toFixed(2));
+
+  setText("study-log-heading", `${studyLog.subject || "Study Log"} · ${studyLog.studentName || "Student"}`);
+  setText(
+    "study-log-period-meta",
+    `${studyLog.numberOfWeeks} weeks · ${formatDate(range.start)}–${formatDate(range.end)} · ${Number(studyLog.requiredHours).toFixed(2)} required hours`
+  );
+
+  populateStudyLogActivityDropdown();
+  renderStudyLogEntries();
+  renderStudyLogWeeklyTotals();
+  renderStudyLogActivityTotals();
+  setDefaultStudyLogEntryDate();
+}
+
+function renderStudyLogEntries() {
+  const list = document.getElementById("study-log-entry-list");
+  if (!list) return;
+
+  if (studyLog.entries.length === 0) {
+    list.className = "bcc-list-empty";
+    list.textContent = "No study time entered yet.";
+    return;
+  }
+
+  list.className = "";
+  list.innerHTML = studyLog.entries.slice(0, 40).map((entry) => {
+    const weekNumber = getStudyLogWeekNumber(entry.date);
+
+    return `
+      <div class="bcc-item">
+        <div class="bcc-item-title">
+          ${escapeHtml(formatDate(entry.date))} · ${escapeHtml(getStudyLogActivityLabel(entry.activity))} · ${escapeHtml(formatMinutes(entry.minutes))}
+        </div>
+        <div class="bcc-item-meta">
+          Week ${escapeHtml(weekNumber)}
+          ${entry.notes ? ` · ${escapeHtml(entry.notes)}` : ""}
+        </div>
+        <div class="bcc-entry-button-row">
+          <button type="button" class="bcc-small-button" onclick="startStudyLogEntryEdit('${escapeHtml(entry.id)}')">Edit</button>
+          <button type="button" class="bcc-small-button" onclick="deleteStudyLogEntry('${escapeHtml(entry.id)}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderStudyLogWeeklyTotals() {
+  const body = document.getElementById("study-log-weekly-body");
+  if (!body) return;
+
+  const weeks = calculateStudyLogWeeks();
+
+  body.innerHTML = weeks.map((week) => `
+    <tr>
+      <td>Week ${week.weekNumber}</td>
+      <td>${escapeHtml(formatDateShort(week.startDate))}–${escapeHtml(formatDateShort(week.endDate))}</td>
+      <td>${week.weekHours.toFixed(2)}</td>
+      <td>${week.cumulativeHours.toFixed(2)}</td>
+      <td>${week.percentage.toFixed(2)}%</td>
+    </tr>
+  `).join("");
+}
+
+function renderStudyLogActivityTotals() {
+  const container = document.getElementById("study-log-activity-totals");
+  if (!container) return;
+
+  const activityTotals = calculateStudyLogActivityTotals();
+
+  container.innerHTML = studyLogActivityIds.map((activityId) => `
+    <div class="bcc-card">
+      <div class="bcc-card-label">${escapeHtml(getStudyLogActivityLabel(activityId))}</div>
+      <div class="bcc-study-log-activity-number">${activityTotals[activityId].toFixed(2)}</div>
+    </div>
+  `).join("");
+}
+
+function calculateStudyLogTotals() {
+  const totalMinutes = studyLog.entries.reduce((total, entry) => total + Number(entry.minutes || 0), 0);
+  const totalHours = totalMinutes / 60;
+  const percentage = studyLog.requiredHours > 0
+    ? (totalHours / studyLog.requiredHours) * 100
+    : 0;
+
+  const currentWeek = getCurrentStudyLogWeek();
+  const remainingWeeks = Math.max(0, studyLog.numberOfWeeks - currentWeek + 1);
+  const remainingHours = Math.max(0, studyLog.requiredHours - totalHours);
+  const neededPerRemainingWeek = remainingWeeks > 0 ? remainingHours / remainingWeeks : 0;
+
+  return {
+    totalMinutes,
+    totalHours,
+    percentage,
+    remainingWeeks,
+    neededPerRemainingWeek
+  };
+}
+
+function calculateStudyLogWeeks() {
+  let cumulativeMinutes = 0;
+
+  return Array.from({ length: studyLog.numberOfWeeks }, (_, index) => {
+    const weekNumber = index + 1;
+    const startDate = addDays(studyLog.startDate, index * 7);
+    const endDate = addDays(startDate, 6);
+
+    const weekMinutes = studyLog.entries
+      .filter((entry) => entry.date >= startDate && entry.date <= endDate)
+      .reduce((total, entry) => total + Number(entry.minutes || 0), 0);
+
+    cumulativeMinutes += weekMinutes;
+
+    const cumulativeHours = cumulativeMinutes / 60;
+    const percentage = studyLog.requiredHours > 0
+      ? (cumulativeHours / studyLog.requiredHours) * 100
+      : 0;
+
+    return {
+      weekNumber,
+      startDate,
+      endDate,
+      weekMinutes,
+      weekHours: weekMinutes / 60,
+      cumulativeMinutes,
+      cumulativeHours,
+      percentage
+    };
+  });
+}
+
+function calculateStudyLogActivityTotals() {
+  const result = Object.fromEntries(studyLogActivityIds.map((id) => [id, 0]));
+
+  studyLog.entries.forEach((entry) => {
+    if (result[entry.activity] === undefined) result[entry.activity] = 0;
+    result[entry.activity] += Number(entry.minutes || 0) / 60;
+  });
+
+  return result;
+}
+
+function getStudyLogActivityLabel(activityId) {
+  const labels = {
+    live_lectures: "Live Lectures",
+    archived_lectures: "Archived Lectures",
+    chat_sessions: "Chat Sessions",
+    study_groups: "Study Groups",
+    case_readings: "Case Readings",
+    outline_prep: "Outline Prep",
+    essay_prep: "Essay Prep",
+    other: studyLog.otherLabel || "Other"
+  };
+
+  return labels[activityId] || activityId;
+}
+
+function getStudyLogOverallRange() {
+  const start = studyLog.startDate;
+  const end = start ? addDays(start, studyLog.numberOfWeeks * 7 - 1) : "";
+
+  return { start, end };
+}
+
+function isDateInsideStudyLog(date) {
+  const range = getStudyLogOverallRange();
+  return Boolean(range.start && range.end && date >= range.start && date <= range.end);
+}
+
+function getStudyLogWeekNumber(date) {
+  if (!studyLog.startDate || !date) return "";
+
+  const start = new Date(`${studyLog.startDate}T00:00:00`);
+  const target = new Date(`${date}T00:00:00`);
+  const difference = Math.floor((target - start) / 86400000);
+
+  return Math.floor(difference / 7) + 1;
+}
+
+function getCurrentStudyLogWeek() {
+  if (!studyLog.configured) return 1;
+
+  const today = todayString();
+
+  if (today <= studyLog.startDate) return 1;
+
+  const range = getStudyLogOverallRange();
+
+  if (today > range.end) return studyLog.numberOfWeeks;
+
+  return Math.min(studyLog.numberOfWeeks, Math.max(1, getStudyLogWeekNumber(today)));
+}
+
+function setStudyLogMessage(message) {
+  const element = document.getElementById("study-log-entry-message");
+  if (!element) return;
+  element.textContent = message || "";
+}
+
+function formatMinutes(minutes) {
+  const safeMinutes = Math.max(0, Math.round(Number(minutes) || 0));
+  const hours = Math.floor(safeMinutes / 60);
+  const remainder = safeMinutes % 60;
+
+  return `${hours}:${String(remainder).padStart(2, "0")}`;
+}
+
+function formatDecimalHours(minutes) {
+  return (Math.max(0, Number(minutes) || 0) / 60).toFixed(2);
+}
+
+function formatDateShort(dateString) {
+  if (!dateString) return "";
+
+  const date = new Date(`${dateString}T00:00:00`);
+
+  return date.toLocaleDateString(undefined, {
+    month: "2-digit",
+    day: "2-digit",
+    year: "2-digit"
+  });
+}
+
+function printStudyLog() {
+  if (!studyLog.configured) return;
+
+  const printWindow = window.open("", "_blank");
+
+  if (!printWindow) {
+    setStudyLogMessage("Allow pop-ups to download or print the Study Log.");
+    return;
+  }
+
+  const weeks = calculateStudyLogWeeks();
+  const totals = calculateStudyLogTotals();
+  const activityLabels = studyLogActivityIds.map((id) => ({
+    id,
+    label: getStudyLogActivityLabel(id)
+  }));
+
+  const weekSections = weeks.map((week) => {
+    const dates = Array.from({ length: 7 }, (_, dayIndex) => addDays(week.startDate, dayIndex));
+
+    const activityRows = activityLabels.map(({ id, label }) => {
+      const dailyCells = dates.map((date) => {
+        const minutes = studyLog.entries
+          .filter((entry) => entry.date === date && entry.activity === id)
+          .reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
+
+        return `<td>${escapeHtml(formatMinutes(minutes))}</td>`;
+      }).join("");
+
+      const rowMinutes = studyLog.entries
+        .filter((entry) => entry.date >= week.startDate && entry.date <= week.endDate && entry.activity === id)
+        .reduce((sum, entry) => sum + Number(entry.minutes || 0), 0);
+
+      return `
+        <tr>
+          <th>${escapeHtml(label)}</th>
+          ${dailyCells}
+          <td>${formatDecimalHours(rowMinutes)}</td>
+        </tr>
+      `;
+    }).join("");
+
+    return `
+      <section class="week">
+        <table>
+          <thead>
+            <tr class="week-summary">
+              <th colspan="3">Week ${week.weekNumber}</th>
+              <th colspan="3">${escapeHtml(formatDateShort(week.startDate))}–${escapeHtml(formatDateShort(week.endDate))}</th>
+              <th>Total Hrs / Wk</th>
+              <th>Total Hours</th>
+              <th>Total %</th>
+            </tr>
+            <tr class="week-summary-values">
+              <th colspan="6"></th>
+              <td>${week.weekHours.toFixed(2)}</td>
+              <td>${week.cumulativeHours.toFixed(2)}</td>
+              <td>${week.percentage.toFixed(2)}%</td>
+            </tr>
+            <tr>
+              <th>Activity</th>
+              <th>Sun</th>
+              <th>Mon</th>
+              <th>Tue</th>
+              <th>Wed</th>
+              <th>Thu</th>
+              <th>Fri</th>
+              <th>Sat</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>${activityRows}</tbody>
+        </table>
+      </section>
+    `;
+  }).join("");
+
+  const range = getStudyLogOverallRange();
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${escapeHtml(studyLog.subject)} Study Log</title>
+  <style>
+    @page { size: letter portrait; margin: 0.35in; }
+    body { font-family: Arial, sans-serif; color: #111; margin: 0; font-size: 10px; }
+    header { border: 2px solid #111; padding: 8px; margin-bottom: 8px; }
+    h1 { font-size: 21px; text-align: center; margin: 0 0 8px; }
+    .summary { display: grid; grid-template-columns: 2fr 1fr 1fr; border-top: 1px solid #111; }
+    .summary > div { padding: 6px; border-right: 1px solid #111; }
+    .summary > div:last-child { border-right: none; }
+    .week { break-inside: avoid; margin-bottom: 9px; }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    th, td { border: 1px solid #222; padding: 3px 2px; text-align: center; }
+    tbody th { text-align: right; width: 24%; }
+    .week-summary th { background: #9fd4e4; font-size: 11px; }
+    .week-summary-values td { font-weight: bold; }
+    .certification { break-inside: avoid; border: 1px solid #111; padding: 10px; margin-top: 12px; font-size: 10px; line-height: 1.35; }
+    .signature { margin-top: 25px; display: grid; grid-template-columns: 1fr 220px; gap: 25px; }
+    .line { border-bottom: 1px solid #111; height: 18px; }
+    .print-controls { margin-bottom: 12px; text-align: right; }
+    .print-controls button { padding: 8px 14px; }
+    @media print { .print-controls { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="print-controls"><button onclick="window.print()">Print / Save as PDF</button></div>
+
+  <header>
+    <h1>Student Study Log</h1>
+    <div class="summary">
+      <div><strong>${escapeHtml(studyLog.studentName)}</strong><br>${escapeHtml(studyLog.subject)}</div>
+      <div><strong>${studyLog.numberOfWeeks} Weeks</strong><br>${escapeHtml(formatDateShort(range.start))}–${escapeHtml(formatDateShort(range.end))}</div>
+      <div><strong>${Number(studyLog.requiredHours).toFixed(2)} Required Hours</strong><br>${totals.totalHours.toFixed(2)} Hours · ${totals.percentage.toFixed(2)}%</div>
+    </div>
+  </header>
+
+  ${weekSections}
+
+  <div class="certification">
+    <h2>Electronic Signature Agreement and Certification</h2>
+    <p>
+      By signing this Study Log electronically, the student certifies that the information provided is true,
+      correct, and an accurate accounting of the study activities recorded for this course period.
+    </p>
+    <div class="signature">
+      <div>Signature<div class="line"></div></div>
+      <div>Date<div class="line"></div></div>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  printWindow.document.open();
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.focus();
+}
+
+window.startStudyLogEntryEdit = startStudyLogEntryEdit;
+window.deleteStudyLogEntry = deleteStudyLogEntry;
+
 function getSubjectName(subjectId) {
   const subject = subjects.find((item) => item.id === subjectId);
   return subject ? subject.name : subjectId || "";
