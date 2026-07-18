@@ -370,21 +370,22 @@ h2 {
 }
 
 .bcc-review-row {
-  padding: 18px 0;
+  padding: 8px 0;
 }
 
 .bcc-review-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(140px, 1fr));
-  gap: 12px;
-  margin-top: 14px;
+  grid-template-columns: repeat(4, minmax(110px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .bcc-review-cell {
   border: 1px solid #dddddd;
-  border-radius: 10px;
-  padding: 14px;
+  border-radius: 8px;
+  padding: 5px 8px;
   background: #ffffff;
+  min-height: 92px;
 }
 
 .bcc-review-cell.due {
@@ -397,14 +398,14 @@ h2 {
 }
 
 .bcc-review-label {
-  font-size: 12px;
+  font-size: 11px;
   color: #666666;
   margin-bottom: 4px;
 }
 
 .bcc-review-date {
-  font-size: 18px;
-  margin-bottom: 10px;
+  font-size: 15px;
+  margin-bottom: 6px;
 }
 
 .bcc-review-cell .bcc-small-button {
@@ -412,8 +413,8 @@ h2 {
   border: 1px solid #111111;
   background: #111111;
   color: #ffffff;
-  padding: 8px 10px;
-  border-radius: 6px;
+  padding: 5px 8px;
+  border-radius: 4px;
   cursor: pointer;
 }
 
@@ -575,7 +576,7 @@ h2 {
 
 .bcc-study-log-table th,
 .bcc-study-log-table td {
-  padding: 8px 10px;
+  padding: 5px 8px;
   border: 1px solid #dddddd;
   text-align: left;
   font-size: 12px;
@@ -665,7 +666,7 @@ h2 {
 }
 
 .bcc-study-log-week-summary > div {
-  padding: 8px 10px;
+  padding: 5px 8px;
   border-right: 1px solid #111111;
   font-size: 12px;
 }
@@ -1023,7 +1024,7 @@ h2 {
   width: 100%;
   min-height: 38px;
   border: 1px solid #cccccc;
-  padding: 8px 10px;
+  padding: 5px 8px;
   font: inherit;
   font-size: 13px;
 }
@@ -1071,7 +1072,7 @@ h2 {
   border: 1px solid #cccccc;
   background: #ffffff;
   color: #111111;
-  padding: 8px 10px;
+  padding: 5px 8px;
   font: inherit;
   font-size: 13px;
 }
@@ -1486,7 +1487,7 @@ h2 {
 .bcc-compact-review-form > input {
   grid-column: 1;
   width: 100%;
-  padding: 8px 10px;
+  padding: 5px 8px;
 }
 
 .bcc-compact-review-form > .bcc-settings-actions {
