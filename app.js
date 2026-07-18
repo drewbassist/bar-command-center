@@ -1633,7 +1633,7 @@ function renderEssays() {
       <div class="bcc-item-meta">
         ${escapeHtml(getSubjectName(essay.subject))} · ${escapeHtml(essay.source || "No source")} · ${escapeHtml(essay.pageNumber || "No page number")} · ${escapeHtml(essay.questionNumber || "No question number")}
       </div>
-      <div class="bcc-rating">Rating: ${essay.rating}/10 · Next Review: ${formatDate(getNextReviewDate(essay.id, "essay"))}</div>
+      <div class="bcc-rating">Rating: ${essay.rating}/10 · Reviewed ${getReviewCount(essay.id,"essay")} times · Next Review: ${formatDate(getNextReviewDate(essay.id, "essay"))}</div>
       <button class="bcc-small-button" type="button" onclick="startEditEntry('essay', '${escapeHtml(essay.id)}')">Edit</button>
       ${essay.notes ? `<div class="bcc-item-notes">${escapeHtml(essay.notes)}</div>` : ""}
     </div>
@@ -1657,7 +1657,7 @@ function renderMcqs() {
       <div class="bcc-item-meta">
         ${escapeHtml(mcq.source || "No source")} · ${Number(mcq.correctCount) || 0} correct · ${getMcqAccuracy(mcq)}%
       </div>
-      <div class="bcc-rating">Rating: ${mcq.rating}/10 · Next Review: ${formatDate(getNextReviewDate(mcq.id, "mcq"))}</div>
+      <div class="bcc-rating">Rating: ${mcq.rating}/10 · Reviewed ${getReviewCount(mcq.id,"mcq")} times · Next Review: ${formatDate(getNextReviewDate(mcq.id, "mcq"))}</div>
       <button class="bcc-small-button" type="button" onclick="startEditEntry('mcq', '${escapeHtml(mcq.id)}')">Edit</button>
       ${mcq.notes ? `<div class="bcc-item-notes">${escapeHtml(mcq.notes)}</div>` : ""}
     </div>
@@ -1681,7 +1681,7 @@ function renderFlashcards() {
       <div class="bcc-item-meta">
         ${escapeHtml(card.source || "No source")} · ${Number(card.count) || 0} cards reviewed
       </div>
-      <div class="bcc-rating">Rating: ${card.rating}/10 · Next Review: ${formatDate(getNextReviewDate(card.id, "flashcard"))}</div>
+      <div class="bcc-rating">Rating: ${card.rating}/10 · Reviewed ${getReviewCount(card.id,"flashcard")} times · Next Review: ${formatDate(getNextReviewDate(card.id, "flashcard"))}</div>
       <button class="bcc-small-button" type="button" onclick="startEditEntry('flashcard', '${escapeHtml(card.id)}')">Edit</button>
       ${card.notes ? `<div class="bcc-item-notes">${escapeHtml(card.notes)}</div>` : ""}
     </div>
@@ -1705,7 +1705,7 @@ function renderLectures() {
       <div class="bcc-item-meta">
         ${escapeHtml(getSubjectName(lecture.subject))} · ${escapeHtml(lecture.source || "AIL")} · ${Number(lecture.minutes) || 0} min
       </div>
-      <div class="bcc-rating">Rating: ${lecture.rating}/10 · Next Review: ${formatDate(getNextReviewDate(lecture.id, "lecture"))}</div>
+      <div class="bcc-rating">Rating: ${lecture.rating}/10 · Reviewed ${getReviewCount(lecture.id,"lecture")} times · Next Review: ${formatDate(getNextReviewDate(lecture.id, "lecture"))}</div>
       <button class="bcc-small-button" type="button" onclick="startEditEntry('lecture', '${escapeHtml(lecture.id)}')">Edit</button>
       ${lecture.notes ? `<div class="bcc-item-notes">${escapeHtml(lecture.notes)}</div>` : ""}
     </div>
@@ -1998,6 +1998,11 @@ function getNextReviewDate(itemId, itemType) {
 
   return pendingReviews.length > 0 ? pendingReviews[0].dueDate : "";
 }
+
+function getReviewCount(itemId,itemType){
+  return 1 + reviews.filter(r=>r.itemId===itemId && r.itemType===itemType && r.status==="completed").length;
+}
+
 function countReviewedItems(type) {
   const reviewedItems = new Set();
 
