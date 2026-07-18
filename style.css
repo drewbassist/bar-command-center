@@ -1617,3 +1617,58 @@ h2 {
     flex-direction: column;
   }
 }
+
+/* ===== Ultra Compact Reviews ===== */
+.bcc-review-row{
+  padding:2px 0 !important;
+  margin:0 !important;
+}
+
+.bcc-review-grid{
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(64px,1fr)) !important;
+  gap:4px !important;
+  margin-top:4px !important;
+}
+
+.bcc-review-cell{
+  min-height:46px !important;
+  padding:4px !important;
+  border-radius:4px !important;
+}
+
+.bcc-review-label{
+  font-size:9px !important;
+  margin-bottom:2px !important;
+  line-height:1 !important;
+}
+
+.bcc-review-date{
+  font-size:11px !important;
+  margin-bottom:2px !important;
+  line-height:1.1 !important;
+}
+
+.bcc-review-cell .bcc-small-button{
+  padding:2px 4px !important;
+  font-size:9px !important;
+  line-height:1.1 !important;
+  margin-top:2px !important;
+  min-height:18px !important;
+}
+
+.bcc-item{
+  padding:4px 0 !important;
+}
+
+.bcc-item-title{
+  font-size:13px !important;
+  margin-bottom:1px !important;
+}
+
+.bcc-item-meta,
+.bcc-rating{
+  font-size:10px !important;
+  line-height:1.15 !important;
+  margin-top:1px !important;
+}
