@@ -1852,12 +1852,12 @@ function renderStats() {
   const panel=document.getElementById("session-stats-panel");
   if(panel) panel.remove();
   const today = todayString();
-  const todayEssayCount = essays.filter((item) => item.date === today).length;
+  const todayEssayCount = essays.filter((item) => item.completedDate === today).length;
   const todayMcqCount = mcqs
-    .filter((item) => item.date === today)
+    .filter((item) => item.completedDate === today)
     .reduce((total, item) => total + getMcqCountValue(item), 0);
   const todayFlashcardCount = flashcards
-    .filter((item) => item.date === today)
+    .filter((item) => item.completedDate === today)
     .reduce((total, item) => total + (Number(item.count) || 0), 0);
 
   const goalPairs = [
