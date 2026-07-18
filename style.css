@@ -1626,9 +1626,9 @@ h2 {
 
 .bcc-review-grid{
   display:grid !important;
-  grid-template-columns:repeat(4,160px) !important;
-  gap:8px !important;
+  grid-template-columns:repeat(auto-fill,160px) !important;
   justify-content:start !important;
+  gap:8px !important;
   margin-top:4px !important;
 }
 
