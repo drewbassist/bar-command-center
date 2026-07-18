@@ -1806,7 +1806,8 @@ function renderStats() {
   const pendingReviews = reviews.filter(r => r.status === "pending").length;
 
   const essaysWritten = essays.length;
-  const essaysReviewed = countReviewedItems("essay");
+  const essaysReviewed = reviews.filter(r=>r.itemType==="essay" && r.status==="completed").length;
+  const essaysTotalStudyEvents = essaysWritten + essaysReviewed;
 
   const mcqsDone = mcqs.reduce((t,m)=>t+(Number(m.count)||0),0);
   const mcqsReviewed = reviews.filter(r=>r.itemType==="mcq" && r.status==="completed")
@@ -1838,26 +1839,26 @@ function renderStats() {
   setText("stats-reviews", pendingReviews);
 
   setText("stats-essay-sets-done", essaysWritten);
-  setText("stats-essay-sets-reviewed", essaysReviewed);
+  setText("stats-essay-sets-reviewed", essaysTotalStudyEvents);
 
   setText("stats-mcq-sets-done", mcqsDone);
-  setText("stats-mcq-sets-reviewed", mcqsReviewed);
+  setText("stats-mcq-sets-reviewed", mcqsDone + mcqsReviewed);
 
   setText("stats-flashcard-sets-done", flashcardsDone);
-  setText("stats-flashcard-sets-reviewed", flashcardsReviewed);
+  setText("stats-flashcard-sets-reviewed", flashcardsDone + flashcardsReviewed);
 
   setText("stats-lecture-sets-done", lectureMinutesDone);
-  setText("stats-lecture-sets-reviewed", lectureMinutesReviewed);
+  setText("stats-lecture-sets-reviewed", lectureMinutesDone + lectureMinutesReviewed);
 
   const panel=document.getElementById("session-stats-panel");
   if(panel) panel.remove();
   const today = todayString();
-  const todayEssayCount = essays.filter((item) => item.completedDate === today).length;
+  const todayEssayCount = essays.filter((item) => item.date === today).length;
   const todayMcqCount = mcqs
-    .filter((item) => item.completedDate === today)
+    .filter((item) => item.date === today)
     .reduce((total, item) => total + getMcqCountValue(item), 0);
   const todayFlashcardCount = flashcards
-    .filter((item) => item.completedDate === today)
+    .filter((item) => item.date === today)
     .reduce((total, item) => total + (Number(item.count) || 0), 0);
 
   const goalPairs = [
