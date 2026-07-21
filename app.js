@@ -124,6 +124,8 @@ async function loadData() {
   );
   studyLog = normalizeStudyLog(loadLocalData("bcc_study_log", createEmptyStudyLog()));
 
+  normalizeReviewMetrics();
+
   currentSession = Number(localStorage.getItem("bcc_current_session") || "1");
 
   if (!Number.isFinite(currentSession) || currentSession < 1) {
@@ -223,6 +225,8 @@ function applyCompleteBarOSData(data) {
   customMcqSources = normalizeCustomSourceList(data?.customMcqSources || []);
   customFlashcardSources = normalizeCustomSourceList(data?.customFlashcardSources || []);
   rebuildCustomizableLists();
+
+  normalizeReviewMetrics();
 
   studyGoals = {
     ...studyGoals,
@@ -1039,7 +1043,10 @@ function handleEssaySubmit(event) {
   const essay = {
     id: createId("essay"),
     ...essayData,
-    completedDate: todayString()
+    completedDate: todayString(),
+    cyclesCompleted: 0,
+    reviewEvents: 0,
+    lastReviewed: ""
   };
 
   essays.push(essay);
@@ -1086,7 +1093,10 @@ function handleMcqSubmit(event) {
   const mcq = {
     id: createId("mcq"),
     ...mcqData,
-    completedDate: todayString()
+    completedDate: todayString(),
+    cyclesCompleted: 0,
+    reviewEvents: 0,
+    lastReviewed: ""
   };
 
   mcqs.push(mcq);
@@ -1129,7 +1139,10 @@ function handleFlashcardSubmit(event) {
   const flashcard = {
     id: createId("flashcard"),
     ...flashcardData,
-    completedDate: todayString()
+    completedDate: todayString(),
+    cyclesCompleted: 0,
+    reviewEvents: 0,
+    lastReviewed: ""
   };
 
   flashcards.push(flashcard);
@@ -1169,7 +1182,10 @@ function handleLectureSubmit(event) {
   const lecture = {
     id: createId("lecture"),
     ...lectureData,
-    completedDate: todayString()
+    completedDate: todayString(),
+    cyclesCompleted: 0,
+    reviewEvents: 0,
+    lastReviewed: ""
   };
 
   lectures.push(lecture);
@@ -1421,7 +1437,10 @@ function formatReviewIntervalList(intervals) {
     .join(", ");
 }
 
-function createReviewsForItem(item) {
+function createReviewsForItem(item, cycleNumber = null) {
+  const resolvedCycle = cycleNumber || getNextCycleNumber(item.id, item.type);
+  const cycleId = createId("cycle");
+
   reviewIntervals.forEach((interval, index) => {
     reviews.push({
       id: createId("review"),
@@ -1431,9 +1450,63 @@ function createReviewsForItem(item) {
       dueDate: addDays(todayString(), interval),
       intervalDays: interval,
       reviewNumber: index + 1,
+      cycleNumber: resolvedCycle,
+      cycleId,
       status: "pending",
       ratingAtCreation: item.rating
     });
+  });
+}
+
+function getNextCycleNumber(itemId, itemType) {
+  const cycleNumbers = reviews
+    .filter((review) => review.itemId === itemId && review.itemType === itemType)
+    .map((review) => Number(review.cycleNumber) || 1);
+
+  return cycleNumbers.length ? Math.max(...cycleNumbers) + 1 : 1;
+}
+
+function normalizeReviewMetrics() {
+  const collections = [essays, mcqs, flashcards, lectures];
+
+  collections.flat().forEach((item) => {
+    const itemReviews = reviews.filter(
+      (review) => review.itemId === item.id && review.itemType === item.type
+    );
+    const completed = itemReviews.filter((review) => review.status === "completed");
+
+    if (!Number.isFinite(Number(item.reviewEvents))) {
+      item.reviewEvents = completed.length;
+    } else {
+      item.reviewEvents = Number(item.reviewEvents);
+    }
+
+    if (!item.lastReviewed) {
+      const dates = completed
+        .map((review) => review.completedDate)
+        .filter(Boolean)
+        .sort();
+      item.lastReviewed = dates.length ? dates[dates.length - 1] : "";
+    }
+
+    if (!Number.isFinite(Number(item.cyclesCompleted))) {
+      const cycleMap = new Map();
+      itemReviews.forEach((review) => {
+        const key = review.cycleId || `legacy-${Number(review.cycleNumber) || 1}`;
+        if (!cycleMap.has(key)) cycleMap.set(key, []);
+        cycleMap.get(key).push(review);
+      });
+      item.cyclesCompleted = [...cycleMap.values()].filter(
+        (cycleReviews) => cycleReviews.length > 0 && cycleReviews.every((review) => review.status === "completed")
+      ).length;
+    } else {
+      item.cyclesCompleted = Number(item.cyclesCompleted);
+    }
+  });
+
+  reviews.forEach((review) => {
+    if (!review.cycleNumber) review.cycleNumber = 1;
+    if (!review.cycleId) review.cycleId = `legacy-${review.itemType}-${review.itemId}-${review.cycleNumber}`;
   });
 }
 
@@ -1633,7 +1706,7 @@ function renderEssays() {
       <div class="bcc-item-meta">
         ${escapeHtml(getSubjectName(essay.subject))} · ${escapeHtml(essay.source || "No source")} · ${escapeHtml(essay.pageNumber || "No page number")} · ${escapeHtml(essay.questionNumber || "No question number")}
       </div>
-      <div class="bcc-rating">Rating: ${essay.rating}/10 · Reviewed ${getReviewCount(essay.id,"essay")} times · Next Review: ${formatDate(getNextReviewDate(essay.id, "essay"))}</div>
+      ${renderItemReviewSummary(essay)}
       <button class="bcc-small-button" type="button" onclick="startEditEntry('essay', '${escapeHtml(essay.id)}')">Edit</button>
       ${essay.notes ? `<div class="bcc-item-notes">${escapeHtml(essay.notes)}</div>` : ""}
     </div>
@@ -1657,7 +1730,7 @@ function renderMcqs() {
       <div class="bcc-item-meta">
         ${escapeHtml(mcq.source || "No source")} · ${Number(mcq.correctCount) || 0} correct · ${getMcqAccuracy(mcq)}%
       </div>
-      <div class="bcc-rating">Rating: ${mcq.rating}/10 · Reviewed ${getReviewCount(mcq.id,"mcq")} times · Next Review: ${formatDate(getNextReviewDate(mcq.id, "mcq"))}</div>
+      ${renderItemReviewSummary(mcq)}
       <button class="bcc-small-button" type="button" onclick="startEditEntry('mcq', '${escapeHtml(mcq.id)}')">Edit</button>
       ${mcq.notes ? `<div class="bcc-item-notes">${escapeHtml(mcq.notes)}</div>` : ""}
     </div>
@@ -1681,7 +1754,7 @@ function renderFlashcards() {
       <div class="bcc-item-meta">
         ${escapeHtml(card.source || "No source")} · ${Number(card.count) || 0} cards reviewed
       </div>
-      <div class="bcc-rating">Rating: ${card.rating}/10 · Reviewed ${getReviewCount(card.id,"flashcard")} times · Next Review: ${formatDate(getNextReviewDate(card.id, "flashcard"))}</div>
+      ${renderItemReviewSummary(card)}
       <button class="bcc-small-button" type="button" onclick="startEditEntry('flashcard', '${escapeHtml(card.id)}')">Edit</button>
       ${card.notes ? `<div class="bcc-item-notes">${escapeHtml(card.notes)}</div>` : ""}
     </div>
@@ -1705,12 +1778,46 @@ function renderLectures() {
       <div class="bcc-item-meta">
         ${escapeHtml(getSubjectName(lecture.subject))} · ${escapeHtml(lecture.source || "AIL")} · ${Number(lecture.minutes) || 0} min
       </div>
-      <div class="bcc-rating">Rating: ${lecture.rating}/10 · Reviewed ${getReviewCount(lecture.id,"lecture")} times · Next Review: ${formatDate(getNextReviewDate(lecture.id, "lecture"))}</div>
+      ${renderItemReviewSummary(lecture)}
       <button class="bcc-small-button" type="button" onclick="startEditEntry('lecture', '${escapeHtml(lecture.id)}')">Edit</button>
       ${lecture.notes ? `<div class="bcc-item-notes">${escapeHtml(lecture.notes)}</div>` : ""}
     </div>
   `).join("");
 }
+
+function renderItemReviewSummary(item) {
+  const nextReview = getNextReviewDate(item.id, item.type);
+  const hasAnyReviews = reviews.some(
+    (review) => review.itemId === item.id && review.itemType === item.type
+  );
+  const hasPending = Boolean(nextReview);
+
+  return `
+    <div class="bcc-review-summary">
+      <div>Cycles Completed: <strong>${Number(item.cyclesCompleted) || 0}</strong></div>
+      <div>Review Events: <strong>${Number(item.reviewEvents) || 0}</strong></div>
+      <div>Last Reviewed: <strong>${item.lastReviewed ? formatDate(item.lastReviewed) : "Not yet"}</strong></div>
+      ${hasPending ? `<div>Next Review: <strong>${formatDate(nextReview)}</strong></div>` : ""}
+    </div>
+    ${hasAnyReviews && !hasPending ? `<button class="bcc-small-button" type="button" onclick="startNewReviewCycle('${escapeHtml(item.id)}', '${escapeHtml(item.type)}')">Start New Cycle</button>` : ""}
+  `;
+}
+
+function startNewReviewCycle(itemId, itemType) {
+  const item = findItem(itemId, itemType);
+  if (!item) return;
+
+  const hasPending = reviews.some(
+    (review) => review.itemId === itemId && review.itemType === itemType && review.status === "pending"
+  );
+  if (hasPending) return;
+
+  createReviewsForItem(item);
+  saveData();
+  renderAll();
+}
+
+window.startNewReviewCycle = startNewReviewCycle;
 
 function renderReviews() {
   const list = document.getElementById("review-list");
@@ -1744,13 +1851,15 @@ function renderReviewGroup(group) {
     const isCompleted = review.status === "completed";
     const isDue = review.status === "pending" && review.dueDate <= todayString();
 
+    if (isCompleted) {
+      return `<div class="bcc-review-chip" title="Reviewed ${formatDate(review.completedDate || review.dueDate)}">✓ D${escapeHtml(review.intervalDays || "")}</div>`;
+    }
+
     return `
-      <div class="bcc-review-cell ${isCompleted ? "completed" : ""} ${isDue ? "due" : ""}">
+      <div class="bcc-review-cell ${isDue ? "due" : ""}">
         <div class="bcc-review-label">Day ${escapeHtml(review.intervalDays || "")}</div>
         <div class="bcc-review-date">${formatDate(review.dueDate)}</div>
-        <button class="bcc-small-button" onclick="completeReview('${escapeHtml(review.id)}')" ${isCompleted ? "disabled" : ""}>
-          ${isCompleted ? "Reviewed" : "Mark Reviewed"}
-        </button>
+        <button class="bcc-small-button" onclick="completeReview('${escapeHtml(review.id)}')">Mark Reviewed</button>
       </div>
     `;
   }).join("");
@@ -1761,6 +1870,7 @@ function renderReviewGroup(group) {
       <div class="bcc-item-meta">
         ${escapeHtml(getTypeLabel(group.itemType))} · ${escapeHtml(subject)}
         ${detail ? ` · ${escapeHtml(detail)}` : ""}
+        · Cycle ${escapeHtml(group.cycleNumber || 1)}
       </div>
       <div class="bcc-review-grid">
         ${cells}
@@ -1793,62 +1903,64 @@ function renderReviewItem(review) {
 
 function completeReview(reviewId) {
   const review = reviews.find((item) => item.id === reviewId);
-  if (!review) return;
+  if (!review || review.status === "completed") return;
 
   review.status = "completed";
   review.completedDate = todayString();
+
+  const item = findItem(review.itemId, review.itemType);
+  if (item) {
+    item.reviewEvents = (Number(item.reviewEvents) || 0) + 1;
+    item.lastReviewed = review.completedDate;
+
+    const cycleReviews = reviews.filter(
+      (candidate) => candidate.itemId === review.itemId &&
+        candidate.itemType === review.itemType &&
+        candidate.cycleId === review.cycleId
+    );
+
+    if (cycleReviews.length > 0 && cycleReviews.every((candidate) => candidate.status === "completed")) {
+      item.cyclesCompleted = (Number(item.cyclesCompleted) || 0) + 1;
+    }
+  }
 
   saveData();
   renderAll();
 }
 
 function renderStats() {
-  const pendingReviews = reviews.filter(r => r.status === "pending").length;
+  const pendingReviews = reviews.filter((review) => review.status === "pending").length;
 
-  const essaysWritten = essays.length;
-  const essaysReviewed = reviews.filter(r=>r.itemType==="essay" && r.status==="completed").length;
-  const essaysTotalStudyEvents = essaysWritten + essaysReviewed;
+  const essaysLearned = essays.length;
+  const essayCycles = essays.reduce((total, item) => total + (Number(item.cyclesCompleted) || 0), 0);
+  const essayReviewEvents = essays.reduce((total, item) => total + (Number(item.reviewEvents) || 0), 0);
 
-  const mcqsDone = mcqs.reduce((t,m)=>t+(Number(m.count)||0),0);
-  const mcqsReviewed = reviews.filter(r=>r.itemType==="mcq" && r.status==="completed")
-    .reduce((t,r)=>{
-      const m = mcqs.find(x=>x.id===r.itemId);
-      return t + (m ? (Number(m.count)||0) : 0);
-    },0);
-  const mcqsCorrect = mcqs.reduce((t,m)=>t+(Number(m.correctCount)||0),0);
-  const mcqAccuracy = mcqsDone ? Math.round(mcqsCorrect/mcqsDone*100) : 0;
+  const mcqSessionsLearned = mcqs.length;
+  const mcqCycles = mcqs.reduce((total, item) => total + (Number(item.cyclesCompleted) || 0), 0);
+  const mcqReviewEvents = mcqs.reduce((total, item) => total + (Number(item.reviewEvents) || 0), 0);
+  const mcqsDone = mcqs.reduce((total, item) => total + (Number(item.count) || 0), 0);
 
-  const flashcardsDone = flashcards.reduce((t,f)=>t+(Number(f.count)||0),0);
-  const flashcardsReviewed = reviews.filter(r=>r.itemType==="flashcard" && r.status==="completed")
-    .reduce((t,r)=>{
-      const f=flashcards.find(x=>x.id===r.itemId);
-      return t + (f ? (Number(f.count)||0) : 0);
-    },0);
+  const flashcardSessionsLearned = flashcards.length;
+  const flashcardCycles = flashcards.reduce((total, item) => total + (Number(item.cyclesCompleted) || 0), 0);
+  const flashcardReviewEvents = flashcards.reduce((total, item) => total + (Number(item.reviewEvents) || 0), 0);
+  const flashcardsDone = flashcards.reduce((total, item) => total + (Number(item.count) || 0), 0);
 
-  const lectureMinutesDone = lectures.reduce((t,l)=>t+(Number(l.minutes)||0),0);
-  const lectureMinutesReviewed = reviews.filter(r=>r.itemType==="lecture" && r.status==="completed")
-    .reduce((t,r)=>{
-      const l=lectures.find(x=>x.id===r.itemId);
-      return t + (l ? (Number(l.minutes)||0) : 0);
-    },0);
-
-  setText("stats-essays", essaysWritten);
+  setText("stats-essays", essaysLearned);
   setText("stats-mcqs", mcqsDone);
   setText("stats-flashcards", flashcardsDone);
-  setText("stats-lectures", lectureMinutesDone);
   setText("stats-reviews", pendingReviews);
 
-  setText("stats-essay-sets-done", essaysWritten);
-  setText("stats-essay-sets-reviewed", essaysTotalStudyEvents);
+  setText("stats-essay-learned", essaysLearned);
+  setText("stats-essay-cycles", essayCycles);
+  setText("stats-essay-review-events", essayReviewEvents);
 
-  setText("stats-mcq-sets-done", mcqsDone);
-  setText("stats-mcq-sets-reviewed", mcqsDone + mcqsReviewed);
+  setText("stats-mcq-learned", mcqSessionsLearned);
+  setText("stats-mcq-cycles", mcqCycles);
+  setText("stats-mcq-review-events", mcqReviewEvents);
 
-  setText("stats-flashcard-sets-done", flashcardsDone);
-  setText("stats-flashcard-sets-reviewed", flashcardsDone + flashcardsReviewed);
-
-  setText("stats-lecture-sets-done", lectureMinutesDone);
-  setText("stats-lecture-sets-reviewed", lectureMinutesDone + lectureMinutesReviewed);
+  setText("stats-flashcard-learned", flashcardSessionsLearned);
+  setText("stats-flashcard-cycles", flashcardCycles);
+  setText("stats-flashcard-review-events", flashcardReviewEvents);
 
   const panel=document.getElementById("session-stats-panel");
   if(panel) panel.remove();
@@ -1881,13 +1993,16 @@ function getReviewGroups() {
   const groups = {};
 
   reviews.forEach((review) => {
-    const key = `${review.itemType}_${review.itemId}`;
+    const cycleKey = review.cycleId || `legacy-${review.itemType}-${review.itemId}-${review.cycleNumber || 1}`;
+    const key = `${review.itemType}_${review.itemId}_${cycleKey}`;
 
     if (!groups[key]) {
       groups[key] = {
         itemId: review.itemId,
         itemType: review.itemType,
         subject: review.subject,
+        cycleNumber: Number(review.cycleNumber) || 1,
+        cycleId: cycleKey,
         reviews: []
       };
     }
@@ -1896,6 +2011,7 @@ function getReviewGroups() {
   });
 
   return Object.values(groups)
+    .filter((group) => group.reviews.some((review) => review.status === "pending"))
     .map((group) => {
       group.reviews.sort((a, b) => Number(a.reviewNumber) - Number(b.reviewNumber));
       return group;
@@ -2000,8 +2116,9 @@ function getNextReviewDate(itemId, itemType) {
   return pendingReviews.length > 0 ? pendingReviews[0].dueDate : "";
 }
 
-function getReviewCount(itemId,itemType){
-  return 1 + reviews.filter(r=>r.itemId===itemId && r.itemType===itemType && r.status==="completed").length;
+function getReviewCount(itemId, itemType) {
+  const item = findItem(itemId, itemType);
+  return item ? (Number(item.reviewEvents) || 0) : 0;
 }
 
 function countReviewedItems(type) {
