@@ -3440,75 +3440,111 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 const essayGridDays = [
-  ["mon","Monday"],["tue","Tuesday"],["wed","Wednesday"],["thu","Thursday"],
-  ["fri","Friday"],["sat","Saturday"],["sun","Sunday"]
+  ["mon", "M"],
+  ["tue", "T"],
+  ["wed", "W"],
+  ["thu", "T"],
+  ["fri", "F"],
+  ["sat", "S"],
+  ["sun", "S"]
 ];
+
 const essayGridSubjects = [
-  ["k","Contracts","K"],["con","Con Law","Con"],["rem","Remedies","Rem"],
-  ["t","Torts","T"],["ba","Business Affairs","BA"],["cr","Crim","CR"],
-  ["evi","Evidence","Evi"]
+  ["k", "K"],
+  ["con", "Con"],
+  ["rem", "Rem"],
+  ["t", "T"],
+  ["ba", "BA"],
+  ["cr", "Crim"],
+  ["evi", "Evi"]
 ];
 
 function normalizeEssayGrid(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+
   const clean = {};
+
   Object.entries(value).forEach(([key, checked]) => {
     if (checked === true) clean[key] = true;
   });
+
   return clean;
 }
 
 function renderEssayGrid() {
   const container = document.getElementById("essay-grid-container");
   if (!container) return;
+
   container.innerHTML = "";
 
   for (let n = 1; n <= 6; n++) {
     const block = document.createElement("section");
     block.className = "bcc-essay-grid-block";
-    block.innerHTML = `<h3 class="bcc-essay-grid-title">Essay ${n}</h3>`;
 
     const wrap = document.createElement("div");
     wrap.className = "bcc-essay-grid-wrap";
+
     const table = document.createElement("table");
     table.className = "bcc-essay-grid-table";
 
     const head = document.createElement("thead");
-    const hr = document.createElement("tr");
-    hr.innerHTML = "<th>Subject</th>";
-    essayGridDays.forEach(([,label]) => {
+    const headerRow = document.createElement("tr");
+
+    const blankCorner = document.createElement("th");
+    blankCorner.className = "bcc-essay-grid-corner";
+    blankCorner.setAttribute("aria-hidden", "true");
+    headerRow.appendChild(blankCorner);
+
+    essayGridDays.forEach(([, label]) => {
       const th = document.createElement("th");
       th.textContent = label;
-      hr.appendChild(th);
+      headerRow.appendChild(th);
     });
-    head.appendChild(hr);
+
+    head.appendChild(headerRow);
     table.appendChild(head);
 
     const body = document.createElement("tbody");
-    essayGridSubjects.forEach(([sid,label,short]) => {
-      const tr = document.createElement("tr");
-      const th = document.createElement("th");
-      th.scope = "row";
-      th.innerHTML = `<span class="bcc-essay-grid-subject">${escapeHtml(label)}</span><span class="bcc-essay-grid-code">${short} ${n}</span>`;
-      tr.appendChild(th);
 
-      essayGridDays.forEach(([did,day]) => {
-        const td = document.createElement("td");
-        const cb = document.createElement("input");
-        const key = `${n}:${sid}:${did}`;
-        cb.type = "checkbox";
-        cb.className = "bcc-essay-grid-check";
-        cb.checked = essayGrid[key] === true;
-        cb.setAttribute("aria-label", `${label} ${n}, ${day}`);
-        cb.addEventListener("change", () => {
-          if (cb.checked) essayGrid[key] = true;
-          else delete essayGrid[key];
+    essayGridSubjects.forEach(([subjectId, label]) => {
+      const row = document.createElement("tr");
+
+      const subjectCell = document.createElement("th");
+      subjectCell.scope = "row";
+      subjectCell.className = "bcc-essay-grid-row-label";
+      subjectCell.textContent = label;
+      row.appendChild(subjectCell);
+
+      essayGridDays.forEach(([dayId, dayLabel]) => {
+        const cell = document.createElement("td");
+        const checkbox = document.createElement("input");
+
+        // Keep the original key format so existing saved check marks remain intact.
+        const key = `${n}:${subjectId}:${dayId}`;
+
+        checkbox.type = "checkbox";
+        checkbox.className = "bcc-essay-grid-check";
+        checkbox.checked = essayGrid[key] === true;
+        checkbox.setAttribute(
+          "aria-label",
+          `${label} essay ${n}, ${dayLabel}`
+        );
+
+        checkbox.addEventListener("change", () => {
+          if (checkbox.checked) {
+            essayGrid[key] = true;
+          } else {
+            delete essayGrid[key];
+          }
+
           saveData();
         });
-        td.appendChild(cb);
-        tr.appendChild(td);
+
+        cell.appendChild(checkbox);
+        row.appendChild(cell);
       });
-      body.appendChild(tr);
+
+      body.appendChild(row);
     });
 
     table.appendChild(body);
