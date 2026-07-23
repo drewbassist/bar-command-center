@@ -37,6 +37,7 @@ let reviews = [];
 let sessionHistory = [];
 let currentSession = 1;
 let editingEntry = null;
+let essayGrid = {};
 
 const studyLogActivityIds = [
   "live_lectures",
@@ -123,6 +124,7 @@ async function loadData() {
     loadLocalData("bcc_review_intervals", recommendedReviewIntervals)
   );
   studyLog = normalizeStudyLog(loadLocalData("bcc_study_log", createEmptyStudyLog()));
+  essayGrid = normalizeEssayGrid(loadLocalData("bcc_essay_grid", {}));
 
   normalizeReviewMetrics();
 
@@ -177,6 +179,7 @@ function saveLocalData() {
   localStorage.setItem("bcc_current_session", String(currentSession));
   localStorage.setItem("bcc_study_mode", currentStudyMode);
   localStorage.setItem("bcc_study_log", JSON.stringify(studyLog));
+  localStorage.setItem("bcc_essay_grid", JSON.stringify(essayGrid));
   localStorage.setItem("bcc_review_intervals", JSON.stringify(reviewIntervals));
   localStorage.setItem("bcc_custom_subjects", JSON.stringify(customSubjects));
   localStorage.setItem("bcc_custom_essay_sources", JSON.stringify(customEssaySources));
@@ -197,6 +200,7 @@ function getCompleteBarOSData() {
     currentSession,
     currentStudyMode,
     studyLog,
+    essayGrid,
     reviewIntervals,
     customSubjects,
     customEssaySources,
@@ -216,6 +220,7 @@ function applyCompleteBarOSData(data) {
   currentSession = Number(data?.currentSession || 1);
   currentStudyMode = data?.currentStudyMode || currentStudyMode || "full";
   studyLog = normalizeStudyLog(data?.studyLog);
+  essayGrid = normalizeEssayGrid(data?.essayGrid);
   reviewIntervals = normalizeReviewIntervals(
     data?.reviewIntervals || recommendedReviewIntervals
   );
@@ -1531,6 +1536,7 @@ function exportBackup() {
     currentSession,
     currentStudyMode,
     studyLog,
+    essayGrid,
     reviewIntervals,
     customSubjects,
     customEssaySources,
@@ -1574,6 +1580,7 @@ function importBackup(event) {
       currentSession = Number(backup.currentSession || 1);
       currentStudyMode = backup.currentStudyMode || currentStudyMode || "full";
       studyLog = normalizeStudyLog(backup.studyLog);
+      essayGrid = normalizeEssayGrid(backup.essayGrid);
       reviewIntervals = normalizeReviewIntervals(
         backup.reviewIntervals || recommendedReviewIntervals
       );
@@ -1606,6 +1613,7 @@ function importBackup(event) {
 }
 
 function renderAll() {
+  renderEssayGrid();
   renderPlanner();
   renderEssays();
   renderMcqs();
@@ -3430,4 +3438,82 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+const essayGridDays = [
+  ["mon","Monday"],["tue","Tuesday"],["wed","Wednesday"],["thu","Thursday"],
+  ["fri","Friday"],["sat","Saturday"],["sun","Sunday"]
+];
+const essayGridSubjects = [
+  ["k","Contracts","K"],["con","Con Law","Con"],["rem","Remedies","Rem"],
+  ["t","Torts","T"],["ba","Business Affairs","BA"],["cr","Crim","CR"],
+  ["evi","Evidence","Evi"]
+];
+
+function normalizeEssayGrid(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const clean = {};
+  Object.entries(value).forEach(([key, checked]) => {
+    if (checked === true) clean[key] = true;
+  });
+  return clean;
+}
+
+function renderEssayGrid() {
+  const container = document.getElementById("essay-grid-container");
+  if (!container) return;
+  container.innerHTML = "";
+
+  for (let n = 1; n <= 6; n++) {
+    const block = document.createElement("section");
+    block.className = "bcc-essay-grid-block";
+    block.innerHTML = `<h3 class="bcc-essay-grid-title">Essay ${n}</h3>`;
+
+    const wrap = document.createElement("div");
+    wrap.className = "bcc-essay-grid-wrap";
+    const table = document.createElement("table");
+    table.className = "bcc-essay-grid-table";
+
+    const head = document.createElement("thead");
+    const hr = document.createElement("tr");
+    hr.innerHTML = "<th>Subject</th>";
+    essayGridDays.forEach(([,label]) => {
+      const th = document.createElement("th");
+      th.textContent = label;
+      hr.appendChild(th);
+    });
+    head.appendChild(hr);
+    table.appendChild(head);
+
+    const body = document.createElement("tbody");
+    essayGridSubjects.forEach(([sid,label,short]) => {
+      const tr = document.createElement("tr");
+      const th = document.createElement("th");
+      th.scope = "row";
+      th.innerHTML = `<span class="bcc-essay-grid-subject">${escapeHtml(label)}</span><span class="bcc-essay-grid-code">${short} ${n}</span>`;
+      tr.appendChild(th);
+
+      essayGridDays.forEach(([did,day]) => {
+        const td = document.createElement("td");
+        const cb = document.createElement("input");
+        const key = `${n}:${sid}:${did}`;
+        cb.type = "checkbox";
+        cb.className = "bcc-essay-grid-check";
+        cb.checked = essayGrid[key] === true;
+        cb.setAttribute("aria-label", `${label} ${n}, ${day}`);
+        cb.addEventListener("change", () => {
+          if (cb.checked) essayGrid[key] = true;
+          else delete essayGrid[key];
+          saveData();
+        });
+        td.appendChild(cb);
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+
+    table.appendChild(body);
+    wrap.appendChild(table);
+    block.appendChild(wrap);
+    container.appendChild(block);
+  }
 }
