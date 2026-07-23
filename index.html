@@ -11,6 +11,7 @@
   <meta name="theme-color" content="#111111" />
 
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="essay-grid.css" />
 </head>
 
 <body>
@@ -69,6 +70,7 @@ New user? Follow instructions sent to your email before signing in.
       <button class="bcc-nav-button" data-view="flashcards">Flashcards</button>
       <button class="bcc-nav-button" data-view="reviews">Reviews</button>
       <button class="bcc-nav-button" data-view="study-log">Study Log</button>
+      <button class="bcc-nav-button" data-view="essay-grid">Essay Grid</button>
       <button class="bcc-nav-button" data-view="stats">Progress</button>
       <button class="bcc-nav-button" data-view="settings">Settings</button>
     </nav>
@@ -395,6 +397,15 @@ New user? Follow instructions sent to your email before signing in.
             <h2>Totals by Activity</h2>
             <div id="study-log-activity-totals" class="bcc-study-log-activity-grid"></div>
           </div>
+        </div>
+      </section>
+
+
+      <section id="essay-grid" class="bcc-view">
+        <div class="bcc-panel">
+          <h2>Essay Grid</h2>
+          <p class="bcc-help-text">Check the day you completed each essay. Check marks save automatically.</p>
+          <div id="essay-grid-container" class="bcc-essay-grid-container"></div>
         </div>
       </section>
 
