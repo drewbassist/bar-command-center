@@ -3439,16 +3439,6 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
-const essayGridDays = [
-  ["mon", "M"],
-  ["tue", "T"],
-  ["wed", "W"],
-  ["thu", "T"],
-  ["fri", "F"],
-  ["sat", "S"],
-  ["sun", "S"]
-];
-
 const essayGridSubjects = [
   ["k", "K"],
   ["con", "Con"],
@@ -3503,74 +3493,46 @@ function renderEssayGrid() {
   controls.appendChild(clearButton);
   container.appendChild(controls);
 
+  const columns = document.createElement("div");
+  columns.className = "bcc-essay-grid-columns";
+
   for (let n = 1; n <= 6; n++) {
-    const block = document.createElement("section");
-    block.className = "bcc-essay-grid-block";
-
-    const wrap = document.createElement("div");
-    wrap.className = "bcc-essay-grid-wrap";
-
-    const table = document.createElement("table");
-    table.className = "bcc-essay-grid-table";
-
-    const head = document.createElement("thead");
-    const headerRow = document.createElement("tr");
-
-    const blankCorner = document.createElement("th");
-    blankCorner.className = "bcc-essay-grid-corner";
-    blankCorner.setAttribute("aria-hidden", "true");
-    headerRow.appendChild(blankCorner);
-
-    essayGridDays.forEach(([, label]) => {
-      const th = document.createElement("th");
-      th.textContent = label;
-      headerRow.appendChild(th);
-    });
-
-    head.appendChild(headerRow);
-    table.appendChild(head);
-
-    const body = document.createElement("tbody");
+    const column = document.createElement("section");
+    column.className = "bcc-essay-grid-column";
 
     essayGridSubjects.forEach(([subjectId, label]) => {
-      const row = document.createElement("tr");
+      const row = document.createElement("label");
+      row.className = "bcc-essay-grid-row";
 
-      const subjectCell = document.createElement("th");
-      subjectCell.scope = "row";
-      subjectCell.className = "bcc-essay-grid-row-label";
-      subjectCell.textContent = `${label}${n}`;
-      row.appendChild(subjectCell);
+      const text = document.createElement("span");
+      text.className = "bcc-essay-grid-row-label";
+      text.textContent = `${label}${n}`;
 
-      essayGridDays.forEach(([dayId, dayLabel]) => {
-        const cell = document.createElement("td");
-        const checkbox = document.createElement("input");
-        const key = `${n}:${subjectId}:${dayId}`;
+      const checkbox = document.createElement("input");
+      const key = `${n}:${subjectId}:done`;
 
-        checkbox.type = "checkbox";
-        checkbox.className = "bcc-essay-grid-check";
-        checkbox.checked = essayGrid[key] === true;
-        checkbox.setAttribute("aria-label", `${label}${n}, ${dayLabel}`);
+      checkbox.type = "checkbox";
+      checkbox.className = "bcc-essay-grid-check";
+      checkbox.checked = essayGrid[key] === true;
+      checkbox.setAttribute("aria-label", `${label}${n}`);
 
-        checkbox.addEventListener("change", () => {
-          if (checkbox.checked) {
-            essayGrid[key] = true;
-          } else {
-            delete essayGrid[key];
-          }
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          essayGrid[key] = true;
+        } else {
+          delete essayGrid[key];
+        }
 
-          saveData();
-        });
-
-        cell.appendChild(checkbox);
-        row.appendChild(cell);
+        saveData();
       });
 
-      body.appendChild(row);
+      row.appendChild(text);
+      row.appendChild(checkbox);
+      column.appendChild(row);
     });
 
-    table.appendChild(body);
-    wrap.appendChild(table);
-    block.appendChild(wrap);
-    container.appendChild(block);
+    columns.appendChild(column);
   }
+
+  container.appendChild(columns);
 }
