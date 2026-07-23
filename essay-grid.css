@@ -34,7 +34,7 @@
 
 .bcc-essay-grid-row {
   display: grid;
-  grid-template-columns: 1fr 28px;
+  grid-template-columns: 1fr 20px 26px;
   align-items: center;
   min-height: 34px;
   border-bottom: 1px solid #ededed;
@@ -53,10 +53,19 @@
   white-space: nowrap;
 }
 
+.bcc-essay-grid-row-number {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .bcc-essay-grid-check {
   width: 15px;
   height: 15px;
   margin: 0;
+  justify-self: end;
+  margin-right: 8px;
   cursor: pointer;
   accent-color: #111111;
 }
