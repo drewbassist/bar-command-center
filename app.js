@@ -3506,7 +3506,11 @@ function renderEssayGrid() {
 
       const text = document.createElement("span");
       text.className = "bcc-essay-grid-row-label";
-      text.textContent = `${label}${n}`;
+      text.textContent = label;
+
+      const number = document.createElement("span");
+      number.className = "bcc-essay-grid-row-number";
+      number.textContent = String(n);
 
       const checkbox = document.createElement("input");
       const key = `${n}:${subjectId}:done`;
@@ -3527,6 +3531,7 @@ function renderEssayGrid() {
       });
 
       row.appendChild(text);
+      row.appendChild(number);
       row.appendChild(checkbox);
       column.appendChild(row);
     });
