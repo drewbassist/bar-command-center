@@ -3512,14 +3512,13 @@ function renderEssayGrid() {
       const subjectCell = document.createElement("th");
       subjectCell.scope = "row";
       subjectCell.className = "bcc-essay-grid-row-label";
-      subjectCell.textContent = label;
+      subjectCell.textContent = `${label}${n}`;
       row.appendChild(subjectCell);
 
       essayGridDays.forEach(([dayId, dayLabel]) => {
         const cell = document.createElement("td");
         const checkbox = document.createElement("input");
 
-        // Keep the original key format so existing saved check marks remain intact.
         const key = `${n}:${subjectId}:${dayId}`;
 
         checkbox.type = "checkbox";
@@ -3527,7 +3526,7 @@ function renderEssayGrid() {
         checkbox.checked = essayGrid[key] === true;
         checkbox.setAttribute(
           "aria-label",
-          `${label} essay ${n}, ${dayLabel}`
+          `${label}${n}, ${dayLabel}`
         );
 
         checkbox.addEventListener("change", () => {
