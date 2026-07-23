@@ -1,0 +1,16 @@
+
+.bcc-essay-grid-container{display:grid;gap:22px;margin-top:18px}
+.bcc-essay-grid-block{border:1px solid #e5e5e5;border-radius:10px;background:#fff;overflow:hidden}
+.bcc-essay-grid-title{margin:0;padding:12px 14px;font-size:15px;font-weight:600;border-bottom:1px solid #e5e5e5}
+.bcc-essay-grid-wrap{overflow-x:auto}
+.bcc-essay-grid-table{width:100%;min-width:760px;border-collapse:collapse;table-layout:fixed}
+.bcc-essay-grid-table th,.bcc-essay-grid-table td{border-right:1px solid #ededed;border-bottom:1px solid #ededed;padding:9px 8px;text-align:center;vertical-align:middle}
+.bcc-essay-grid-table tr:last-child th,.bcc-essay-grid-table tr:last-child td{border-bottom:0}
+.bcc-essay-grid-table th:last-child,.bcc-essay-grid-table td:last-child{border-right:0}
+.bcc-essay-grid-table thead th{font-size:11px;font-weight:600;background:#fafafa;white-space:nowrap}
+.bcc-essay-grid-table thead th:first-child,.bcc-essay-grid-table tbody th{width:150px;text-align:left}
+.bcc-essay-grid-table tbody th{padding-left:14px;font-weight:500}
+.bcc-essay-grid-subject{display:block;font-size:12px}
+.bcc-essay-grid-code{display:block;margin-top:2px;font-size:10px;font-weight:400;color:#777}
+.bcc-essay-grid-check{width:20px;height:20px;margin:0;cursor:pointer;accent-color:#111}
+@media(max-width:700px){.bcc-essay-grid-table{min-width:680px}}
