@@ -3471,11 +3471,37 @@ function normalizeEssayGrid(value) {
   return clean;
 }
 
+function clearEssayGrid() {
+  const confirmed = window.confirm(
+    "Clear all Essay Grid check marks? This will not delete anything from your Essays tracker or Reviews."
+  );
+
+  if (!confirmed) return;
+
+  essayGrid = {};
+  saveData();
+  renderEssayGrid();
+}
+
+window.clearEssayGrid = clearEssayGrid;
+
 function renderEssayGrid() {
   const container = document.getElementById("essay-grid-container");
   if (!container) return;
 
   container.innerHTML = "";
+
+  const controls = document.createElement("div");
+  controls.className = "bcc-essay-grid-controls";
+
+  const clearButton = document.createElement("button");
+  clearButton.type = "button";
+  clearButton.className = "bcc-small-button bcc-essay-grid-clear-button";
+  clearButton.textContent = "Clear Grid";
+  clearButton.addEventListener("click", clearEssayGrid);
+
+  controls.appendChild(clearButton);
+  container.appendChild(controls);
 
   for (let n = 1; n <= 6; n++) {
     const block = document.createElement("section");
@@ -3518,16 +3544,12 @@ function renderEssayGrid() {
       essayGridDays.forEach(([dayId, dayLabel]) => {
         const cell = document.createElement("td");
         const checkbox = document.createElement("input");
-
         const key = `${n}:${subjectId}:${dayId}`;
 
         checkbox.type = "checkbox";
         checkbox.className = "bcc-essay-grid-check";
         checkbox.checked = essayGrid[key] === true;
-        checkbox.setAttribute(
-          "aria-label",
-          `${label}${n}, ${dayLabel}`
-        );
+        checkbox.setAttribute("aria-label", `${label}${n}, ${dayLabel}`);
 
         checkbox.addEventListener("change", () => {
           if (checkbox.checked) {
