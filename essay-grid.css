@@ -6,6 +6,17 @@
   max-width: 100%;
 }
 
+.bcc-essay-grid-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2px;
+}
+
+.bcc-essay-grid-clear-button {
+  font-size: 10px;
+  padding: 4px 8px;
+}
+
 .bcc-essay-grid-block {
   width: 430px;
   max-width: 100%;
