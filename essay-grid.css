@@ -1,15 +1,13 @@
 .bcc-essay-grid-container {
-  display: grid;
-  gap: 8px;
   margin-top: 10px;
-  width: 430px;
+  width: fit-content;
   max-width: 100%;
 }
 
 .bcc-essay-grid-controls {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 2px;
+  margin-bottom: 8px;
 }
 
 .bcc-essay-grid-clear-button {
@@ -17,83 +15,54 @@
   padding: 4px 8px;
 }
 
-.bcc-essay-grid-block {
-  width: 430px;
-  max-width: 100%;
+.bcc-essay-grid-columns {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.bcc-essay-grid-column {
+  width: 110px;
+  flex: 0 0 110px;
   border: 1px solid #e5e5e5;
   border-radius: 6px;
   background: #ffffff;
   overflow: hidden;
 }
 
-.bcc-essay-grid-wrap {
-  overflow-x: auto;
-}
-
-.bcc-essay-grid-table {
-  width: 430px;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-.bcc-essay-grid-table th,
-.bcc-essay-grid-table td {
-  border-right: 1px solid #ededed;
+.bcc-essay-grid-row {
+  display: grid;
+  grid-template-columns: 1fr 28px;
+  align-items: center;
+  min-height: 34px;
   border-bottom: 1px solid #ededed;
-  padding: 2px 3px;
-  text-align: center;
-  vertical-align: middle;
-  height: 21px;
+  cursor: pointer;
 }
 
-.bcc-essay-grid-table tr:last-child th,
-.bcc-essay-grid-table tr:last-child td {
+.bcc-essay-grid-row:last-child {
   border-bottom: 0;
 }
 
-.bcc-essay-grid-table th:last-child,
-.bcc-essay-grid-table td:last-child {
-  border-right: 0;
-}
-
-.bcc-essay-grid-table thead th {
-  height: 19px;
-  padding: 2px;
-  font-size: 9px;
-  font-weight: 600;
-  background: #fafafa;
-  white-space: nowrap;
-}
-
-.bcc-essay-grid-table thead th:first-child,
-.bcc-essay-grid-table tbody th {
-  width: 55px;
-}
-
-.bcc-essay-grid-corner {
-  background: #fafafa;
-}
-
 .bcc-essay-grid-row-label {
-  padding-left: 6px !important;
-  text-align: left !important;
-  font-size: 10px;
+  padding-left: 10px;
+  text-align: left;
+  font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .bcc-essay-grid-check {
-  width: 13px;
-  height: 13px;
+  width: 15px;
+  height: 15px;
   margin: 0;
   cursor: pointer;
   accent-color: #111111;
 }
 
-@media (max-width: 500px) {
-  .bcc-essay-grid-container,
-  .bcc-essay-grid-block,
-  .bcc-essay-grid-table {
-    width: 100%;
+@media (max-width: 700px) {
+  .bcc-essay-grid-columns {
+    max-width: calc(100vw - 70px);
   }
 }
