@@ -1,12 +1,12 @@
 .bcc-essay-grid-container {
   display: grid;
-  gap: 22px;
-  margin-top: 18px;
+  gap: 12px;
+  margin-top: 10px;
 }
 
 .bcc-essay-grid-block {
   border: 1px solid #e5e5e5;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #ffffff;
   overflow: hidden;
 }
@@ -17,7 +17,7 @@
 
 .bcc-essay-grid-table {
   width: 100%;
-  min-width: 560px;
+  min-width: 440px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -26,9 +26,10 @@
 .bcc-essay-grid-table td {
   border-right: 1px solid #ededed;
   border-bottom: 1px solid #ededed;
-  padding: 9px 8px;
+  padding: 4px 5px;
   text-align: center;
   vertical-align: middle;
+  height: 28px;
 }
 
 .bcc-essay-grid-table tr:last-child th,
@@ -42,15 +43,16 @@
 }
 
 .bcc-essay-grid-table thead th {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
   background: #fafafa;
   white-space: nowrap;
+  height: 24px;
 }
 
 .bcc-essay-grid-table thead th:first-child,
 .bcc-essay-grid-table tbody th {
-  width: 72px;
+  width: 58px;
 }
 
 .bcc-essay-grid-corner {
@@ -58,16 +60,16 @@
 }
 
 .bcc-essay-grid-row-label {
-  padding-left: 10px !important;
+  padding-left: 8px !important;
   text-align: left !important;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .bcc-essay-grid-check {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   margin: 0;
   cursor: pointer;
   accent-color: #111111;
@@ -75,6 +77,6 @@
 
 @media (max-width: 700px) {
   .bcc-essay-grid-table {
-    min-width: 520px;
+    min-width: 420px;
   }
 }
