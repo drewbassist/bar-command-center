@@ -364,9 +364,6 @@ function setupAppControlsOnce() {
   setupReviewFrequencyControls();
   setupCustomizationControls();
   setupSettingsControls();
-
-  const fp=document.getElementById("flashcardsplus-form");
-if(fp){fp.addEventListener("submit",e=>{e.preventDefault();flashcardsPlus.push({id:Date.now().toString(),subject:getValue("flashcardsplus-subject"),question:getValue("flashcardsplus-question"),answer:getValue("flashcardsplus-answer"),rule:getValue("flashcardsplus-rule"),notes:getValue("flashcardsplus-notes"),created:todayString()});saveData();fp.reset();populateSubjectDropdown("flashcardsplus-subject");document.getElementById("flashcardsplus-message").textContent="Flashcard saved.";});}
 appControlsReady = true;
 }
 
