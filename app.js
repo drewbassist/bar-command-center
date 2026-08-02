@@ -32,6 +32,7 @@ let currentStudyMode = "full";
 let essays = [];
 let mcqs = [];
 let flashcards = [];
+let flashcardsPlus = loadLocalData('bcc_flashcards_plus', []);
 let lectures = [];
 let reviews = [];
 let sessionHistory = [];
@@ -173,6 +174,7 @@ function saveLocalData() {
   localStorage.setItem("bcc_essays", JSON.stringify(essays));
   localStorage.setItem("bcc_mcqs", JSON.stringify(mcqs));
   localStorage.setItem("bcc_flashcards", JSON.stringify(flashcards));
+  localStorage.setItem("bcc_flashcards_plus", JSON.stringify(flashcardsPlus));
   localStorage.setItem("bcc_lectures", JSON.stringify(lectures));
   localStorage.setItem("bcc_reviews", JSON.stringify(reviews));
   localStorage.setItem("bcc_session_history", JSON.stringify(sessionHistory));
@@ -363,7 +365,9 @@ function setupAppControlsOnce() {
   setupCustomizationControls();
   setupSettingsControls();
 
-  appControlsReady = true;
+  const fp=document.getElementById("flashcardsplus-form");
+if(fp){fp.addEventListener("submit",e=>{e.preventDefault();flashcardsPlus.push({id:Date.now().toString(),subject:getValue("flashcardsplus-subject"),question:getValue("flashcardsplus-question"),answer:getValue("flashcardsplus-answer"),rule:getValue("flashcardsplus-rule"),notes:getValue("flashcardsplus-notes"),created:todayString()});saveData();fp.reset();populateSubjectDropdown("flashcardsplus-subject");document.getElementById("flashcardsplus-message").textContent="Flashcard saved.";});}
+appControlsReady = true;
 }
 
 async function handleSignIn(event) {
@@ -619,6 +623,7 @@ function populateSubjectDropdowns() {
   populateSubjectDropdown("essay-subject");
   populateSubjectDropdown("mcq-subject");
   populateSubjectDropdown("flashcard-subject");
+  populateSubjectDropdown("flashcardsplus-subject");
   populateSubjectDropdown("lecture-subject");
 }
 

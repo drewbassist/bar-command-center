@@ -478,22 +478,15 @@ New user? Follow instructions sent to your email before signing in.
       </section>
 
       
-<section id="flashcardsplus" class="bcc-view" style="display:none">
-<div class="bcc-panel">
-<h1>Flashcards+</h1>
-<form>
-<label>Subject
-<select><option>Constitutional Law</option></select>
-</label><br><br>
-<label>Question<br><textarea rows="3" style="width:100%"></textarea></label><br><br>
-<label>Answer<br><textarea rows="4" style="width:100%"></textarea></label><br><br>
-<label>Rule<br><textarea rows="4" style="width:100%"></textarea></label><br><br>
-<label>Notes<br><textarea rows="4" style="width:100%"></textarea></label><br><br>
-<button type="button">Save</button>
-</form>
-</div>
-</section>
-
+<section id="flashcardsplus" class="bcc-view">
+<div class="bcc-panel"><h1>Flashcards+</h1>
+<form id="flashcardsplus-form" class="bcc-form">
+<label>Subject<select id="flashcardsplus-subject"></select></label><br><br>
+<label>Question<br><textarea id="flashcardsplus-question" rows="3" style="width:100%"></textarea></label><br><br>
+<label>Answer<br><textarea id="flashcardsplus-answer" rows="4" style="width:100%"></textarea></label><br><br>
+<label>Rule<br><textarea id="flashcardsplus-rule" rows="4" style="width:100%"></textarea></label><br><br>
+<label>Notes<br><textarea id="flashcardsplus-notes" rows="4" style="width:100%"></textarea></label><br><br>
+<button type="submit">Save Flashcard</button></form><div id="flashcardsplus-message"></div></div></section>
 <section id="settings" class="bcc-view">
         <div class="bcc-settings-header">
           <div>
