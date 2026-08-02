@@ -310,3 +310,17 @@ main {
     }
 
 }
+
+
+/* Back to BarOS */
+.home-button{
+    display:inline-flex;
+    align-items:center;
+    margin:24px 0 0 40px;
+    color:#111;
+    text-decoration:none;
+    font-size:15px;
+    font-weight:600;
+    transition:.2s;
+}
+.home-button:hover{opacity:.6;}
