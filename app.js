@@ -3546,3 +3546,15 @@ function renderEssayGrid() {
 
   container.appendChild(columns);
 }
+
+
+document.addEventListener('DOMContentLoaded',()=>{
+ const a=document.getElementById('show-answer-btn');
+ const r=document.getElementById('show-rule-btn');
+ const n=document.getElementById('show-notes-btn');
+ if(a){
+  a.onclick=()=>{document.getElementById('study-answer').style.display='block';a.style.display='none';r.style.display='inline-block';};
+  r.onclick=()=>{document.getElementById('study-rule').style.display='block';r.style.display='none';n.style.display='inline-block';};
+  n.onclick=()=>{document.getElementById('study-notes').style.display='block';n.style.display='none';document.getElementById('study-rating').style.display='block';};
+ }
+});

@@ -486,7 +486,28 @@ New user? Follow instructions sent to your email before signing in.
 <label>Answer<br><textarea id="flashcardsplus-answer" rows="4" style="width:100%"></textarea></label><br><br>
 <label>Rule<br><textarea id="flashcardsplus-rule" rows="4" style="width:100%"></textarea></label><br><br>
 <label>Notes<br><textarea id="flashcardsplus-notes" rows="4" style="width:100%"></textarea></label><br><br>
-<button type="submit">Save Flashcard</button></form><div id="flashcardsplus-message"></div></div></section>
+<button type="submit">Save Flashcard</button></form>
+<div id="flashcardsplus-message"></div>
+<hr style="margin:40px 0">
+<h2>Study Mode Preview</h2>
+<div class="bcc-panel" style="max-width:800px;margin:auto">
+<div><strong>Constitutional Law</strong> • Card 1 of 100</div>
+<h3 id="study-question">What level of scrutiny applies to content-based restrictions on speech?</h3>
+<div id="study-answer" style="display:none"><h4>Answer</h4><p>Strict scrutiny.</p></div>
+<div id="study-rule" style="display:none"><h4>Rule</h4><p>Content-based restrictions on protected speech must satisfy strict scrutiny.</p></div>
+<div id="study-notes" style="display:none"><h4>Notes</h4><p>Remember commercial speech and time/place/manner use different tests.</p></div>
+<div style="margin-top:20px">
+<button id="show-answer-btn" type="button">Show Answer</button>
+<button id="show-rule-btn" type="button" style="display:none">Show Rule</button>
+<button id="show-notes-btn" type="button" style="display:none">Show Notes</button>
+</div>
+<div id="study-rating" style="display:none;margin-top:25px">
+<button>Again</button>
+<button>Hard</button>
+<button>Good</button>
+<button>Easy</button>
+</div>
+</div></div></section>
 <section id="settings" class="bcc-view">
         <div class="bcc-settings-header">
           <div>
