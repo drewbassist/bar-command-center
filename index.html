@@ -1,496 +1,408 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Drew's BarOS</title>
-
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <link rel="apple-touch-icon" href="favicon.png" />
-  <meta name="theme-color" content="#111111" />
-
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="essay-grid.css" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Drew's BarOS</title>
+<link href="favicon.png" rel="icon" type="image/png"/>
+<link href="favicon.png" rel="apple-touch-icon"/>
+<meta content="#111111" name="theme-color"/>
+<link href="style.css" rel="stylesheet"/>
+<link href="essay-grid.css" rel="stylesheet"/>
 </head>
-
 <body>
-  <header class="bcc-header">
-    <div>
-      <div class="bcc-title">BarOS</div>
+<header class="bcc-header">
+<div>
+<div class="bcc-title">BarOS</div>
 <div class="bcc-subtitle">Powered by StudyLedgerOS</div>
-    </div>
-
-    <div id="cloud-controls" class="bcc-cloud-controls" hidden>
-      <div>
-        <div id="signed-in-email" class="bcc-signed-in-email"></div>
-        <div id="cloud-save-status" class="bcc-cloud-save-status">Cloud ready</div>
-      </div>
-      <button id="sign-out-button" type="button" class="bcc-header-button">Sign Out</button>
-    </div>
-  </header>
-
-  <section id="auth-screen" class="bcc-auth-screen">
-    <div class="bcc-auth-panel">
-      <h1>Sign in to BarOS</h1>
-
+</div>
+<div class="bcc-cloud-controls" hidden="" id="cloud-controls">
+<div>
+<div class="bcc-signed-in-email" id="signed-in-email"></div>
+<div class="bcc-cloud-save-status" id="cloud-save-status">Cloud ready</div>
+</div>
+<button class="bcc-header-button" id="sign-out-button" type="button">Sign Out</button>
+</div>
+</header>
+<section class="bcc-auth-screen" id="auth-screen">
+<div class="bcc-auth-panel">
+<h1>Sign in to BarOS</h1>
 <p>
 Create an account to securely save your study progress and sync it across your devices.
 </p>
-
 <p class="bcc-help-text">
 New user? Follow instructions sent to your email before signing in.
 </p>
-      <form id="auth-form" class="bcc-form">
-        <label>
+<form class="bcc-form" id="auth-form">
+<label>
           Email
-          <input id="auth-email" type="email" autocomplete="email" required />
-        </label>
-
-        <label>
+          <input autocomplete="email" id="auth-email" required="" type="email"/>
+</label>
+<label>
           Password
-          <input id="auth-password" type="password" autocomplete="current-password" required />
-        </label>
-
-        <div class="bcc-auth-actions">
-          <button type="submit">Sign In</button>
-          <button id="create-account-button" type="button" class="bcc-secondary-button">Create Account</button>
-        </div>
-
-        <div id="auth-message" class="bcc-auth-message"></div>
-      </form>
-    </div>
-  </section>
-
-  <div id="app-shell" hidden>
-    <nav class="bcc-nav">
-      <button class="bcc-nav-button" data-view="dashboard">Today</button>
-      <button class="bcc-nav-button" data-view="essays">Essays</button>
-      <button class="bcc-nav-button" data-view="mcqs">MCQs</button>
-      <button class="bcc-nav-button" data-view="flashcards">Flashcards</button>
-      <button class="bcc-nav-button" data-view="reviews">Reviews</button>
-      <button class="bcc-nav-button" data-view="study-log">Study Log</button>
-      <button class="bcc-nav-button" data-view="essay-grid">Essay Grid</button>
-      <button class="bcc-nav-button" data-view="stats">Progress</button>
-      <button class="bcc-nav-button" data-view="flashcardsplus">Flashcards+</button>
-      <button class="bcc-nav-button" data-view="settings">Settings</button>
-    </nav>
-
-    <main class="bcc-main">
-      <section id="dashboard" class="bcc-view">
-        <div class="bcc-panel">
-          <h2>Today's Totals</h2>
-
-          <div class="bcc-grid">
-            <div class="bcc-card">
-              <div class="bcc-card-label">Essays</div>
-              <div class="bcc-card-number" id="dashboard-essays-target">0</div>
-            </div>
-
-            <div class="bcc-card">
-              <div class="bcc-card-label">MCQs</div>
-              <div class="bcc-card-number" id="dashboard-mcqs-target">0</div>
-            </div>
-
-            <div class="bcc-card">
-              <div class="bcc-card-label">Flashcards</div>
-              <div class="bcc-card-number" id="dashboard-flashcards-target">0</div>
-            </div>
-
-            <div class="bcc-card">
-              <div class="bcc-card-label">Reviews Due</div>
-              <div class="bcc-card-number" id="dashboard-reviews-due">0</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bcc-panel">
-          <h2>Minimums</h2>
-
-          <div class="bcc-list">
-            <div class="bcc-item">
-              <div class="bcc-item-title">Essays</div>
-              <div class="bcc-item-meta">
-                <span id="dashboard-essays-target-minimum">0</span> /
+          <input autocomplete="current-password" id="auth-password" required="" type="password"/>
+</label>
+<div class="bcc-auth-actions">
+<button type="submit">Sign In</button>
+<button class="bcc-secondary-button" id="create-account-button" type="button">Create Account</button>
+</div>
+<div class="bcc-auth-message" id="auth-message"></div>
+</form>
+</div>
+</section>
+<div hidden="" id="app-shell">
+<nav class="bcc-nav">
+<button class="bcc-nav-button" data-view="dashboard">Today</button>
+<button class="bcc-nav-button" data-view="essays">Essays</button>
+<button class="bcc-nav-button" data-view="mcqs">MCQs</button>
+<button class="bcc-nav-button" data-view="flashcards">Flashcards</button>
+<button class="bcc-nav-button" data-view="reviews">Reviews</button>
+<button class="bcc-nav-button" data-view="study-log">Study Log</button>
+<button class="bcc-nav-button" data-view="essay-grid">Essay Grid</button>
+<button class="bcc-nav-button" data-view="stats">Progress</button>
+<button class="bcc-nav-button" data-view="flashcardsplus">Flashcards+</button>
+<button class="bcc-nav-button" data-view="settings">Settings</button>
+</nav>
+<main class="bcc-main">
+<section class="bcc-view" id="dashboard">
+<div class="bcc-panel">
+<h2>Today's Totals</h2>
+<div class="bcc-grid">
+<div class="bcc-card">
+<div class="bcc-card-label">Essays</div>
+<div class="bcc-card-number" id="dashboard-essays-target">0</div>
+</div>
+<div class="bcc-card">
+<div class="bcc-card-label">MCQs</div>
+<div class="bcc-card-number" id="dashboard-mcqs-target">0</div>
+</div>
+<div class="bcc-card">
+<div class="bcc-card-label">Flashcards</div>
+<div class="bcc-card-number" id="dashboard-flashcards-target">0</div>
+</div>
+<div class="bcc-card">
+<div class="bcc-card-label">Reviews Due</div>
+<div class="bcc-card-number" id="dashboard-reviews-due">0</div>
+</div>
+</div>
+</div>
+<div class="bcc-panel">
+<h2>Minimums</h2>
+<div class="bcc-list">
+<div class="bcc-item">
+<div class="bcc-item-title">Essays</div>
+<div class="bcc-item-meta">
+<span id="dashboard-essays-target-minimum">0</span> /
                 <span id="dashboard-essays-goal">0</span>
                 completed today
               </div>
-            </div>
-
-            <div class="bcc-item">
-              <div class="bcc-item-title">MCQs</div>
-              <div class="bcc-item-meta">
-                <span id="dashboard-mcqs-target-minimum">0</span> /
+</div>
+<div class="bcc-item">
+<div class="bcc-item-title">MCQs</div>
+<div class="bcc-item-meta">
+<span id="dashboard-mcqs-target-minimum">0</span> /
                 <span id="dashboard-mcqs-goal">0</span>
                 completed today
               </div>
-            </div>
-
-            <div class="bcc-item">
-              <div class="bcc-item-title">Flashcards</div>
-              <div class="bcc-item-meta">
-                <span id="dashboard-flashcards-target-minimum">0</span> /
+</div>
+<div class="bcc-item">
+<div class="bcc-item-title">Flashcards</div>
+<div class="bcc-item-meta">
+<span id="dashboard-flashcards-target-minimum">0</span> /
                 <span id="dashboard-flashcards-goal">0</span>
                 completed today
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bcc-panel">
-          <h2>Due Today</h2>
-          <div id="today-list" class="bcc-list-empty">No due items yet.</div>
-        </div>
-      </section>
-
-      <section id="essays" class="bcc-view">
-        <div class="bcc-panel">
-          <h2>Log Essay</h2>
-
-          <form id="essay-form" class="bcc-form bcc-entry-form bcc-essay-form">
-            <label>Subject<select id="essay-subject"></select></label>
-            <label>Source<select id="essay-source"></select></label>
-            <label class="bcc-field-wide">Title<input id="essay-title" type="text" /></label>
-            <label>Page Number<input id="essay-page-number" type="text" /></label>
-            <label>Question Number<input id="essay-question-number" type="text" /></label>
-            <label>Rating<select id="essay-rating"></select></label>
-            <label class="bcc-field-wide">Notes<textarea id="essay-notes"></textarea></label>
-            <button type="submit">Save Essay</button>
-          </form>
-        </div>
-
-        <div class="bcc-panel">
-          <h2>Recent Essays</h2>
-          <div id="essay-list" class="bcc-list-empty">No essays added yet.</div>
-        </div>
-      </section>
-
-      <section id="mcqs" class="bcc-view">
-        <div class="bcc-panel">
-          <h2>Log MCQ Session</h2>
-
-          <form id="mcq-form" class="bcc-form bcc-entry-form bcc-mcq-form">
-            <label>Subject<select id="mcq-subject"></select></label>
-            <label>Source<select id="mcq-source"></select></label>
-            <label>Questions Completed<input id="mcq-count" type="number" min="0" /></label>
-            <label>Correct<input id="mcq-correct-count" type="number" min="0" /></label>
-            <label>Rating<select id="mcq-rating"></select></label>
-            <label class="bcc-field-wide">Notes<textarea id="mcq-notes"></textarea></label>
-            <button type="submit">Save MCQ Session</button>
-          </form>
-        </div>
-
-        <div class="bcc-panel">
-          <h2>Recent MCQ Sessions</h2>
-          <div id="mcq-list" class="bcc-list-empty">No MCQ sessions added yet.</div>
-        </div>
-      </section>
-
-      <section id="flashcards" class="bcc-view">
-        <div class="bcc-panel">
-          <h2>Log Flashcard Session</h2>
-
-          <form id="flashcard-form" class="bcc-form bcc-entry-form bcc-flashcard-form">
-            <label>Subject<select id="flashcard-subject"></select></label>
-            <label>Source<select id="flashcard-source"></select></label>
-            <label>Card Range<input id="flashcard-card-range" type="text" /></label>
-            <label>Rating<select id="flashcard-rating"></select></label>
-            <label class="bcc-field-wide">Notes<textarea id="flashcard-notes"></textarea></label>
-            <button type="submit">Save Flashcard Session</button>
-          </form>
-        </div>
-
-        <div class="bcc-panel">
-          <h2>Recent Flashcard Sessions</h2>
-          <div id="flashcard-list" class="bcc-list-empty">No flashcard sessions added yet.</div>
-        </div>
-      </section>
-
-      <section id="reviews" class="bcc-view">
-        <div class="bcc-panel">
-          <h2>Review Queue</h2>
-          <div id="review-list" class="bcc-list-empty">No reviews scheduled yet.</div>
-        </div>
-      </section>
-
-
-      <section id="study-log" class="bcc-view">
-        <div id="study-log-setup-panel" class="bcc-panel">
-          <h2>Study Log Setup</h2>
-          <p class="bcc-help-text">
+</div>
+</div>
+</div>
+<div class="bcc-panel">
+<h2>Due Today</h2>
+<div class="bcc-list-empty" id="today-list">No due items yet.</div>
+</div>
+</section>
+<section class="bcc-view" id="essays">
+<div class="bcc-panel">
+<h2>Log Essay</h2>
+<form class="bcc-form bcc-entry-form bcc-essay-form" id="essay-form">
+<label>Subject<select id="essay-subject"></select></label>
+<label>Source<select id="essay-source"></select></label>
+<label class="bcc-field-wide">Title<input id="essay-title" type="text"/></label>
+<label>Page Number<input id="essay-page-number" type="text"/></label>
+<label>Question Number<input id="essay-question-number" type="text"/></label>
+<label>Rating<select id="essay-rating"></select></label>
+<label class="bcc-field-wide">Notes<textarea id="essay-notes"></textarea></label>
+<button type="submit">Save Essay</button>
+</form>
+</div>
+<div class="bcc-panel">
+<h2>Recent Essays</h2>
+<div class="bcc-list-empty" id="essay-list">No essays added yet.</div>
+</div>
+</section>
+<section class="bcc-view" id="mcqs">
+<div class="bcc-panel">
+<h2>Log MCQ Session</h2>
+<form class="bcc-form bcc-entry-form bcc-mcq-form" id="mcq-form">
+<label>Subject<select id="mcq-subject"></select></label>
+<label>Source<select id="mcq-source"></select></label>
+<label>Questions Completed<input id="mcq-count" min="0" type="number"/></label>
+<label>Correct<input id="mcq-correct-count" min="0" type="number"/></label>
+<label>Rating<select id="mcq-rating"></select></label>
+<label class="bcc-field-wide">Notes<textarea id="mcq-notes"></textarea></label>
+<button type="submit">Save MCQ Session</button>
+</form>
+</div>
+<div class="bcc-panel">
+<h2>Recent MCQ Sessions</h2>
+<div class="bcc-list-empty" id="mcq-list">No MCQ sessions added yet.</div>
+</div>
+</section>
+<section class="bcc-view" id="flashcards">
+<div class="bcc-panel">
+<h2>Log Flashcard Session</h2>
+<form class="bcc-form bcc-entry-form bcc-flashcard-form" id="flashcard-form">
+<label>Subject<select id="flashcard-subject"></select></label>
+<label>Source<select id="flashcard-source"></select></label>
+<label>Card Range<input id="flashcard-card-range" type="text"/></label>
+<label>Rating<select id="flashcard-rating"></select></label>
+<label class="bcc-field-wide">Notes<textarea id="flashcard-notes"></textarea></label>
+<button type="submit">Save Flashcard Session</button>
+</form>
+</div>
+<div class="bcc-panel">
+<h2>Recent Flashcard Sessions</h2>
+<div class="bcc-list-empty" id="flashcard-list">No flashcard sessions added yet.</div>
+</div>
+</section>
+<section class="bcc-view" id="reviews">
+<div class="bcc-panel">
+<h2>Review Queue</h2>
+<div class="bcc-list-empty" id="review-list">No reviews scheduled yet.</div>
+</div>
+</section>
+<section class="bcc-view" id="study-log">
+<div class="bcc-panel" id="study-log-setup-panel">
+<h2>Study Log Setup</h2>
+<p class="bcc-help-text">
             Set up one course period. The complete weekly grid appears below before you save it.
           </p>
-
-          <form id="study-log-setup-form" class="bcc-study-log-setup-grid">
-            <label>
+<form class="bcc-study-log-setup-grid" id="study-log-setup-form">
+<label>
               Student Name
-              <input id="study-log-student-name" type="text" required />
-            </label>
-
-            <label>
+              <input id="study-log-student-name" required="" type="text"/>
+</label>
+<label>
               School
-              <input id="study-log-school" type="text" />
-            </label>
-
-            <label>
+              <input id="study-log-school" type="text"/>
+</label>
+<label>
               Subject
-              <input id="study-log-subject" type="text" required />
-            </label>
-
-            <label>
+              <input id="study-log-subject" required="" type="text"/>
+</label>
+<label>
               Start Date
-              <input id="study-log-start-date" type="date" required />
-            </label>
-
-            <label>
+              <input id="study-log-start-date" required="" type="date"/>
+</label>
+<label>
               Number of Weeks
               <div class="bcc-week-stepper">
-                <button id="study-log-weeks-minus" type="button" class="bcc-stepper-button" aria-label="Subtract one week">−</button>
-                <input id="study-log-weeks" type="number" min="1" max="52" value="18" required />
-                <button id="study-log-weeks-plus" type="button" class="bcc-stepper-button" aria-label="Add one week">+</button>
-              </div>
-            </label>
-
-            <label>
+<button aria-label="Subtract one week" class="bcc-stepper-button" id="study-log-weeks-minus" type="button">−</button>
+<input id="study-log-weeks" max="52" min="1" required="" type="number" value="18"/>
+<button aria-label="Add one week" class="bcc-stepper-button" id="study-log-weeks-plus" type="button">+</button>
+</div>
+</label>
+<label>
               Required Hours
               <div class="bcc-hour-stepper">
-                <button id="study-log-hours-minus" type="button" class="bcc-stepper-button" aria-label="Subtract one required hour">−</button>
-                <input id="study-log-required-hours" type="number" min="0" max="5000" step="1" value="299" required />
-                <button id="study-log-hours-plus" type="button" class="bcc-stepper-button" aria-label="Add one required hour">+</button>
-              </div>
-            </label>
-
-            <label>
+<button aria-label="Subtract one required hour" class="bcc-stepper-button" id="study-log-hours-minus" type="button">−</button>
+<input id="study-log-required-hours" max="5000" min="0" required="" step="1" type="number" value="299"/>
+<button aria-label="Add one required hour" class="bcc-stepper-button" id="study-log-hours-plus" type="button">+</button>
+</div>
+</label>
+<label>
               Other Activity Label
-              <input id="study-log-other-label" type="text" value="Other" />
-            </label>
-
-            <div class="bcc-study-log-setup-actions">
-              <button type="submit" class="bcc-primary-button">Create Study Log</button>
-              <button id="study-log-reset-button" type="button" class="bcc-secondary-button">Reset Study Log</button>
-            </div>
-          </form>
-
-          <div class="bcc-study-log-preview-heading">
-            <h2>Weekly Grid Preview</h2>
-            <p class="bcc-help-text">
+              <input id="study-log-other-label" type="text" value="Other"/>
+</label>
+<div class="bcc-study-log-setup-actions">
+<button class="bcc-primary-button" type="submit">Create Study Log</button>
+<button class="bcc-secondary-button" id="study-log-reset-button" type="button">Reset Study Log</button>
+</div>
+</form>
+<div class="bcc-study-log-preview-heading">
+<h2>Weekly Grid Preview</h2>
+<p class="bcc-help-text">
               The full weekly grid updates immediately. After creating the Study Log, every daily cell becomes editable.
             </p>
-          </div>
-
-          <div id="study-log-full-grid" class="bcc-study-log-full-grid"></div>
-        </div>
-
-        <div id="study-log-active-area" hidden>
-          <div class="bcc-grid bcc-study-log-summary-grid">
-            <div class="bcc-card">
-              <div class="bcc-card-label">Required Hours</div>
-              <div class="bcc-card-number" id="study-log-required-hours-summary">0.00</div>
-            </div>
-
-            <div class="bcc-card">
-              <div class="bcc-card-label">Hours to Date</div>
-              <div class="bcc-card-number" id="study-log-total-hours">0.00</div>
-            </div>
-
-            <div class="bcc-card">
-              <div class="bcc-card-label">Hours Remaining</div>
-              <div class="bcc-card-number" id="study-log-hours-remaining">0.00</div>
-            </div>
-
-            <div class="bcc-card">
-              <div class="bcc-card-label">Completion</div>
-              <div class="bcc-card-number" id="study-log-completion-percent">0.00%</div>
-            </div>
-
-            <div class="bcc-card">
-              <div class="bcc-card-label">Needed Per Remaining Week</div>
-              <div class="bcc-card-number" id="study-log-needed-per-week">0.00</div>
-            </div>
-          </div>
-
-          <div class="bcc-panel bcc-progress-panel">
-            <div class="bcc-progress-heading">
-              <span>Course-hour progress</span>
-              <strong id="study-log-progress-label">0.00%</strong>
-            </div>
-            <div class="bcc-progress-track" aria-hidden="true">
-              <div id="study-log-progress-bar" class="bcc-progress-fill"></div>
-            </div>
-          </div>
-
-          <div class="bcc-panel">
-            <div class="bcc-study-log-heading-row">
-              <div>
-                <h2 id="study-log-heading">Study Log</h2>
-                <div id="study-log-period-meta" class="bcc-item-meta"></div>
-              </div>
-
-              <div class="bcc-study-log-toolbar">
-                <button id="study-log-edit-setup-button" type="button" class="bcc-small-button">Edit Setup</button>
-                <button id="study-log-print-button" type="button" class="bcc-small-button">Download Excel Log</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="bcc-panel">
-            <h2>Log Study Time</h2>
-
-            <form id="study-log-entry-form" class="bcc-form bcc-study-log-entry-grid">
-              <label>
+</div>
+<div class="bcc-study-log-full-grid" id="study-log-full-grid"></div>
+</div>
+<div hidden="" id="study-log-active-area">
+<div class="bcc-grid bcc-study-log-summary-grid">
+<div class="bcc-card">
+<div class="bcc-card-label">Required Hours</div>
+<div class="bcc-card-number" id="study-log-required-hours-summary">0.00</div>
+</div>
+<div class="bcc-card">
+<div class="bcc-card-label">Hours to Date</div>
+<div class="bcc-card-number" id="study-log-total-hours">0.00</div>
+</div>
+<div class="bcc-card">
+<div class="bcc-card-label">Hours Remaining</div>
+<div class="bcc-card-number" id="study-log-hours-remaining">0.00</div>
+</div>
+<div class="bcc-card">
+<div class="bcc-card-label">Completion</div>
+<div class="bcc-card-number" id="study-log-completion-percent">0.00%</div>
+</div>
+<div class="bcc-card">
+<div class="bcc-card-label">Needed Per Remaining Week</div>
+<div class="bcc-card-number" id="study-log-needed-per-week">0.00</div>
+</div>
+</div>
+<div class="bcc-panel bcc-progress-panel">
+<div class="bcc-progress-heading">
+<span>Course-hour progress</span>
+<strong id="study-log-progress-label">0.00%</strong>
+</div>
+<div aria-hidden="true" class="bcc-progress-track">
+<div class="bcc-progress-fill" id="study-log-progress-bar"></div>
+</div>
+</div>
+<div class="bcc-panel">
+<div class="bcc-study-log-heading-row">
+<div>
+<h2 id="study-log-heading">Study Log</h2>
+<div class="bcc-item-meta" id="study-log-period-meta"></div>
+</div>
+<div class="bcc-study-log-toolbar">
+<button class="bcc-small-button" id="study-log-edit-setup-button" type="button">Edit Setup</button>
+<button class="bcc-small-button" id="study-log-print-button" type="button">Download Excel Log</button>
+</div>
+</div>
+</div>
+<div class="bcc-panel">
+<h2>Log Study Time</h2>
+<form class="bcc-form bcc-study-log-entry-grid" id="study-log-entry-form">
+<label>
                 Date
-                <input id="study-log-entry-date" type="date" required />
-              </label>
-
-              <label>
+                <input id="study-log-entry-date" required="" type="date"/>
+</label>
+<label>
                 Activity
-                <select id="study-log-entry-activity" required></select>
-              </label>
-
-              <label>
+                <select id="study-log-entry-activity" required=""></select>
+</label>
+<label>
                 Hours
-                <input id="study-log-entry-hours" type="number" min="0" step="1" value="0" required />
-              </label>
-
-              <label>
+                <input id="study-log-entry-hours" min="0" required="" step="1" type="number" value="0"/>
+</label>
+<label>
                 Minutes
-                <input id="study-log-entry-minutes" type="number" min="0" max="59" step="1" value="0" required />
-              </label>
-
-              <label class="bcc-study-log-notes-field">
+                <input id="study-log-entry-minutes" max="59" min="0" required="" step="1" type="number" value="0"/>
+</label>
+<label class="bcc-study-log-notes-field">
                 Notes
-                <input id="study-log-entry-notes" type="text" />
-              </label>
-
-              <div class="bcc-study-log-entry-actions">
-                <button id="study-log-entry-submit" type="submit">Save Time Entry</button>
-                <button id="study-log-entry-cancel" type="button" class="bcc-secondary-button" hidden>Cancel Edit</button>
-              </div>
-            </form>
-
-            <div id="study-log-entry-message" class="bcc-auth-message"></div>
-          </div>
-
-          <div class="bcc-panel">
-            <h2>Recent Entries</h2>
-            <div id="study-log-entry-list" class="bcc-list-empty">No study time entered yet.</div>
-          </div>
-
-          <div class="bcc-panel">
-            <h2>Weekly Totals</h2>
-            <div class="bcc-study-log-table-wrap">
-              <table class="bcc-study-log-table">
-                <thead>
-                  <tr>
-                    <th>Week</th>
-                    <th>Date Range</th>
-                    <th>This Week</th>
-                    <th>Cumulative</th>
-                    <th>Total %</th>
-                  </tr>
-                </thead>
-                <tbody id="study-log-weekly-body"></tbody>
-              </table>
-            </div>
-          </div>
-
-          <div class="bcc-panel">
-            <h2>Totals by Activity</h2>
-            <div id="study-log-activity-totals" class="bcc-study-log-activity-grid"></div>
-          </div>
-        </div>
-      </section>
-
-
-      <section id="essay-grid" class="bcc-view">
-        <div class="bcc-panel">
-          <h2>Essay Grid</h2>
-          <p class="bcc-help-text">Check the day you completed each essay. Check marks save automatically.</p>
-          <div id="essay-grid-container" class="bcc-essay-grid-container"></div>
-        </div>
-      </section>
-
-      <section id="stats" class="bcc-view">
-        <div class="bcc-grid">
-          <div class="bcc-card">
-            <div class="bcc-card-label">Essays Done</div>
-            <div class="bcc-card-number" id="stats-essays">0</div>
-          </div>
-
-          <div class="bcc-card">
-            <div class="bcc-card-label">MCQs Done</div>
-            <div class="bcc-card-number" id="stats-mcqs">0</div>
-          </div>
-
-          <div class="bcc-card">
-            <div class="bcc-card-label">Flashcards Done</div>
-            <div class="bcc-card-number" id="stats-flashcards">0</div>
-          </div>
-
-          <div class="bcc-card">
-            <div class="bcc-card-label">Pending Reviews</div>
-            <div class="bcc-card-number" id="stats-reviews">0</div>
-          </div>
-        </div>
-
-        <div class="bcc-panel bcc-progress-panel">
-          <div class="bcc-progress-heading">
-            <span>Today's minimums completed</span>
-            <strong id="stats-overall-progress-label">0%</strong>
-          </div>
-          <div class="bcc-progress-track" aria-hidden="true">
-            <div id="stats-overall-progress-bar" class="bcc-progress-fill"></div>
-          </div>
-        </div>
-
-        <div class="bcc-panel">
-          <h2>Study Progress</h2>
-
-          <div class="bcc-item bcc-progress-summary-item">
-            <div class="bcc-item-title">Essays</div>
-            <div class="bcc-progress-summary-metrics">
-              <span><strong id="stats-essay-learned">0</strong> Learned</span>
-              <span><strong id="stats-essay-cycles">0</strong> Cycles Completed</span>
-              <span><strong id="stats-essay-review-events">0</strong> Review Events</span>
-            </div>
-          </div>
-
-          <div class="bcc-item bcc-progress-summary-item">
-            <div class="bcc-item-title">MCQ Sessions</div>
-            <div class="bcc-progress-summary-metrics">
-              <span><strong id="stats-mcq-learned">0</strong> Learned</span>
-              <span><strong id="stats-mcq-cycles">0</strong> Cycles Completed</span>
-              <span><strong id="stats-mcq-review-events">0</strong> Review Events</span>
-            </div>
-          </div>
-
-          <div class="bcc-item bcc-progress-summary-item">
-            <div class="bcc-item-title">Flashcard Sessions</div>
-            <div class="bcc-progress-summary-metrics">
-              <span><strong id="stats-flashcard-learned">0</strong> Learned</span>
-              <span><strong id="stats-flashcard-cycles">0</strong> Cycles Completed</span>
-              <span><strong id="stats-flashcard-review-events">0</strong> Review Events</span>
-            </div>
-          </div>
-        </div>
-
-
-      </section>
-
-      
-<section id="flashcardsplus" class="bcc-view">
-<div class="bcc-panel"><h1>Flashcards+</h1>
-<form id="flashcardsplus-form" class="bcc-form">
-<label>Subject<select id="flashcardsplus-subject"></select></label><br><br>
-<label>Question<br><textarea id="flashcardsplus-question" rows="3" style="width:100%"></textarea></label><br><br>
-<label>Answer<br><textarea id="flashcardsplus-answer" rows="4" style="width:100%"></textarea></label><br><br>
-<label>Rule<br><textarea id="flashcardsplus-rule" rows="4" style="width:100%"></textarea></label><br><br>
-<label>Notes<br><textarea id="flashcardsplus-notes" rows="4" style="width:100%"></textarea></label><br><br>
-<button type="submit">Save Flashcard</button></form>
-<div id="flashcardsplus-message"></div>
-<hr style="margin:40px 0">
-<h2>Study Mode Preview</h2>
-<div class="bcc-panel" style="max-width:800px;margin:auto">
+                <input id="study-log-entry-notes" type="text"/>
+</label>
+<div class="bcc-study-log-entry-actions">
+<button id="study-log-entry-submit" type="submit">Save Time Entry</button>
+<button class="bcc-secondary-button" hidden="" id="study-log-entry-cancel" type="button">Cancel Edit</button>
+</div>
+</form>
+<div class="bcc-auth-message" id="study-log-entry-message"></div>
+</div>
+<div class="bcc-panel">
+<h2>Recent Entries</h2>
+<div class="bcc-list-empty" id="study-log-entry-list">No study time entered yet.</div>
+</div>
+<div class="bcc-panel">
+<h2>Weekly Totals</h2>
+<div class="bcc-study-log-table-wrap">
+<table class="bcc-study-log-table">
+<thead>
+<tr>
+<th>Week</th>
+<th>Date Range</th>
+<th>This Week</th>
+<th>Cumulative</th>
+<th>Total %</th>
+</tr>
+</thead>
+<tbody id="study-log-weekly-body"></tbody>
+</table>
+</div>
+</div>
+<div class="bcc-panel">
+<h2>Totals by Activity</h2>
+<div class="bcc-study-log-activity-grid" id="study-log-activity-totals"></div>
+</div>
+</div>
+</section>
+<section class="bcc-view" id="essay-grid">
+<div class="bcc-panel">
+<h2>Essay Grid</h2>
+<p class="bcc-help-text">Check the day you completed each essay. Check marks save automatically.</p>
+<div class="bcc-essay-grid-container" id="essay-grid-container"></div>
+</div>
+</section>
+<section class="bcc-view" id="stats">
+<div class="bcc-grid">
+<div class="bcc-card">
+<div class="bcc-card-label">Essays Done</div>
+<div class="bcc-card-number" id="stats-essays">0</div>
+</div>
+<div class="bcc-card">
+<div class="bcc-card-label">MCQs Done</div>
+<div class="bcc-card-number" id="stats-mcqs">0</div>
+</div>
+<div class="bcc-card">
+<div class="bcc-card-label">Flashcards Done</div>
+<div class="bcc-card-number" id="stats-flashcards">0</div>
+</div>
+<div class="bcc-card">
+<div class="bcc-card-label">Pending Reviews</div>
+<div class="bcc-card-number" id="stats-reviews">0</div>
+</div>
+</div>
+<div class="bcc-panel bcc-progress-panel">
+<div class="bcc-progress-heading">
+<span>Today's minimums completed</span>
+<strong id="stats-overall-progress-label">0%</strong>
+</div>
+<div aria-hidden="true" class="bcc-progress-track">
+<div class="bcc-progress-fill" id="stats-overall-progress-bar"></div>
+</div>
+</div>
+<div class="bcc-panel">
+<h2>Study Progress</h2>
+<div class="bcc-item bcc-progress-summary-item">
+<div class="bcc-item-title">Essays</div>
+<div class="bcc-progress-summary-metrics">
+<span><strong id="stats-essay-learned">0</strong> Learned</span>
+<span><strong id="stats-essay-cycles">0</strong> Cycles Completed</span>
+<span><strong id="stats-essay-review-events">0</strong> Review Events</span>
+</div>
+</div>
+<div class="bcc-item bcc-progress-summary-item">
+<div class="bcc-item-title">MCQ Sessions</div>
+<div class="bcc-progress-summary-metrics">
+<span><strong id="stats-mcq-learned">0</strong> Learned</span>
+<span><strong id="stats-mcq-cycles">0</strong> Cycles Completed</span>
+<span><strong id="stats-mcq-review-events">0</strong> Review Events</span>
+</div>
+</div>
+<div class="bcc-item bcc-progress-summary-item">
+<div class="bcc-item-title">Flashcard Sessions</div>
+<div class="bcc-progress-summary-metrics">
+<span><strong id="stats-flashcard-learned">0</strong> Learned</span>
+<span><strong id="stats-flashcard-cycles">0</strong> Cycles Completed</span>
+<span><strong id="stats-flashcard-review-events">0</strong> Review Events</span>
+</div>
+</div>
+</div>
+</section>
+<section class="bcc-view" id="flashcardsplus">
+<div class="bcc-panel"><h1>Flashcards+</h1><h2>Study Mode Preview</h2><div class="bcc-panel" style="max-width:800px;margin:auto">
 <div><strong>Constitutional Law</strong> • Card 1 of 100</div>
 <h3 id="study-question">What level of scrutiny applies to content-based restrictions on speech?</h3>
 <div id="study-answer" style="display:none"><h4>Answer</h4><p>Strict scrutiny.</p></div>
@@ -498,8 +410,8 @@ New user? Follow instructions sent to your email before signing in.
 <div id="study-notes" style="display:none"><h4>Notes</h4><p>Remember commercial speech and time/place/manner use different tests.</p></div>
 <div style="margin-top:20px">
 <button id="show-answer-btn" type="button">Show Answer</button>
-<button id="show-rule-btn" type="button" style="display:none">Show Rule</button>
-<button id="show-notes-btn" type="button" style="display:none">Show Notes</button>
+<button id="show-rule-btn" style="display:none" type="button">Show Rule</button>
+<button id="show-notes-btn" style="display:none" type="button">Show Notes</button>
 </div>
 <div id="study-rating" style="display:none;margin-top:25px">
 <button>Again</button>
@@ -507,146 +419,133 @@ New user? Follow instructions sent to your email before signing in.
 <button>Good</button>
 <button>Easy</button>
 </div>
-</div></div></section>
-<section id="settings" class="bcc-view">
-        <div class="bcc-settings-header">
-          <div>
-            <h1>Settings</h1>
-            <p>Manage goals, review timing, courses, sources, backups, and account access.</p>
-          </div>
-        </div>
+</div><hr style="margin:40px 0"/>
+<form class="bcc-form" id="flashcardsplus-form">
+<label>Subject<select id="flashcardsplus-subject"></select></label><br/><br/>
+<label>Question<br/><textarea id="flashcardsplus-question" rows="3" style="width:100%"></textarea></label><br/><br/>
+<label>Answer<br/><textarea id="flashcardsplus-answer" rows="4" style="width:100%"></textarea></label><br/><br/>
+<label>Rule<br/><textarea id="flashcardsplus-rule" rows="4" style="width:100%"></textarea></label><br/><br/>
+<label>Notes<br/><textarea id="flashcardsplus-notes" rows="4" style="width:100%"></textarea></label><br/><br/>
+<button type="submit">Save Flashcard</button></form>
+<div id="flashcardsplus-message"></div>
 
-        <div class="bcc-panel">
-          <h2>Daily Minimums</h2>
-          <form id="daily-goals-form" class="bcc-settings-goals-grid">
-            <label>
+
+</div></section>
+<section class="bcc-view" id="settings">
+<div class="bcc-settings-header">
+<div>
+<h1>Settings</h1>
+<p>Manage goals, review timing, courses, sources, backups, and account access.</p>
+</div>
+</div>
+<div class="bcc-panel">
+<h2>Daily Minimums</h2>
+<form class="bcc-settings-goals-grid" id="daily-goals-form">
+<label>
               Essays per day
-              <input id="settings-essay-goal" type="number" min="0" step="1" />
-            </label>
-            <label>
+              <input id="settings-essay-goal" min="0" step="1" type="number"/>
+</label>
+<label>
               MCQs per day
-              <input id="settings-mcq-goal" type="number" min="0" step="1" />
-            </label>
-            <label>
+              <input id="settings-mcq-goal" min="0" step="1" type="number"/>
+</label>
+<label>
               Flashcards per day
-              <input id="settings-flashcard-goal" type="number" min="0" step="1" />
-            </label>
-            <div class="bcc-settings-actions">
-              <button type="submit">Save Minimums</button>
-            </div>
-          </form>
-          <div id="daily-goals-message" class="bcc-auth-message"></div>
-        </div>
-
-        <div class="bcc-panel">
-          <h2>Spaced Repetition</h2>
-          <form id="review-frequency-form" class="bcc-compact-review-form">
-            <label for="review-frequency-input">Review Days</label>
-            <input
-              id="review-frequency-input"
-              type="text"
-              inputmode="numeric"
-              value="1, 3, 7, 30"
-              aria-describedby="review-frequency-help"
-            />
-            <div class="bcc-settings-actions">
-              <button type="submit">Save Schedule</button>
-              <button id="review-frequency-reset-button" type="button" class="bcc-secondary-button">
+              <input id="settings-flashcard-goal" min="0" step="1" type="number"/>
+</label>
+<div class="bcc-settings-actions">
+<button type="submit">Save Minimums</button>
+</div>
+</form>
+<div class="bcc-auth-message" id="daily-goals-message"></div>
+</div>
+<div class="bcc-panel">
+<h2>Spaced Repetition</h2>
+<form class="bcc-compact-review-form" id="review-frequency-form">
+<label for="review-frequency-input">Review Days</label>
+<input aria-describedby="review-frequency-help" id="review-frequency-input" inputmode="numeric" type="text" value="1, 3, 7, 30"/>
+<div class="bcc-settings-actions">
+<button type="submit">Save Schedule</button>
+<button class="bcc-secondary-button" id="review-frequency-reset-button" type="button">
                 Use Recommended
               </button>
-            </div>
-            <div class="bcc-review-recommended-line">
+</div>
+<div class="bcc-review-recommended-line">
               Recommended: <strong>1, 3, 7, 30 days</strong>
-            </div>
-            <div id="review-frequency-help" class="bcc-help-text">
+</div>
+<div class="bcc-help-text" id="review-frequency-help">
               Positive whole-number days separated by commas. New entries use this schedule; existing review dates do not change.
             </div>
-            <div id="review-frequency-message" class="bcc-auth-message"></div>
-          </form>
-        </div>
-
-        <div class="bcc-panel">
-          <h2>Customize Courses and Sources</h2>
-          <p class="bcc-help-text">
+<div class="bcc-auth-message" id="review-frequency-message"></div>
+</form>
+</div>
+<div class="bcc-panel">
+<h2>Customize Courses and Sources</h2>
+<p class="bcc-help-text">
             Add your own courses or subjects and source names. Custom entries appear in the Essay,
             MCQ, and Flashcard dropdowns and are saved to your account.
           </p>
-
-          <div class="bcc-customization-grid">
-            <section class="bcc-customization-section">
-              <h3>Courses / Subjects</h3>
-              <form id="custom-subject-form" class="bcc-inline-add-form">
-                <input id="custom-subject-input" type="text" placeholder="Course or subject name" />
-                <button type="submit">Add</button>
-              </form>
-              <div id="custom-subject-list" class="bcc-custom-item-list"></div>
-            </section>
-
-            <section class="bcc-customization-section">
-              <h3>Essay Sources</h3>
-              <form id="custom-essay-source-form" class="bcc-inline-add-form">
-                <input id="custom-essay-source-input" type="text" placeholder="Essay source" />
-                <button type="submit">Add</button>
-              </form>
-              <div id="custom-essay-source-list" class="bcc-custom-item-list"></div>
-            </section>
-
-            <section class="bcc-customization-section">
-              <h3>MCQ Sources</h3>
-              <form id="custom-mcq-source-form" class="bcc-inline-add-form">
-                <input id="custom-mcq-source-input" type="text" placeholder="MCQ source" />
-                <button type="submit">Add</button>
-              </form>
-              <div id="custom-mcq-source-list" class="bcc-custom-item-list"></div>
-            </section>
-
-            <section class="bcc-customization-section">
-              <h3>Flashcard Sources</h3>
-              <form id="custom-flashcard-source-form" class="bcc-inline-add-form">
-                <input id="custom-flashcard-source-input" type="text" placeholder="Flashcard source" />
-                <button type="submit">Add</button>
-              </form>
-              <div id="custom-flashcard-source-list" class="bcc-custom-item-list"></div>
-            </section>
-          </div>
-
-          <div id="customization-message" class="bcc-auth-message"></div>
-        </div>
-
-
-        <div class="bcc-panel">
-          <h2>Backup</h2>
-
-          <div class="bcc-backup-actions">
-            <button id="export-backup-button" class="bcc-session-button">Export Backup</button>
-
-            <label class="bcc-session-button" for="import-backup-input">Import Backup</label>
-
-            <input id="import-backup-input" type="file" accept=".json" />
-          </div>
-        </div>
-
-
-        <div class="bcc-panel">
-          <h2>Account</h2>
-          <div class="bcc-account-row">
-            <div>
-              <div class="bcc-account-label">Signed in as</div>
-              <div id="settings-account-email" class="bcc-account-value"></div>
-              <div id="settings-cloud-status" class="bcc-item-meta"></div>
-            </div>
-            <button id="settings-sign-out-button" type="button" class="bcc-secondary-button">Sign Out</button>
-          </div>
-        </div>
-      </section>
-
-    </main>
-  </div>
-
-  <footer class="bcc-footer">BarOS v1.1.1</footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-  <script src="app.js"></script>
+<div class="bcc-customization-grid">
+<section class="bcc-customization-section">
+<h3>Courses / Subjects</h3>
+<form class="bcc-inline-add-form" id="custom-subject-form">
+<input id="custom-subject-input" placeholder="Course or subject name" type="text"/>
+<button type="submit">Add</button>
+</form>
+<div class="bcc-custom-item-list" id="custom-subject-list"></div>
+</section>
+<section class="bcc-customization-section">
+<h3>Essay Sources</h3>
+<form class="bcc-inline-add-form" id="custom-essay-source-form">
+<input id="custom-essay-source-input" placeholder="Essay source" type="text"/>
+<button type="submit">Add</button>
+</form>
+<div class="bcc-custom-item-list" id="custom-essay-source-list"></div>
+</section>
+<section class="bcc-customization-section">
+<h3>MCQ Sources</h3>
+<form class="bcc-inline-add-form" id="custom-mcq-source-form">
+<input id="custom-mcq-source-input" placeholder="MCQ source" type="text"/>
+<button type="submit">Add</button>
+</form>
+<div class="bcc-custom-item-list" id="custom-mcq-source-list"></div>
+</section>
+<section class="bcc-customization-section">
+<h3>Flashcard Sources</h3>
+<form class="bcc-inline-add-form" id="custom-flashcard-source-form">
+<input id="custom-flashcard-source-input" placeholder="Flashcard source" type="text"/>
+<button type="submit">Add</button>
+</form>
+<div class="bcc-custom-item-list" id="custom-flashcard-source-list"></div>
+</section>
+</div>
+<div class="bcc-auth-message" id="customization-message"></div>
+</div>
+<div class="bcc-panel">
+<h2>Backup</h2>
+<div class="bcc-backup-actions">
+<button class="bcc-session-button" id="export-backup-button">Export Backup</button>
+<label class="bcc-session-button" for="import-backup-input">Import Backup</label>
+<input accept=".json" id="import-backup-input" type="file"/>
+</div>
+</div>
+<div class="bcc-panel">
+<h2>Account</h2>
+<div class="bcc-account-row">
+<div>
+<div class="bcc-account-label">Signed in as</div>
+<div class="bcc-account-value" id="settings-account-email"></div>
+<div class="bcc-item-meta" id="settings-cloud-status"></div>
+</div>
+<button class="bcc-secondary-button" id="settings-sign-out-button" type="button">Sign Out</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<footer class="bcc-footer">BarOS v1.1.1</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
