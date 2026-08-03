@@ -389,7 +389,7 @@ if (beginStudyButton) {
 
         }
 
-        flashcards = data || [];
+       flashcards = data || [];
 
 if (flashcards.length === 0) {
 
@@ -398,6 +398,8 @@ if (flashcards.length === 0) {
     return;
 
 }
+
+studyCount.textContent = "";
 
 currentCardIndex = 0;
 
