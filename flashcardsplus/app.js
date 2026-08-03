@@ -106,11 +106,9 @@ function renderCards() {
 
 }
 
-97 // =========================
-98 // Display Study Card
-99 // =========================
-
-100 function displayStudyCard() {
+ // =========================
+ // Display Study Card
+ // ========================function displayStudyCard() {
 
     if (flashcards.length === 0) return;
 
