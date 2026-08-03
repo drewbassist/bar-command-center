@@ -350,6 +350,7 @@ if (beginStudyButton) {
 currentCardIndex = 0;
 
 displayStudyCard();
+        document.getElementById("study-screen").style.display = "block";
 
 showView("study");
 
