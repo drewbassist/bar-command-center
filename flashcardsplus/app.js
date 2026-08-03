@@ -143,7 +143,7 @@ async function initializeSupabase() {
     // =========================
 
     if (saveCardButton) {
-        saveCardButton.addEventListener("click", () => {
+        saveCardButton.addEventListener("click", async () => {
             const card = {
                 subject: subjectInput?.value.trim() || "",
                 question: questionInput?.value.trim() || "",
