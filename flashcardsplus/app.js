@@ -211,35 +211,50 @@ const beginStudyButton = document.getElementById("begin-study");
 const studyCount = document.getElementById("study-count");
 
     // =========================
-    // Progressive reveal
-    // =========================
+// Progressive reveal
+// =========================
 
-    if (showAnswerButton && answer && showRuleButton) {
-        showAnswerButton.addEventListener("click", () => {
-            answer.hidden = false;
-            showAnswerButton.hidden = true;
-            showRuleButton.hidden = false;
-        });
-    }
+if (showAnswerButton) {
 
-    if (showRuleButton && rule && showNotesButton) {
-        showRuleButton.addEventListener("click", () => {
-            rule.hidden = false;
-            showRuleButton.hidden = true;
-            showNotesButton.hidden = false;
-        });
-    }
+    showAnswerButton.addEventListener("click", () => {
 
-    if (showNotesButton && notes) {
-        showNotesButton.addEventListener("click", () => {
-            notes.hidden = false;
-            showNotesButton.hidden = true;
+        answer.hidden = false;
 
-            if (rating) {
-                rating.hidden = false;
-            }
-        });
-    }
+        showAnswerButton.hidden = true;
+
+        showRuleButton.hidden = false;
+
+    });
+
+}
+
+if (showRuleButton) {
+
+    showRuleButton.addEventListener("click", () => {
+
+        rule.hidden = false;
+
+        showRuleButton.hidden = true;
+
+        showNotesButton.hidden = false;
+
+    });
+
+}
+
+if (showNotesButton) {
+
+    showNotesButton.addEventListener("click", () => {
+
+        notes.hidden = false;
+
+        showNotesButton.hidden = true;
+
+        rating.hidden = false;
+
+    });
+
+}
 
     // =========================
     // Tab navigation
