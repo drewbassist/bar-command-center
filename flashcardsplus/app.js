@@ -324,6 +324,8 @@ if (tabStudy) {
     tabStudy.addEventListener("click", () => {
 
         showView("study");
+        console.log("Button:", beginStudyButton);
+console.log("Subject:", studySubject);
 
     });
 
@@ -359,8 +361,10 @@ if (tabNew) {
 if (beginStudyButton) {
 
     beginStudyButton.addEventListener("click", async () => {
+        console.log("Begin Study clicked");
 
         const subject = studySubject.value;
+        console.log("Subject:", subject);
 
         if (!subject) {
 
@@ -390,7 +394,7 @@ if (beginStudyButton) {
         }
 
        flashcards = data || [];
-
+        console.log(flashcards);
 if (flashcards.length === 0) {
 
     studyCount.textContent = "No cards for this subject.";
