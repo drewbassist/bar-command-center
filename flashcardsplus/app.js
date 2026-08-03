@@ -17,6 +17,7 @@ const supabaseClient = window.supabase.createClient(
 let currentUser = null;
 let flashcards = [];
 let editingCardId = null;
+let currentCardIndex = 0;
 
 async function initializeSupabase() {
 
@@ -104,6 +105,47 @@ function renderCards() {
     browseView.innerHTML = html;
 
 }
+
+97 // =========================
+98 // Display Study Card
+99 // =========================
+
+100 function displayStudyCard() {
+
+    if (flashcards.length === 0) return;
+
+    const card = flashcards[currentCardIndex];
+
+    document.querySelector(".study-header span:first-child").textContent =
+        card.subject;
+
+    document.querySelector(".study-header span:last-child").textContent =
+        `Card ${currentCardIndex + 1} of ${flashcards.length}`;
+
+    document.getElementById("question").textContent =
+        card.question;
+
+    document.querySelector("#answer p").textContent =
+        card.answer || "";
+
+    document.querySelector("#rule p").textContent =
+        card.rule || "";
+
+    document.querySelector("#notes p").textContent =
+        card.notes || "";
+
+    document.getElementById("answer").hidden = true;
+    document.getElementById("rule").hidden = true;
+    document.getElementById("notes").hidden = true;
+
+    document.getElementById("show-answer").hidden = false;
+    document.getElementById("show-rule").hidden = true;
+    document.getElementById("show-notes").hidden = true;
+
+    document.querySelector(".rating").hidden = true;
+
+}
+
 // =========================
 // Edit Card
 // =========================
@@ -305,10 +347,11 @@ if (beginStudyButton) {
 
         flashcards = data || [];
 
-        studyCount.textContent =
-            `${flashcards.length} cards loaded.`;
+currentCardIndex = 0;
 
-        console.log("Study Cards:", flashcards);
+displayStudyCard();
+
+showView("study");
 
     });
 
