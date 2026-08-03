@@ -1,3 +1,4 @@
+console.log("FLASHCARDS APP VERSION 2");
 // =========================
 // Supabase
 // =========================
