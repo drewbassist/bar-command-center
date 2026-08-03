@@ -1,84 +1,157 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // =========================
+    // DOM references
+    // =========================
 
-    // -------------------------
-    // Progressive Reveal
-    // -------------------------
+    const studyView = document.querySelector(".study");
+    const browseView = document.getElementById("browse-view");
+    const newView = document.getElementById("new-view");
+
+    const tabStudy = document.getElementById("tab-study");
+    const tabBrowse = document.getElementById("tab-browse");
+    const tabNew = document.getElementById("tab-new");
 
     const answer = document.getElementById("answer");
     const rule = document.getElementById("rule");
     const notes = document.getElementById("notes");
 
-    const showAnswer = document.getElementById("show-answer");
-    const showRule = document.getElementById("show-rule");
-    const showNotes = document.getElementById("show-notes");
+    const showAnswerButton = document.getElementById("show-answer");
+    const showRuleButton = document.getElementById("show-rule");
+    const showNotesButton = document.getElementById("show-notes");
 
     const rating = document.querySelector(".rating");
 
-    if (showAnswer) {
+    const subjectInput = document.getElementById("fc-subject");
+    const questionInput = document.getElementById("fc-question");
+    const answerInput = document.getElementById("fc-answer");
+    const ruleInput = document.getElementById("fc-rule");
+    const notesInput = document.getElementById("fc-notes");
 
-        showAnswer.addEventListener("click", () => {
+    const saveCardButton = document.getElementById("save-card");
+    const saveMessage = document.getElementById("save-message");
 
+    // =========================
+    // Progressive reveal
+    // =========================
+
+    if (showAnswerButton && answer && showRuleButton) {
+        showAnswerButton.addEventListener("click", () => {
             answer.hidden = false;
-
-            showAnswer.hidden = true;
-            showRule.hidden = false;
-
+            showAnswerButton.hidden = true;
+            showRuleButton.hidden = false;
         });
-
     }
 
-    if (showRule) {
-
-        showRule.addEventListener("click", () => {
-
+    if (showRuleButton && rule && showNotesButton) {
+        showRuleButton.addEventListener("click", () => {
             rule.hidden = false;
-
-            showRule.hidden = true;
-            showNotes.hidden = false;
-
+            showRuleButton.hidden = true;
+            showNotesButton.hidden = false;
         });
-
     }
 
-    if (showNotes) {
-
-        showNotes.addEventListener("click", () => {
-
+    if (showNotesButton && notes) {
+        showNotesButton.addEventListener("click", () => {
             notes.hidden = false;
+            showNotesButton.hidden = true;
 
-            showNotes.hidden = true;
-
-            rating.hidden = false;
-
+            if (rating) {
+                rating.hidden = false;
+            }
         });
-
     }
 
+    // =========================
+    // Tab navigation
+    // =========================
+
+    function showView(view) {
+        if (studyView) {
+            studyView.style.display = view === "study" ? "flex" : "none";
+        }
+
+        if (browseView) {
+            browseView.style.display = view === "browse" ? "block" : "none";
+        }
+
+        if (newView) {
+            newView.style.display = view === "new" ? "block" : "none";
+        }
+
+        if (tabStudy) {
+            tabStudy.classList.toggle("active", view === "study");
+        }
+
+        if (tabBrowse) {
+            tabBrowse.classList.toggle("active", view === "browse");
+        }
+
+        if (tabNew) {
+            tabNew.classList.toggle("active", view === "new");
+        }
+    }
+
+    if (tabStudy) {
+        tabStudy.addEventListener("click", () => showView("study"));
+    }
+
+    if (tabBrowse) {
+        tabBrowse.addEventListener("click", () => showView("browse"));
+    }
+
+    if (tabNew) {
+        tabNew.addEventListener("click", () => showView("new"));
+    }
+
+    // =========================
+    // Save new card locally
+    // =========================
+
+    if (saveCardButton) {
+        saveCardButton.addEventListener("click", () => {
+            const card = {
+                subject: subjectInput?.value.trim() || "",
+                question: questionInput?.value.trim() || "",
+                answer: answerInput?.value.trim() || "",
+                rule: ruleInput?.value.trim() || "",
+                notes: notesInput?.value.trim() || ""
+            };
+
+            if (!card.subject || !card.question || !card.answer) {
+                if (saveMessage) {
+                    saveMessage.textContent =
+                        "Enter a subject, question, and answer.";
+                }
+
+                return;
+            }
+
+            const savedCards = JSON.parse(
+                localStorage.getItem("flashcardsplus_cards") || "[]"
+            );
+
+            savedCards.push({
+                id: Date.now().toString(),
+                ...card,
+                createdAt: new Date().toISOString()
+            });
+
+            localStorage.setItem(
+                "flashcardsplus_cards",
+                JSON.stringify(savedCards)
+            );
+
+            if (saveMessage) {
+                saveMessage.textContent = "Flashcard saved locally.";
+            }
+
+            if (subjectInput) subjectInput.value = "";
+            if (questionInput) questionInput.value = "";
+            if (answerInput) answerInput.value = "";
+            if (ruleInput) ruleInput.value = "";
+            if (notesInput) notesInput.value = "";
+        });
+    }
+
+    showView("study");
 });
-
-
-const studyView=document.querySelector(".study");
-const browseView=document.getElementById("browse-view");
-const newView=document.getElementById("new-view");
-function show(view){
- studyView.style.display=view==="study"?"flex":"none";
- browseView.style.display=view==="browse"?"block":"none";
- newView.style.display=view==="new"?"block":"none";
- document.getElementById("tab-study").classList.toggle("active",view==="study");
- document.getElementById("tab-browse").classList.toggle("active",view==="browse");
- document.getElementById("tab-new").classList.toggle("active",view==="new");
-}
-document.getElementById("tab-study").onclick=()=>show("study");
-document.getElementById("tab-browse").onclick=()=>show("browse");
-document.getElementById("tab-new").onclick=()=>show("new");
-document.getElementById("save-card").onclick=()=>{
- const card={
- subject:fc-subject.value,
- question:fc-question.value,
- answer:fc-answer.value,
- rule:fc-rule.value,
- notes:fc-notes.value
- };
- localStorage.setItem("flashcardplus_last",JSON.stringify(card));
- document.getElementById("save-message").textContent="Sample card saved locally.";
-};
