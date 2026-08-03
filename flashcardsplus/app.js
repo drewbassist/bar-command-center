@@ -23,15 +23,17 @@ async function initializeSupabase() {
         await supabaseClient.auth.getSession();
 
     if (error) {
-
         console.error(error);
         return;
-
     }
 
     currentUser = data.session?.user ?? null;
 
     console.log("Current User:", currentUser);
+
+}   // <-- initializeSupabase ENDS HERE
+
+
 // =========================
 // Load Cards
 // =========================
@@ -47,10 +49,8 @@ async function loadCards() {
         .order("created_at", { ascending: false });
 
     if (error) {
-
         console.error(error);
         return;
-
     }
 
     flashcards = data || [];
@@ -58,9 +58,10 @@ async function loadCards() {
     console.log("Flashcards:", flashcards);
 
 }
-}document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
     await initializeSupabase();
+await loadCards();
     // =========================
     // DOM references
     // =========================
