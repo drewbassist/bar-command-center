@@ -32,7 +32,32 @@ async function initializeSupabase() {
     currentUser = data.session?.user ?? null;
 
     console.log("Current User:", currentUser);
+// =========================
+// Load Cards
+// =========================
 
+async function loadCards() {
+
+    if (!currentUser) return;
+
+    const { data, error } = await supabaseClient
+        .from("flashcards_plus")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+
+        console.error(error);
+        return;
+
+    }
+
+    flashcards = data || [];
+
+    console.log("Flashcards:", flashcards);
+
+}
 }document.addEventListener("DOMContentLoaded", async () => {
 
     await initializeSupabase();
