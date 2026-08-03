@@ -108,7 +108,8 @@ function renderCards() {
 
  // =========================
  // Display Study Card
- // ========================function displayStudyCard() {
+ // ========================
+function displayStudyCard() {
 
     if (flashcards.length === 0) return;
 
