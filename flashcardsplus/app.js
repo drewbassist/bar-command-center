@@ -401,13 +401,10 @@ if (flashcards.length === 0) {
 
 currentCardIndex = 0;
 
+document.getElementById("subject-picker").style.display = "none";
 document.getElementById("study-screen").style.display = "block";
-        document.getElementById("study-subject").style.display = "none";
-document.getElementById("begin-study").style.display = "none";
 
 displayStudyCard();
-
-showView("study");
 
     });
 
