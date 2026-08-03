@@ -25,45 +25,99 @@
 
 <section class="study">
 
-    <div class="card">
+<div class="card">
 
-        <h2>Choose a Subject</h2>
+<h2>Choose a Subject</h2>
 
-        <p>
+<p>
+<select id="study-subject" style="width:100%;padding:12px;font-size:16px;">
 
-            <select id="study-subject" style="width:100%;padding:12px;font-size:16px;">
+<option value="">Select Subject</option>
 
-                <option value="">Select Subject</option>
+<option>Civil Procedure</option>
+<option>Constitutional Law</option>
+<option>Contracts / Sales</option>
+<option>Criminal Law and Procedure</option>
+<option>Evidence</option>
+<option>Real Property</option>
+<option>Torts</option>
+<option>Business Associations</option>
+<option>Community Property</option>
+<option>Professional Responsibility</option>
+<option>Remedies</option>
+<option>Trusts</option>
+<option>Wills and Succession</option>
 
-                <option>Civil Procedure</option>
-                <option>Constitutional Law</option>
-                <option>Contracts / Sales</option>
-                <option>Criminal Law and Procedure</option>
-                <option>Evidence</option>
-                <option>Real Property</option>
-                <option>Torts</option>
-                <option>Business Associations</option>
-                <option>Community Property</option>
-                <option>Professional Responsibility</option>
-                <option>Remedies</option>
-                <option>Trusts</option>
-                <option>Wills and Succession</option>
+</select>
+</p>
 
-            </select>
+<p>
+<button id="begin-study">Begin Study</button>
+</p>
 
-        </p>
+<div id="study-count"></div>
 
-        <p>
+<hr style="margin:40px 0">
 
-            <button id="begin-study">
-                Begin Study
-            </button>
+<div class="study-header">
 
-        </p>
+<span id="study-subject-title"></span>
 
-        <div id="study-count"></div>
+<span id="study-card-number"></span>
 
-    </div>
+</div>
+
+<h2 id="question"></h2>
+
+<div id="answer" hidden>
+
+<h3>Answer</h3>
+
+<p></p>
+
+<button id="show-rule" hidden>
+Show Rule
+</button>
+
+</div>
+
+<div id="rule" hidden>
+
+<h3>Rule</h3>
+
+<p></p>
+
+<button id="show-notes" hidden>
+Show Notes
+</button>
+
+</div>
+
+<div id="notes" hidden>
+
+<h3>Notes</h3>
+
+<p></p>
+
+</div>
+
+<button id="show-answer">
+Show Answer
+</button>
+
+<div class="rating" hidden>
+
+<button>Again</button>
+
+<button>Hard</button>
+
+<button>Good</button>
+
+<button>Easy</button>
+
+</div>
+
+</div>
 
 </section>
 
