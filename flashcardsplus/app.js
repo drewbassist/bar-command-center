@@ -1,4 +1,39 @@
-document.addEventListener("DOMContentLoaded", () => {
+// =========================
+// Supabase
+// =========================
+
+const SUPABASE_URL =
+    "https://rudhrifkjhretilqdncy.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_TGTjuqPmo8AOx_P2OpxnOw_NGT-1Z9l";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+);
+
+let currentUser = null;
+
+async function initializeSupabase() {
+
+    const { data, error } =
+        await supabaseClient.auth.getSession();
+
+    if (error) {
+
+        console.error(error);
+        return;
+
+    }
+
+    currentUser = data.session?.user ?? null;
+
+    console.log("Current User:", currentUser);
+
+}document.addEventListener("DOMContentLoaded", async () => {
+
+    await initializeSupabase();
     // =========================
     // DOM references
     // =========================
@@ -126,24 +161,42 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const savedCards = JSON.parse(
-                localStorage.getItem("flashcardsplus_cards") || "[]"
-            );
+            const { error } =
+    await supabaseClient
+        .from("flashcards_plus")
+        .insert({
 
-            savedCards.push({
-                id: Date.now().toString(),
-                ...card,
-                createdAt: new Date().toISOString()
-            });
+            user_id: currentUser.id,
 
-            localStorage.setItem(
-                "flashcardsplus_cards",
-                JSON.stringify(savedCards)
-            );
+            subject: card.subject,
+            question: card.question,
+            answer: card.answer,
+            rule: card.rule,
+            notes: card.notes
 
-            if (saveMessage) {
-                saveMessage.textContent = "Flashcard saved locally.";
-            }
+        });
+
+if (error) {
+
+    console.error(error);
+
+    if (saveMessage) {
+
+        saveMessage.textContent =
+            "Save failed.";
+
+    }
+
+} else {
+
+    if (saveMessage) {
+
+        saveMessage.textContent =
+            "Flashcard saved.";
+
+    }
+
+}
 
             if (subjectInput) subjectInput.value = "";
             if (questionInput) questionInput.value = "";
