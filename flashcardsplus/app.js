@@ -111,7 +111,10 @@ function renderCards() {
  // ========================
 function displayStudyCard() {
 
+    console.log("displayStudyCard()");
+
     if (flashcards.length === 0) return;
+
 
     const card = flashcards[currentCardIndex];
 
