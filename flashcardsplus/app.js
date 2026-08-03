@@ -257,6 +257,33 @@ if (showNotesButton) {
 }
 
     // =========================
+// Next Card
+// =========================
+
+function nextCard() {
+
+    currentCardIndex++;
+
+    if (currentCardIndex >= flashcards.length) {
+
+        alert("Study session complete!");
+
+        document.getElementById("study-screen").style.display = "none";
+
+        return;
+
+    }
+
+    displayStudyCard();
+
+}
+
+document.getElementById("again-btn").onclick = nextCard;
+document.getElementById("hard-btn").onclick = nextCard;
+document.getElementById("good-btn").onclick = nextCard;
+document.getElementById("easy-btn").onclick = nextCard;
+
+    // =========================
     // Tab navigation
     // =========================
 
@@ -375,6 +402,8 @@ if (flashcards.length === 0) {
 currentCardIndex = 0;
 
 document.getElementById("study-screen").style.display = "block";
+        document.getElementById("study-subject").style.display = "none";
+document.getElementById("begin-study").style.display = "none";
 
 displayStudyCard();
 
