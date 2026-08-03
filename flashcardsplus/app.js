@@ -162,6 +162,9 @@ await loadCards();
 
     const saveCardButton = document.getElementById("save-card");
     const saveMessage = document.getElementById("save-message");
+    const studySubject = document.getElementById("study-subject");
+const beginStudyButton = document.getElementById("begin-study");
+const studyCount = document.getElementById("study-count");
 
     // =========================
     // Progressive reveal
@@ -226,13 +229,22 @@ function showView(view) {
 
 }
 
+// =========================
+// Tab navigation events
+// =========================
+
 if (tabStudy) {
+
     tabStudy.addEventListener("click", () => {
+
         showView("study");
+
     });
+
 }
 
 if (tabBrowse) {
+
     tabBrowse.addEventListener("click", async () => {
 
         await loadCards();
@@ -240,14 +252,67 @@ if (tabBrowse) {
         showView("browse");
 
     });
+
 }
 
 if (tabNew) {
+
     tabNew.addEventListener("click", () => {
+
         showView("new");
+
     });
+
 }
 
+
+// =========================
+// Begin Study
+// =========================
+
+if (beginStudyButton) {
+
+    beginStudyButton.addEventListener("click", async () => {
+
+        const subject = studySubject.value;
+
+        if (!subject) {
+
+            studyCount.textContent =
+                "Please choose a subject.";
+
+            return;
+
+        }
+
+        const { data, error } =
+            await supabaseClient
+                .from("flashcards_plus")
+                .select("*")
+                .eq("user_id", currentUser.id)
+                .eq("subject", subject);
+
+        if (error) {
+
+            console.error(error);
+
+            studyCount.textContent =
+                "Unable to load cards.";
+
+            return;
+
+        }
+
+        flashcards = data || [];
+
+        studyCount.textContent =
+            `${flashcards.length} cards loaded.`;
+
+        console.log("Study Cards:", flashcards);
+
+    });
+
+}
     // =========================
     // Save new card locally
     // =========================
@@ -307,15 +372,7 @@ if (editingCardId) {
 
 }
 
-            user_id: currentUser.id,
-
-            subject: card.subject,
-            question: card.question,
-            answer: card.answer,
-            rule: card.rule,
-            notes: card.notes
-
-        });
+            
 
 if (error) {
 
@@ -333,8 +390,13 @@ if (error) {
     if (saveMessage) {
 
         saveMessage.textContent =
-            "Flashcard saved.";
+            editingCardId
+                ? "Flashcard updated."
+                : "Flashcard saved.";
+
         await loadCards();
+
+        editingCardId = null;
 
     }
 
