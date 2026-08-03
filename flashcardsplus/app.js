@@ -56,6 +56,49 @@ async function loadCards() {
     flashcards = data || [];
 
     console.log("Flashcards:", flashcards);
+    renderCards();
+
+}
+function renderCards() {
+
+    const browseView = document.getElementById("browse-view");
+
+    if (!browseView) return;
+
+    if (flashcards.length === 0) {
+
+        browseView.innerHTML = `
+            <h2>Browse</h2>
+            <p>No flashcards yet.</p>
+        `;
+
+        return;
+
+    }
+
+    let html = "<h2>Browse</h2>";
+
+    flashcards.forEach(card => {
+
+        html += `
+            <div style="border:1px solid #ddd;padding:16px;margin-bottom:16px;border-radius:8px;">
+
+                <strong>${card.subject}</strong><br><br>
+
+                <strong>Question:</strong><br>
+                ${card.question}<br><br>
+
+                <strong>Answer:</strong><br>
+                ${card.answer}<br><br>
+
+                <button>Edit</button>
+
+            </div>
+        `;
+
+    });
+
+    browseView.innerHTML = html;
 
 }
 document.addEventListener("DOMContentLoaded", async () => {
@@ -128,43 +171,55 @@ await loadCards();
     // Tab navigation
     // =========================
 
-    function showView(view) {
-        if (studyView) {
-            studyView.style.display = view === "study" ? "flex" : "none";
-        }
+function showView(view) {
 
-        if (browseView) {
-            browseView.style.display = view === "browse" ? "block" : "none";
-        }
+    if (studyView) {
+        studyView.style.display = view === "study" ? "flex" : "none";
+    }
 
-        if (newView) {
-            newView.style.display = view === "new" ? "block" : "none";
-        }
+    if (browseView) {
+        browseView.style.display = view === "browse" ? "block" : "none";
+    }
 
-        if (tabStudy) {
-            tabStudy.classList.toggle("active", view === "study");
-        }
-
-        if (tabBrowse) {
-            tabBrowse.classList.toggle("active", view === "browse");
-        }
-
-        if (tabNew) {
-            tabNew.classList.toggle("active", view === "new");
-        }
+    if (newView) {
+        newView.style.display = view === "new" ? "block" : "none";
     }
 
     if (tabStudy) {
-        tabStudy.addEventListener("click", () => showView("study"));
+        tabStudy.classList.toggle("active", view === "study");
     }
 
     if (tabBrowse) {
-        tabBrowse.addEventListener("click", () => showView("browse"));
+        tabBrowse.classList.toggle("active", view === "browse");
     }
 
     if (tabNew) {
-        tabNew.addEventListener("click", () => showView("new"));
+        tabNew.classList.toggle("active", view === "new");
     }
+
+}
+
+if (tabStudy) {
+    tabStudy.addEventListener("click", () => {
+        showView("study");
+    });
+}
+
+if (tabBrowse) {
+    tabBrowse.addEventListener("click", async () => {
+
+        await loadCards();
+
+        showView("browse");
+
+    });
+}
+
+if (tabNew) {
+    tabNew.addEventListener("click", () => {
+        showView("new");
+    });
+}
 
     // =========================
     // Save new card locally
@@ -221,6 +276,7 @@ if (error) {
 
         saveMessage.textContent =
             "Flashcard saved.";
+        await loadCards();
 
     }
 
