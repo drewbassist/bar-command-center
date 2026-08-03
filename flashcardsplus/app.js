@@ -104,6 +104,30 @@ function renderCards() {
     browseView.innerHTML = html;
 
 }
+// =========================
+// Edit Card
+// =========================
+
+function editCard(id) {
+
+    const card = flashcards.find(c => c.id === id);
+
+    if (!card) return;
+
+    editingCardId = id;
+
+    document.getElementById("fc-subject").value = card.subject || "";
+    document.getElementById("fc-question").value = card.question || "";
+    document.getElementById("fc-answer").value = card.answer || "";
+    document.getElementById("fc-rule").value = card.rule || "";
+    document.getElementById("fc-notes").value = card.notes || "";
+
+    document.getElementById("tab-new").click();
+
+    document.getElementById("save-message").textContent =
+        "Editing existing flashcard.";
+
+}
 document.addEventListener("DOMContentLoaded", async () => {
 
     await initializeSupabase();
