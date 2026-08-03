@@ -271,10 +271,41 @@ if (tabNew) {
                 return;
             }
 
-            const { error } =
-    await supabaseClient
+            let error;
+
+if (editingCardId) {
+
+    ({ error } = await supabaseClient
+        .from("flashcards_plus")
+        .update({
+
+            subject: card.subject,
+            question: card.question,
+            answer: card.answer,
+            rule: card.rule,
+            notes: card.notes
+
+        })
+        .eq("id", editingCardId)
+        .eq("user_id", currentUser.id));
+
+} else {
+
+    ({ error } = await supabaseClient
         .from("flashcards_plus")
         .insert({
+
+            user_id: currentUser.id,
+
+            subject: card.subject,
+            question: card.question,
+            answer: card.answer,
+            rule: card.rule,
+            notes: card.notes
+
+        }));
+
+}
 
             user_id: currentUser.id,
 
