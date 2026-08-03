@@ -116,10 +116,10 @@ function renderCards() {
 
     const card = flashcards[currentCardIndex];
 
-    document.querySelector(".study-header span:first-child").textContent =
+    document.getElementById("study-subject-title").textContent =
         card.subject;
 
-    document.querySelector(".study-header span:last-child").textContent =
+    document.getElementById("study-card-number").textContent =
         `Card ${currentCardIndex + 1} of ${flashcards.length}`;
 
     document.getElementById("question").textContent =
@@ -138,11 +138,11 @@ function renderCards() {
     document.getElementById("rule").hidden = true;
     document.getElementById("notes").hidden = true;
 
+    document.querySelector(".rating").hidden = true;
+
     document.getElementById("show-answer").hidden = false;
     document.getElementById("show-rule").hidden = true;
     document.getElementById("show-notes").hidden = true;
-
-    document.querySelector(".rating").hidden = true;
 
 }
 
@@ -347,10 +347,19 @@ if (beginStudyButton) {
 
         flashcards = data || [];
 
+if (flashcards.length === 0) {
+
+    studyCount.textContent = "No cards for this subject.";
+
+    return;
+
+}
+
 currentCardIndex = 0;
 
+document.getElementById("study-screen").style.display = "block";
+
 displayStudyCard();
-        document.getElementById("study-screen").style.display = "block";
 
 showView("study");
 
