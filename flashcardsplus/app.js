@@ -16,6 +16,7 @@ const supabaseClient = window.supabase.createClient(
 
 let currentUser = null;
 let flashcards = [];
+let editingCardId = null;
 
 async function initializeSupabase() {
 
@@ -91,7 +92,9 @@ function renderCards() {
                 <strong>Answer:</strong><br>
                 ${card.answer}<br><br>
 
-                <button>Edit</button>
+                <button onclick="editCard('${card.id}')">
+    Edit
+</button>
 
             </div>
         `;
