@@ -15,6 +15,7 @@ const supabaseClient = window.supabase.createClient(
 );
 
 let currentUser = null;
+let flashcards = [];
 
 async function initializeSupabase() {
 
