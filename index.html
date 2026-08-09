@@ -59,7 +59,7 @@ New user? Follow instructions sent to your email before signing in.
 <button class="bcc-nav-button" data-view="flashcards">Flashcards</button>
 <button class="bcc-nav-button" data-view="reviews">Reviews</button>
 <button class="bcc-nav-button" data-view="study-log">Study Log</button>
-<button class="bcc-nav-button" data-view="essay-grid">Essay Grid</button>
+<button class="bcc-nav-button" data-view="essay-grid">Bar Cycle</button>
 <button class="bcc-nav-button" data-view="stats">Progress</button>
 <button class="bcc-nav-button" onclick="window.location.href='/flashcardsplus/'" type="button">Flashcards+</button>
 <button class="bcc-nav-button" data-view="settings">Settings</button>
@@ -339,11 +339,108 @@ New user? Follow instructions sent to your email before signing in.
 </div>
 </section>
 <section class="bcc-view" id="essay-grid">
-<div class="bcc-panel">
-<h2>Essay Grid</h2>
-<p class="bcc-help-text">Check the day you completed each essay. Check marks save automatically.</p>
-<div class="bcc-essay-grid-container" id="essay-grid-container"></div>
-</div>
+
+    <div class="bcc-panel">
+
+        <h2>Bar Cycle</h2>
+
+        <p class="bcc-help-text">
+            Every two weeks, one subject becomes the focus. Every day, all thirteen subjects remain
+            active through essays, mixed MCQs, active recall, and spaced repetition.
+        </p>
+
+        <table class="bar-cycle-table">
+
+            <thead>
+
+                <tr>
+                    <th>2-Week Focus Cycle</th>
+                    <th>What Happens During These 14 Days</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td><strong>Focus Subject</strong></td>
+                    <td>
+                        Learn the doctrine, understand the concepts, build or update your outline,
+                        create flashcards, and complete subject-specific essays and MCQs.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><strong>Daily Essay</strong></td>
+                    <td>
+                        Write one essay every day, rotating through all thirteen bar subjects.
+                        Every subject is practiced at least once during each two-week cycle.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><strong>Mixed MCQs</strong></td>
+                    <td>
+                        Complete 20–25 mixed MCQs daily using interleaving.
+                        Most questions come from previously completed subjects while gradually
+                        increasing questions from the current focus subject.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><strong>Active Recall</strong></td>
+                    <td>
+                        Recall rule statements before looking them up.
+                        Rewrite missed rules from essays and MCQs.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><strong>Spaced Repetition</strong></td>
+                    <td>
+                        Review flashcards, previous essays, and missed MCQs according
+                        to your BarOS review schedule.
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><strong>End of Cycle</strong></td>
+                    <td>
+                        Move the focus subject into permanent review and begin the next
+                        two-week focus subject.
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="bcc-panel">
+
+        <h2>26-Week Subject Rotation</h2>
+
+        <div class="bar-cycle-checklist">
+
+            <label><input type="checkbox"> Weeks 1–2 — Civil Procedure</label>
+            <label><input type="checkbox"> Weeks 3–4 — Real Property</label>
+            <label><input type="checkbox"> Weeks 5–6 — Professional Responsibility</label>
+            <label><input type="checkbox"> Weeks 7–8 — Community Property</label>
+            <label><input type="checkbox"> Weeks 9–10 — Wills</label>
+            <label><input type="checkbox"> Weeks 11–12 — Trusts</label>
+            <label><input type="checkbox"> Weeks 13–14 — Constitutional Law</label>
+            <label><input type="checkbox"> Weeks 15–16 — Contracts</label>
+            <label><input type="checkbox"> Weeks 17–18 — Torts</label>
+            <label><input type="checkbox"> Weeks 19–20 — Criminal Law & Procedure</label>
+            <label><input type="checkbox"> Weeks 21–22 — Evidence</label>
+            <label><input type="checkbox"> Weeks 23–24 — Business Associations</label>
+            <label><input type="checkbox"> Weeks 25–26 — Remedies</label>
+
+        </div>
+
+    </div>
+
 </section>
 <section class="bcc-view" id="stats">
 <div class="bcc-grid">
