@@ -1,81 +1,110 @@
-.bcc-essay-grid-container {
-  margin-top: 10px;
-  width: fit-content;
-  max-width: 100%;
+/* ==========================================================
+   BAR CYCLE
+   ========================================================== */
+
+.bar-cycle-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 18px;
+    table-layout: fixed;
 }
 
-.bcc-essay-grid-controls {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 8px;
+.bar-cycle-table th,
+.bar-cycle-table td {
+    border: 1px solid #e5e5e5;
+    padding: 14px 18px;
+    text-align: left;
+    vertical-align: top;
+    line-height: 1.5;
 }
 
-.bcc-essay-grid-clear-button {
-  font-size: 10px;
-  padding: 4px 8px;
+.bar-cycle-table th {
+    background: #f7f7f7;
+    font-size: 17px;
+    font-weight: 700;
 }
 
-.bcc-essay-grid-columns {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  overflow-x: auto;
-  padding-bottom: 2px;
+.bar-cycle-table td:first-child,
+.bar-cycle-table th:first-child {
+    width: 240px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
-.bcc-essay-grid-column {
-  width: 130px;
-  flex: 0 0 130px;
-  border: 1px solid #e5e5e5;
-  border-radius: 6px;
-  background: #ffffff;
-  overflow: hidden;
+.bar-cycle-table td:last-child {
+    color: #333;
 }
 
-.bcc-essay-grid-row {
-  display: grid;
-  grid-template-columns: 1fr 24px 24px;
-  column-gap: 4px;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 8px;
-  border-bottom: 1px solid #ededed;
-  cursor: pointer;
+/* ==========================================================
+   CHECKLIST
+   ========================================================== */
+
+.bar-cycle-checklist {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 18px;
 }
 
-.bcc-essay-grid-row:last-child {
-  border-bottom: 0;
+.bar-cycle-checklist label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 17px;
+    line-height: 1.4;
+    cursor: pointer;
 }
 
-.bcc-essay-grid-row-label {
-  min-width: 0;
-  padding: 0 !important;
-  text-align: left !important;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
+.bar-cycle-checklist input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: #111111;
+    flex-shrink: 0;
 }
 
-.bcc-essay-grid-row-number {
-  padding: 0;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
+/* ==========================================================
+   BAR CYCLE PAGE
+   ========================================================== */
+
+#essay-grid .bcc-panel + .bcc-panel {
+    margin-top: 22px;
 }
 
-.bcc-essay-grid-check {
-  display: block;
-  width: 15px;
-  height: 15px;
-  margin: 0;
-  justify-self: end;
-  cursor: pointer;
-  accent-color: #111111;
+#essay-grid h2 {
+    margin-bottom: 12px;
 }
 
-@media (max-width: 700px) {
-  .bcc-essay-grid-columns {
-    max-width: calc(100vw - 70px);
-  }
+#essay-grid .bcc-help-text {
+    max-width: 900px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+}
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 900px) {
+
+    .bar-cycle-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .bar-cycle-table th,
+    .bar-cycle-table td {
+        font-size: 15px;
+        padding: 12px;
+    }
+
+    .bar-cycle-table td:first-child,
+    .bar-cycle-table th:first-child {
+        width: 180px;
+    }
+
+    .bar-cycle-checklist label {
+        font-size: 15px;
+    }
+
 }
