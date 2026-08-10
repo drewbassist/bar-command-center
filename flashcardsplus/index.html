@@ -1,181 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flashcards+</title>
-  <link rel="stylesheet" href="style.css">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Flashcards+</title>
+
+<link rel="stylesheet" href="style.css">
+
 </head>
+
 <body>
 
 <header class="header">
 
-  <a href="/" class="home-button">← Back to BarOS</a>
+    <a href="/" class="home-button">
+        ← Back to BarOS
+    </a>
 
-  <div class="brand">
-    <h1>Flashcards+</h1>
-    <p>Powered by StudyLedgerOS</p>
-  </div>
+    <div class="brand">
+        <h1>Flashcards+</h1>
+        <p>Powered by StudyLedgerOS</p>
+    </div>
 
-  <nav>
-    <button id="tab-study" class="active">Study</button>
-    <button id="tab-browse">Browse</button>
-    <button id="tab-new">New Card</button>
-  </nav>
+    <nav>
+
+        <button id="tab-study" class="active">
+            Study
+        </button>
+
+        <button id="tab-browse">
+            Browse
+        </button>
+
+        <button id="tab-new">
+            New Card
+        </button>
+
+    </nav>
 
 </header>
 
 <main>
 
-<!-- =========================
+<!-- =========================================
      STUDY
-========================= -->
+========================================= -->
 
-<section class="study">
+<section id="study-view" class="view">
 
-  <div class="card">
+    <div class="card">
 
-    <label>Subject</label>
+        <h2>Study</h2>
 
-    <select id="study-subject">
+        <label>Subject</label>
 
-      <option value="">Select Subject</option>
+        <select id="study-subject">
 
-      <option>Civil Procedure</option>
-      <option>Constitutional Law</option>
-      <option>Contracts / Sales</option>
-      <option>Criminal Law and Procedure</option>
-      <option>Evidence</option>
-      <option>Real Property</option>
-      <option>Torts</option>
-      <option>Business Associations</option>
-      <option>Community Property</option>
-      <option>Professional Responsibility</option>
-      <option>Remedies</option>
-      <option>Trusts</option>
-      <option>Wills and Succession</option>
+            <option value="">Select Subject</option>
 
-    </select>
+            <option>Civil Procedure</option>
+            <option>Constitutional Law</option>
+            <option>Contracts / Sales</option>
+            <option>Criminal Law and Procedure</option>
+            <option>Evidence</option>
+            <option>Real Property</option>
+            <option>Torts</option>
+            <option>Business Associations</option>
+            <option>Community Property</option>
+            <option>Professional Responsibility</option>
+            <option>Remedies</option>
+            <option>Trusts</option>
+            <option>Wills and Succession</option>
 
-    <label>Subsubject</label>
+        </select>
 
-    <select id="study-subsubject">
+        <label>Subsubject</label>
 
-      <option value="">All Subsubjects</option>
+        <select id="study-subsubject">
 
-    </select>
+            <option value="">All Subsubjects</option>
 
-    <h2 id="question"></h2>
+        </select>
 
-    <button id="show-answer">
+        <div class="study-card">
 
-      Show Answer
+            <h3 id="question"></h3>
 
-    </button>
+            <button id="show-answer">
+                Show Answer
+            </button>
 
-    <div id="answer" hidden>
+            <div id="answer" hidden>
 
-      <p></p>
+                <p></p>
+
+            </div>
+
+        </div>
+
+        <div class="study-navigation">
+
+            <button id="previous-card">
+                ← Previous
+            </button>
+
+            <button id="next-card">
+                Next →
+            </button>
+
+        </div>
 
     </div>
-
-    <div class="study-nav">
-
-      <button id="prev-card">
-
-        Previous
-
-      </button>
-
-      <button id="next-card">
-
-        Next
-
-      </button>
-
-    </div>
-
-  </div>
 
 </section>
 
-<!-- =========================
+<!-- =========================================
      BROWSE
-========================= -->
+========================================= -->
 
-<section id="browse-view" style="display:none">
+<section id="browse-view" class="view" style="display:none;">
 
-  <h2>Browse Flashcards</h2>
+    <div class="card">
+
+        <h2>Browse Flashcards</h2>
+
+        <label>Subject</label>
+
+        <select id="browse-subject">
+
+            <option value="">All Subjects</option>
+
+        </select>
+
+        <label>Subsubject</label>
+
+        <select id="browse-subsubject">
+
+            <option value="">All Subsubjects</option>
+
+        </select>
+
+        <input
+            id="search"
+            type="text"
+            placeholder="Search flashcards">
+
+        <div id="card-list"></div>
+
+    </div>
 
 </section>
 
-<!-- =========================
-     NEW CARD
-========================= -->
+<!-- =========================================
+     NEW / EDIT
+========================================= -->
 
-<section id="new-view" style="display:none">
+<section id="new-view" class="view" style="display:none;">
 
-  <div class="card">
+    <div class="card">
 
-    <h2>New Flashcard</h2>
+        <h2 id="editor-title">
+            New Flashcard
+        </h2>
 
-    <label>Subject</label>
+        <label>Subject</label>
 
-    <select id="fc-subject">
+        <select id="fc-subject">
 
-      <option value="">Select Subject</option>
+            <option value="">Select Subject</option>
 
-      <option>Civil Procedure</option>
-      <option>Constitutional Law</option>
-      <option>Contracts / Sales</option>
-      <option>Criminal Law and Procedure</option>
-      <option>Evidence</option>
-      <option>Real Property</option>
-      <option>Torts</option>
-      <option>Business Associations</option>
-      <option>Community Property</option>
-      <option>Professional Responsibility</option>
-      <option>Remedies</option>
-      <option>Trusts</option>
-      <option>Wills and Succession</option>
+            <option>Civil Procedure</option>
+            <option>Constitutional Law</option>
+            <option>Contracts / Sales</option>
+            <option>Criminal Law and Procedure</option>
+            <option>Evidence</option>
+            <option>Real Property</option>
+            <option>Torts</option>
+            <option>Business Associations</option>
+            <option>Community Property</option>
+            <option>Professional Responsibility</option>
+            <option>Remedies</option>
+            <option>Trusts</option>
+            <option>Wills and Succession</option>
 
-    </select>
+        </select>
 
-    <label>Subsubject</label>
+        <label>Subsubject</label>
 
-    <input
-      id="fc-subsubject"
-      type="text"
-      placeholder="Example: Equal Protection">
+        <input
+            id="fc-subsubject"
+            type="text"
+            placeholder="Example: Equal Protection">
 
-    <label>Question</label>
+        <label>Question</label>
 
-    <textarea
-      id="fc-question"
-      placeholder="Question"></textarea>
+        <textarea
+            id="fc-question"
+            rows="5"
+            placeholder="Question"></textarea>
 
-    <label>Answer</label>
+        <label>Answer</label>
 
-    <textarea
-      id="fc-answer"
-      placeholder="Answer (include the rule at the bottom)"></textarea>
+        <textarea
+            id="fc-answer"
+            rows="10"
+            placeholder="Answer (include the rule in the answer)"></textarea>
 
-    <button id="save-card">
+        <div class="editor-buttons">
 
-      Save Card
+            <button id="save-card">
 
-    </button>
+                Save Card
 
-    <div id="save-message"></div>
+            </button>
 
-  </div>
+            <button id="delete-card">
+
+                Delete Card
+
+            </button>
+
+        </div>
+
+        <div id="save-message"></div>
+
+    </div>
 
 </section>
 
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="app.js"></script>
 
 </body>
+
 </html>
