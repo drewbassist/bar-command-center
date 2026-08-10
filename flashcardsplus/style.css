@@ -29,7 +29,6 @@ text-decoration:none;
 color:#111;
 font-weight:600;
 }
-
 .home-button:hover{opacity:.65;}
 
 .brand{
@@ -38,14 +37,28 @@ margin:0 auto;
 padding:28px 40px;
 }
 
-.brand h1{
-font-size:34px;
-line-height:1.1;
-margin-bottom:6px;
+.brand h1{font-size:34px;line-height:1.1;margin-bottom:6px;}
+.brand p{color:var(--muted);margin-bottom:20px;}
+
+.top-tabs{
+display:flex;
+gap:12px;
+margin-top:18px;
 }
 
-.brand p{
-color:var(--muted);
+.top-tabs button{
+padding:10px 18px;
+border:1px solid var(--line);
+background:#fff;
+border-radius:8px;
+cursor:pointer;
+font:inherit;
+}
+
+.top-tabs button.active{
+background:#111;
+color:#fff;
+border-color:#111;
 }
 
 main{
@@ -54,25 +67,20 @@ margin:48px auto 80px;
 padding:0 40px;
 }
 
+.view{display:block;}
+
 .card{
 display:flex;
 flex-direction:column;
 gap:18px;
 }
 
-h2{
-font-size:28px;
-margin-bottom:8px;
-}
+h2{font-size:28px;margin-bottom:8px;}
+h3{font-size:24px;font-weight:600;}
 
-label{
-font-weight:600;
-margin-top:8px;
-}
+label{font-weight:600;margin-top:8px;}
 
-select,
-input,
-textarea{
+select,input,textarea{
 width:100%;
 padding:14px;
 border:1px solid var(--line);
@@ -81,16 +89,18 @@ font:inherit;
 background:#fff;
 }
 
-textarea{
-resize:vertical;
-min-height:140px;
-}
+textarea{resize:vertical;min-height:140px;}
 
-.editor-buttons{
+.editor-buttons,.study-nav{
+display:flex;
+gap:12px;
 margin-top:12px;
 }
 
-#save-card{
+#save-card,
+#begin-review,
+#show-answer,
+.study-nav button{
 border:none;
 background:#111;
 color:#fff;
@@ -100,8 +110,18 @@ cursor:pointer;
 font:inherit;
 }
 
-#save-card:hover{
+#save-card:hover,
+#begin-review:hover,
+#show-answer:hover,
+.study-nav button:hover{
 opacity:.9;
+}
+
+#study-answer{
+padding:20px;
+border:1px solid var(--line);
+border-radius:8px;
+background:#fafafa;
 }
 
 #save-message{
@@ -117,6 +137,11 @@ border:none;
 border-top:1px solid var(--line);
 }
 
+.library-note{
+color:var(--muted);
+margin-bottom:16px;
+}
+
 #card-list{
 display:flex;
 flex-direction:column;
@@ -128,32 +153,30 @@ margin-top:20px;
 padding:14px 16px;
 border:1px solid var(--line);
 border-radius:8px;
-cursor:pointer;
-transition:.2s;
 background:#fff;
 }
 
-.card-row:hover{
-background:#f8f8f8;
+.edit-card{
+margin-top:8px;
+border:none;
+background:none;
+color:#111;
+text-align:left;
+cursor:pointer;
+font:inherit;
 }
 
-@media (max-width:700px){
+.edit-card:hover{text-decoration:underline;}
 
-.home-button,
-.brand,
-main{
+@media(max-width:700px){
+.home-button,.brand,main{
 padding-left:20px;
 padding-right:20px;
 margin-left:0;
 margin-right:0;
 }
-
-.brand h1{
-font-size:30px;
-}
-
-main{
-margin-top:32px;
-}
-
+.brand h1{font-size:30px;}
+.top-tabs{flex-wrap:wrap;}
+.study-nav{flex-direction:column;}
+main{margin-top:32px;}
 }
