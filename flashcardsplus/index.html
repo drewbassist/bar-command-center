@@ -10,16 +10,71 @@
 
 <header class="header">
 <a href="/" class="home-button">← Back to BarOS</a>
-
 <div class="brand">
 <h1>Flashcards+</h1>
 <p>Powered by StudyLedgerOS</p>
+
+<div class="top-tabs">
+<button id="tab-review" class="active" type="button">Review</button>
+<button id="tab-manage" type="button">Manage</button>
+</div>
 </div>
 </header>
 
 <main>
 
-<section class="card">
+<section id="review-view" class="view">
+
+<div class="card">
+
+<h2>Review Flashcards</h2>
+
+<label for="review-subject">Subject</label>
+<select id="review-subject">
+<option value="">Select Subject</option>
+<option>Civil Procedure</option>
+<option>Constitutional Law</option>
+<option>Contracts / Sales</option>
+<option>Criminal Law and Procedure</option>
+<option>Evidence</option>
+<option>Real Property</option>
+<option>Torts</option>
+<option>Business Associations</option>
+<option>Community Property</option>
+<option>Professional Responsibility</option>
+<option>Remedies</option>
+<option>Trusts</option>
+<option>Wills and Succession</option>
+</select>
+
+<label for="review-subsubject">Subsubject (optional)</label>
+<select id="review-subsubject">
+<option value="">All Subsubjects</option>
+</select>
+
+<button id="begin-review" type="button">Begin Review</button>
+
+<hr>
+
+<h3 id="study-question"></h3>
+
+<button id="show-answer" type="button">Show Answer</button>
+
+<div id="study-answer" hidden>
+<p></p>
+</div>
+
+<div class="study-nav">
+<button id="previous-card" type="button">← Previous</button>
+<button id="next-card" type="button">Next →</button>
+</div>
+
+</div>
+</section>
+
+<section id="manage-view" class="view" style="display:none;">
+
+<div class="card">
 
 <h2 id="editor-title">Flashcard Editor</h2>
 
@@ -45,16 +100,16 @@
 <input id="fc-subsubject" type="text" placeholder="Example: Equal Protection">
 
 <label for="fc-question">Question</label>
-<textarea id="fc-question" rows="5" placeholder="Question"></textarea>
+<textarea id="fc-question" rows="5"></textarea>
 
 <label for="fc-answer">Answer</label>
-<textarea id="fc-answer" rows="10" placeholder="Include the rule in your answer"></textarea>
+<textarea id="fc-answer" rows="10"></textarea>
 
 <div class="editor-buttons">
 <button id="save-card" type="button">Save Flashcard</button>
 </div>
 
-<div id="save-message" aria-live="polite"></div>
+<div id="save-message"></div>
 
 <hr>
 
@@ -63,6 +118,8 @@
 <p class="library-note">Select a flashcard below to edit it.</p>
 <div id="card-list"></div>
 </section>
+
+</div>
 
 </section>
 
