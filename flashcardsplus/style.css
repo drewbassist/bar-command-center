@@ -70,7 +70,7 @@ body {
 
 .header h1 {
 
-    font-size: 44px;
+    font-size: 34px;
     font-weight: 700;
     letter-spacing: -.03em;
 
@@ -85,55 +85,8 @@ body {
 }
 
 /* ==========================================
-   Navigation
-   ========================================== */
-
-nav {
-
-    max-width: var(--width);
-
-    margin: auto;
-
-    display: flex;
-    gap: 14px;
-
-    padding: 0 40px 22px;
-
-}
-
-nav button {
-
-    border: 1px solid var(--line);
-    background: white;
-
-    padding: 11px 18px;
-
-    border-radius: 8px;
-
-    font-size: 15px;
-
-    cursor: pointer;
-
-    transition: .2s;
-
-}
-
-nav button:hover {
-
-    background: #f2f2f2;
-
-}
-
-nav button.active {
-
-    background: #111;
-    color: white;
-    border-color: #111;
-
-}
-
-/* ==========================================
    Main
+   ========================================== */
    ========================================== */
 
 main {
@@ -147,70 +100,8 @@ main {
 }
 
 /* ==========================================
-   Study Card
+   Editor
    ========================================== */
-
-.study {
-
-    display: flex;
-    justify-content: center;
-
-}
-
-.card{
-    max-width:900px;
-    margin:48px auto;
-    padding:0;
-    border:none;
-    background:transparent;
-    box-shadow:none;
-}
-
-.study-header {
-
-    display: flex;
-    justify-content: space-between;
-
-    margin-bottom: 34px;
-
-    color: var(--muted);
-
-    font-size: 15px;
-
-}
-
-.card h2 {
-
-    font-size: 42px;
-
-    line-height: 1.15;
-
-    letter-spacing: -.03em;
-
-    margin-bottom: 40px;
-
-}
-
-.card h3 {
-
-    font-size: 22px;
-
-    margin-bottom: 12px;
-
-}
-
-.card p {
-
-    font-size: 20px;
-
-    line-height: 1.65;
-
-    margin-bottom: 32px;
-
-}
-
-/* ==========================================
-   Buttons
    ========================================== */
 
 .controls {
@@ -277,7 +168,6 @@ main {
 @media (max-width:900px) {
 
     .header .brand,
-    nav,
     main {
 
         padding-left: 24px;
