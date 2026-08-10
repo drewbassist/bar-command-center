@@ -59,18 +59,56 @@ function renderCardList(){
  });
 }
 
-function populateReviewFilters(){
- const subj=$("review-subject");
- const sub=$("review-subsubject");
- if(!subj||!sub)return;
+function populateReviewFilters() {
 
- const subjects=[...new Set(flashcards.map(c=>c.subject))];
- subj.innerHTML='<option value="">Select Subject</option>'+subjects.map(s=>`<option>${s}</option>`).join("");
+    const subj = $("review-subject");
+    const sub = $("review-subsubject");
 
- subj.onchange=()=>{
-   const vals=[...new Set(flashcards.filter(c=>c.subject===subj.value).map(c=>c.subsubject).filter(Boolean))];
-   sub.innerHTML='<option value="">All Subsubjects</option>'+vals.map(v=>`<option>${v}</option>`).join("");
- };
+    if (!subj || !sub) return;
+
+    const SUBJECTS = [
+        "Civil Procedure",
+        "Constitutional Law",
+        "Contracts / Sales",
+        "Criminal Law and Procedure",
+        "Evidence",
+        "Real Property",
+        "Torts",
+        "Business Associations",
+        "Community Property",
+        "Professional Responsibility",
+        "Remedies",
+        "Trusts",
+        "Wills and Succession"
+    ];
+
+    subj.innerHTML =
+        '<option value="">Select Subject</option>' +
+        SUBJECTS.map(subject =>
+            `<option value="${subject}">${subject}</option>`
+        ).join("");
+
+    subj.onchange = () => {
+
+        const selectedSubject = subj.value;
+
+        const subsubjects = [
+            ...new Set(
+                flashcards
+                    .filter(card => card.subject === selectedSubject)
+                    .map(card => card.subsubject)
+                    .filter(Boolean)
+            )
+        ].sort();
+
+        sub.innerHTML =
+            '<option value="">All Subsubjects</option>' +
+            subsubjects.map(name =>
+                `<option value="${name}">${name}</option>`
+            ).join("");
+
+    };
+
 }
 
 // ---------- Review ----------
