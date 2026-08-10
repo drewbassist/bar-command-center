@@ -174,10 +174,15 @@ async function saveCard() {
     }
 
     if (response.error) {
-        console.error(response.error);
-        $("save-message").textContent = "Save failed.";
-        return;
-    }
+
+    console.error(response.error);
+
+    $("save-message").textContent =
+        response.error.message;
+
+    return;
+
+}
 
     $("save-message").textContent =
         editingCardId ? "Flashcard updated." : "Flashcard saved.";
