@@ -25,145 +25,22 @@
         <p>Powered by StudyLedgerOS</p>
     </div>
 
-    <nav>
-
-        <button id="tab-study" class="active">
-            Study
-        </button>
-
-        <button id="tab-browse">
-            Browse
-        </button>
-
-        <button id="tab-new">
-            New Card
-        </button>
-
-    </nav>
+    
 
 </header>
 
 <main>
 
 <!-- =========================================
-     STUDY
-========================================= -->
-
-<section id="study-view" class="view">
-
-    <div class="card">
-
-        <h2>Study</h2>
-
-        <label>Subject</label>
-
-        <select id="study-subject">
-
-            <option value="">Select Subject</option>
-
-            <option>Civil Procedure</option>
-            <option>Constitutional Law</option>
-            <option>Contracts / Sales</option>
-            <option>Criminal Law and Procedure</option>
-            <option>Evidence</option>
-            <option>Real Property</option>
-            <option>Torts</option>
-            <option>Business Associations</option>
-            <option>Community Property</option>
-            <option>Professional Responsibility</option>
-            <option>Remedies</option>
-            <option>Trusts</option>
-            <option>Wills and Succession</option>
-
-        </select>
-
-        <label>Subsubject</label>
-
-        <select id="study-subsubject">
-
-            <option value="">All Subsubjects</option>
-
-        </select>
-
-        <div class="study-card">
-
-            <h3 id="question"></h3>
-
-            <button id="show-answer">
-                Show Answer
-            </button>
-
-            <div id="answer" hidden>
-
-                <p></p>
-
-            </div>
-
-        </div>
-
-        <div class="study-navigation">
-
-            <button id="previous-card">
-                ← Previous
-            </button>
-
-            <button id="next-card">
-                Next →
-            </button>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- =========================================
-     BROWSE
-========================================= -->
-
-<section id="browse-view" class="view" style="display:none;">
-
-    <div class="card">
-
-        <h2>Browse Flashcards</h2>
-
-        <label>Subject</label>
-
-        <select id="browse-subject">
-
-            <option value="">All Subjects</option>
-
-        </select>
-
-        <label>Subsubject</label>
-
-        <select id="browse-subsubject">
-
-            <option value="">All Subsubjects</option>
-
-        </select>
-
-        <input
-            id="search"
-            type="text"
-            placeholder="Search flashcards">
-
-        <div id="card-list"></div>
-
-    </div>
-
-</section>
-
-<!-- =========================================
      NEW / EDIT
 ========================================= -->
 
-<section id="new-view" class="view" style="display:none;">
+<section id="new-view" class="view" >
 
     <div class="card">
 
         <h2 id="editor-title">
-            New Flashcard
+            Flashcard Editor
         </h2>
 
         <label>Subject</label>
@@ -217,15 +94,17 @@
 
             </button>
 
-            <button id="delete-card">
-
-                Delete Card
-
-            </button>
+            
 
         </div>
 
         <div id="save-message"></div>
+
+        <hr>
+
+        <h2>My Flashcards</h2>
+
+        <div id="card-list"></div>
 
     </div>
 
