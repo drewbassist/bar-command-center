@@ -3555,3 +3555,61 @@ document.addEventListener('DOMContentLoaded',()=>{
   n.onclick=()=>{document.getElementById('study-notes').style.display='block';n.style.display='none';document.getElementById('study-rating').style.display='block';};
  }
 });
+/* ========================================
+   BAR CYCLE — TWO-DAY MCQ CHECKLIST
+   ======================================== */
+
+function initializeBarMcqChecklist() {
+
+    const checkboxes = document.querySelectorAll(
+        '[data-mcq-check]'
+    );
+
+    checkboxes.forEach((checkbox) => {
+
+        const key =
+            'baros-mcq-' +
+            checkbox.dataset.mcqCheck;
+
+        checkbox.checked =
+            localStorage.getItem(key) === 'true';
+
+        checkbox.addEventListener('change', () => {
+
+            localStorage.setItem(
+                key,
+                checkbox.checked
+            );
+
+        });
+
+    });
+
+    const clearButton =
+        document.getElementById('bar-mcq-clear');
+
+    if (clearButton) {
+
+        clearButton.addEventListener('click', () => {
+
+            checkboxes.forEach((checkbox) => {
+
+                checkbox.checked = false;
+
+                localStorage.removeItem(
+                    'baros-mcq-' +
+                    checkbox.dataset.mcqCheck
+                );
+
+            });
+
+        });
+
+    }
+
+}
+
+document.addEventListener(
+    'DOMContentLoaded',
+    initializeBarMcqChecklist
+);
