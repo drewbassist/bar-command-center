@@ -5,7 +5,8 @@ console.log("FLASHCARDS+");
 // =========================
 
 const SUPABASE_URL = "https://rudhrifkjhretilqdncy.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "YOUR_PUBLISHABLE_KEY";
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_TGTjuqPmo8AOx_P2OpxnOw_NGT-1Z9l";
 
 const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
