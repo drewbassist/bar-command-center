@@ -39,6 +39,7 @@ let sessionHistory = [];
 let currentSession = 1;
 let editingEntry = null;
 let essayGrid = {};
+let barCycleRotation = {};
 
 const studyLogActivityIds = [
   "live_lectures",
@@ -126,6 +127,7 @@ async function loadData() {
   );
   studyLog = normalizeStudyLog(loadLocalData("bcc_study_log", createEmptyStudyLog()));
   essayGrid = normalizeEssayGrid(loadLocalData("bcc_essay_grid", {}));
+  barCycleRotation = normalizeBarCycleRotation(loadLocalData("bcc_bar_cycle_rotation", {}));
 
   normalizeReviewMetrics();
 
@@ -182,6 +184,7 @@ function saveLocalData() {
   localStorage.setItem("bcc_study_mode", currentStudyMode);
   localStorage.setItem("bcc_study_log", JSON.stringify(studyLog));
   localStorage.setItem("bcc_essay_grid", JSON.stringify(essayGrid));
+  localStorage.setItem("bcc_bar_cycle_rotation", JSON.stringify(barCycleRotation));
   localStorage.setItem("bcc_review_intervals", JSON.stringify(reviewIntervals));
   localStorage.setItem("bcc_custom_subjects", JSON.stringify(customSubjects));
   localStorage.setItem("bcc_custom_essay_sources", JSON.stringify(customEssaySources));
@@ -203,6 +206,7 @@ function getCompleteBarOSData() {
     currentStudyMode,
     studyLog,
     essayGrid,
+    barCycleRotation,
     reviewIntervals,
     customSubjects,
     customEssaySources,
@@ -223,6 +227,7 @@ function applyCompleteBarOSData(data) {
   currentStudyMode = data?.currentStudyMode || currentStudyMode || "full";
   studyLog = normalizeStudyLog(data?.studyLog);
   essayGrid = normalizeEssayGrid(data?.essayGrid);
+  barCycleRotation = normalizeBarCycleRotation(data?.barCycleRotation);
   reviewIntervals = normalizeReviewIntervals(
     data?.reviewIntervals || recommendedReviewIntervals
   );
@@ -364,6 +369,7 @@ function setupAppControlsOnce() {
   setupReviewFrequencyControls();
   setupCustomizationControls();
   setupSettingsControls();
+  setupBarCycleRotation();
 appControlsReady = true;
 }
 
@@ -1539,6 +1545,7 @@ function exportBackup() {
     currentStudyMode,
     studyLog,
     essayGrid,
+    barCycleRotation,
     reviewIntervals,
     customSubjects,
     customEssaySources,
@@ -1616,6 +1623,7 @@ function importBackup(event) {
 
 function renderAll() {
   renderEssayGrid();
+  renderBarCycleRotation();
   renderPlanner();
   renderEssays();
   renderMcqs();
@@ -3555,6 +3563,50 @@ document.addEventListener('DOMContentLoaded',()=>{
   n.onclick=()=>{document.getElementById('study-notes').style.display='block';n.style.display='none';document.getElementById('study-rating').style.display='block';};
  }
 });
+/* ========================================
+   BAR CYCLE — 26-WEEK SUBJECT ROTATION
+   Saved through BarOS data -> Supabase
+   ======================================== */
+
+function normalizeBarCycleRotation(value) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+
+    const clean = {};
+
+    Object.entries(value).forEach(([key, checked]) => {
+        if (checked === true) clean[key] = true;
+    });
+
+    return clean;
+}
+
+function setupBarCycleRotation() {
+    const checkboxes = document.querySelectorAll('[data-bar-cycle-check]');
+
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', () => {
+            const key = checkbox.dataset.barCycleCheck;
+
+            if (checkbox.checked) {
+                barCycleRotation[key] = true;
+            } else {
+                delete barCycleRotation[key];
+            }
+
+            saveData();
+        });
+    });
+}
+
+function renderBarCycleRotation() {
+    const checkboxes = document.querySelectorAll('[data-bar-cycle-check]');
+
+    checkboxes.forEach((checkbox) => {
+        const key = checkbox.dataset.barCycleCheck;
+        checkbox.checked = barCycleRotation[key] === true;
+    });
+}
+
 /* ========================================
    BAR CYCLE — TWO-DAY MCQ CHECKLIST
    ======================================== */
