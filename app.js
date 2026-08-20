@@ -1085,6 +1085,7 @@ function handleMcqSubmit(event) {
     correctCount,
     incorrectCount,
     accuracy,
+    questionNumbers: getValue("mcq-question-numbers"),
     rating: Number(getValue("mcq-rating")),
     notes: getValue("mcq-notes")
   };
@@ -1233,6 +1234,7 @@ function startEditEntry(type, id) {
     setFormValue("mcq-source", item.source);
     setFormValue("mcq-count", item.count);
     setFormValue("mcq-correct-count", item.correctCount);
+    setFormValue("mcq-question-numbers", item.questionNumbers || "");
     setFormValue("mcq-rating", item.rating);
     setFormValue("mcq-notes", item.notes);
     setSubmitButtonText("mcq-form", "Save Edit");
@@ -1746,7 +1748,7 @@ function renderMcqs() {
     <div class="bcc-item">
       <div class="bcc-item-title">${escapeHtml(getSubjectName(mcq.subject))} · ${getMcqCountValue(mcq)} questions</div>
       <div class="bcc-item-meta">
-        ${escapeHtml(mcq.source || "No source")} · ${Number(mcq.correctCount) || 0} correct · ${getMcqAccuracy(mcq)}%
+        ${escapeHtml(mcq.source || "No source")} · ${Number(mcq.correctCount) || 0} correct · ${getMcqAccuracy(mcq)}%${mcq.questionNumbers ? ` · Questions ${escapeHtml(mcq.questionNumbers)}` : ""}
       </div>
       ${renderItemReviewSummary(mcq)}
       <button class="bcc-small-button" type="button" onclick="startEditEntry('mcq', '${escapeHtml(mcq.id)}')">Edit</button>
@@ -2195,7 +2197,8 @@ function getReviewDetailLine(item, type) {
   if (type === "mcq") {
     const source = item.source || "No source";
     const count = getMcqCountValue(item);
-    return `${source} · ${count} questions`;
+    const questionNumbers = item.questionNumbers ? ` · Questions ${item.questionNumbers}` : "";
+    return `${source} · ${count} questions${questionNumbers}`;
   }
 
   if (type === "essay") {
