@@ -112,24 +112,64 @@ function populateReviewFilters() {
 }
 
 // ---------- Review ----------
-function beginReview(){
+const REVIEW_POSITION_KEY="flashcardsPlusReviewPosition";
+
+function getReviewKey(){
+ const s=$("review-subject").value;
+ const ss=$("review-subsubject").value||"ALL";
+ return `${s}::${ss}`;
+}
+
+function getSavedReviewPositions(){
+ try{return JSON.parse(localStorage.getItem(REVIEW_POSITION_KEY)||"{}");}
+ catch{return {};}
+}
+
+function saveReviewPosition(){
+ if(!studyCards.length)return;
+ const positions=getSavedReviewPositions();
+ positions[getReviewKey()]=studyIndex;
+ localStorage.setItem(REVIEW_POSITION_KEY,JSON.stringify(positions));
+}
+
+function beginReview(forceStart=false){
  const s=$("review-subject").value;
  const ss=$("review-subsubject").value;
  studyCards=flashcards.filter(c=>c.subject===s && (!ss||c.subsubject===ss));
- studyIndex=0;
+
+ if(!studyCards.length){
+  studyIndex=0;
+  displayCard();
+  return;
+ }
+
+ if(forceStart){
+  studyIndex=0;
+ }else{
+  const saved=getSavedReviewPositions()[getReviewKey()];
+  studyIndex=Number.isInteger(saved)?Math.min(saved,studyCards.length-1):0;
+ }
  displayCard();
+ saveReviewPosition();
 }
 
 function displayCard(){
+ const progress=$("study-progress");
  if(!studyCards.length){
+  progress.textContent="0 of 0";
   $("study-question").textContent="No flashcards found.";
   $("study-answer").hidden=true;
+  $("previous-card").disabled=true;
+  $("next-card").disabled=true;
   return;
  }
  const c=studyCards[studyIndex];
+ progress.textContent=`Card ${studyIndex+1} of ${studyCards.length}`;
  $("study-question").textContent=c.question;
  $("study-answer").hidden=true;
  $("study-answer").querySelector("p").textContent=c.answer;
+ $("previous-card").disabled=studyIndex===0;
+ $("next-card").disabled=studyIndex===studyCards.length-1;
 }
 
 function editCard(id){
@@ -174,10 +214,11 @@ document.addEventListener("DOMContentLoaded",async()=>{
  if(!(await initializeSupabase()))return;
  $("tab-review").onclick=()=>showView("review");
  $("tab-manage").onclick=()=>showView("manage");
- $("begin-review").onclick=beginReview;
+ $("begin-review").onclick=()=>beginReview(false);
  $("show-answer").onclick=()=>$("study-answer").hidden=false;
- $("previous-card").onclick=()=>{if(studyIndex>0){studyIndex--;displayCard();}};
- $("next-card").onclick=()=>{if(studyIndex<studyCards.length-1){studyIndex++;displayCard();}};
+ $("previous-card").onclick=()=>{if(studyIndex>0){studyIndex--;displayCard();saveReviewPosition();}};
+ $("next-card").onclick=()=>{if(studyIndex<studyCards.length-1){studyIndex++;displayCard();saveReviewPosition();}};
+ $("restart-review").onclick=()=>beginReview(true);
  $("save-card").onclick=saveCard;
  showView("review");
  await loadCards();
