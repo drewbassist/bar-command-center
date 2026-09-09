@@ -37,6 +37,8 @@
 
 <h2>Review Flashcards</h2>
 
+<div class="review-controls">
+<div class="filter-field">
 <label for="review-subject">Subject</label>
 <select id="review-subject">
 <option value="">Select Subject</option>
@@ -54,16 +56,21 @@
 <option>Trusts</option>
 <option>Wills and Succession</option>
 </select>
+</div>
 
+<div class="filter-field">
 <label for="review-subsubject">Subsubject (optional)</label>
 <select id="review-subsubject">
 <option value="">All Subsubjects</option>
 </select>
+</div>
+</div>
 
 <button id="begin-review" type="button">Begin Review</button>
 
-<hr>
+<div class="study-divider"></div>
 
+<div id="study-progress" class="study-progress">Select a subject to begin.</div>
 <h3 id="study-question"></h3>
 
 <button id="show-answer" type="button">Show Answer</button>
@@ -74,6 +81,7 @@
 
 <div class="study-nav">
 <button id="previous-card" type="button">← Previous</button>
+<button id="restart-review" type="button" class="secondary-study-button">Start at Card 1</button>
 <button id="next-card" type="button">Next →</button>
 </div>
 
