@@ -1,182 +1,148 @@
-*{margin:0;padding:0;box-sizing:border-box}
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
-:root{
---text:#111;
---muted:#666;
---line:#e6e6e6;
---bg:#fff;
---max:900px;
-}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-body{
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-background:var(--bg);
-color:var(--text);
-}
+<title>Flashcards+</title>
 
-.header{
-position:sticky;
-top:0;
-background:rgba(255,255,255,.96);
-backdrop-filter:blur(12px);
-border-bottom:1px solid var(--line);
-}
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<meta name="theme-color" content="#111111">
 
-.home-button{
-display:inline-block;
-margin:24px 40px 0;
-text-decoration:none;
-color:#111;
-font-weight:600;
-}
-.home-button:hover{opacity:.65;}
+<link rel="stylesheet" href="style.css">
 
-.brand{
-max-width:var(--max);
-margin:0 auto;
-padding:28px 40px;
-}
+</head>
+<body>
 
-.brand h1{font-size:34px;line-height:1.1;margin-bottom:6px;}
-.brand p{color:var(--muted);margin-bottom:20px;}
+<header class="header">
+<a href="/" class="home-button">← Back to BarOS</a>
+<div class="brand">
+<h1>Flashcards+</h1>
+<p>Powered by StudyLedgerOS</p>
 
-.top-tabs{
-display:flex;
-gap:12px;
-margin-top:18px;
-}
+<div class="top-tabs">
+<button id="tab-review" class="active" type="button">Review</button>
+<button id="tab-manage" type="button">Manage</button>
+</div>
+</div>
+</header>
 
-.top-tabs button{
-padding:10px 18px;
-border:1px solid var(--line);
-background:#fff;
-border-radius:8px;
-cursor:pointer;
-font:inherit;
-}
+<main>
 
-.top-tabs button.active{
-background:#111;
-color:#fff;
-border-color:#111;
-}
+<section id="review-view" class="view">
 
-main{
-max-width:var(--max);
-margin:48px auto 80px;
-padding:0 40px;
-}
+<div class="card">
 
-.view{display:block;}
+<h2>Review Flashcards</h2>
 
-.card{
-display:flex;
-flex-direction:column;
-gap:18px;
-}
+<div class="review-controls">
+<div class="filter-field">
+<label for="review-subject">Subject</label>
+<select id="review-subject">
+<option value="">Select Subject</option>
+<option>Civil Procedure</option>
+<option>Constitutional Law</option>
+<option>Contracts / Sales</option>
+<option>Criminal Law and Procedure</option>
+<option>Evidence</option>
+<option>Real Property</option>
+<option>Torts</option>
+<option>Business Associations</option>
+<option>Community Property</option>
+<option>Professional Responsibility</option>
+<option>Remedies</option>
+<option>Trusts</option>
+<option>Wills and Succession</option>
+</select>
+</div>
 
-h2{font-size:28px;margin-bottom:8px;}
-h3{font-size:24px;font-weight:600;}
+<div class="filter-field">
+<label for="review-subsubject">Subsubject (optional)</label>
+<select id="review-subsubject">
+<option value="">All Subsubjects</option>
+</select>
+</div>
+</div>
 
-label{font-weight:600;margin-top:8px;}
+<button id="begin-review" type="button">Begin Review</button>
 
-select,input,textarea{
-width:100%;
-padding:14px;
-border:1px solid var(--line);
-border-radius:8px;
-font:inherit;
-background:#fff;
-}
+<div class="study-divider"></div>
 
-textarea{resize:vertical;min-height:140px;}
+<div id="study-progress" class="study-progress">Select a subject to begin.</div>
+<h3 id="study-question"></h3>
 
-.editor-buttons,.study-nav{
-display:flex;
-gap:12px;
-margin-top:12px;
-}
+<button id="show-answer" type="button">Show Answer</button>
 
-#save-card,
-#begin-review,
-#show-answer,
-.study-nav button{
-border:none;
-background:#111;
-color:#fff;
-padding:14px 22px;
-border-radius:8px;
-cursor:pointer;
-font:inherit;
-}
+<div id="study-answer" hidden>
+<p></p>
+</div>
 
-#save-card:hover,
-#begin-review:hover,
-#show-answer:hover,
-.study-nav button:hover{
-opacity:.9;
-}
+<div class="study-nav">
+<button id="previous-card" type="button">← Previous</button>
+<button id="restart-review" type="button" class="secondary-study-button">Start at Card 1</button>
+<button id="next-card" type="button">Next →</button>
+</div>
 
-#study-answer{
-padding:20px;
-border:1px solid var(--line);
-border-radius:8px;
-background:#fafafa;
-}
+</div>
+</section>
 
-#save-message{
-margin-top:14px;
-min-height:20px;
-color:#2c7a3f;
-font-weight:600;
-}
+<section id="manage-view" class="view" style="display:none;">
 
-hr{
-margin:40px 0;
-border:none;
-border-top:1px solid var(--line);
-}
+<div class="card">
 
-.library-note{
-color:var(--muted);
-margin-bottom:16px;
-}
+<h2 id="editor-title">Flashcard Editor</h2>
 
-#card-list{
-display:flex;
-flex-direction:column;
-gap:12px;
-margin-top:20px;
-}
+<label for="fc-subject">Subject</label>
+<select id="fc-subject">
+<option value="">Select Subject</option>
+<option>Civil Procedure</option>
+<option>Constitutional Law</option>
+<option>Contracts / Sales</option>
+<option>Criminal Law and Procedure</option>
+<option>Evidence</option>
+<option>Real Property</option>
+<option>Torts</option>
+<option>Business Associations</option>
+<option>Community Property</option>
+<option>Professional Responsibility</option>
+<option>Remedies</option>
+<option>Trusts</option>
+<option>Wills and Succession</option>
+</select>
 
-.card-row{
-padding:14px 16px;
-border:1px solid var(--line);
-border-radius:8px;
-background:#fff;
-}
+<label for="fc-subsubject">Subsubject</label>
+<input id="fc-subsubject" type="text" placeholder="Example: Equal Protection">
 
-.edit-card{
-margin-top:8px;
-border:none;
-background:none;
-color:#111;
-text-align:left;
-cursor:pointer;
-font:inherit;
-}
+<label for="fc-question">Question</label>
+<textarea id="fc-question" rows="5"></textarea>
 
-.edit-card:hover{text-decoration:underline;}
+<label for="fc-answer">Answer</label>
+<textarea id="fc-answer" rows="10"></textarea>
 
-@media(max-width:700px){
-.home-button,.brand,main{
-padding-left:20px;
-padding-right:20px;
-margin-left:0;
-margin-right:0;
-}
-.brand h1{font-size:30px;}
-.top-tabs{flex-wrap:wrap;}
-.study-nav{flex-direction:column;}
-main{margin-top:32px;}
-}
+<div class="editor-buttons">
+<button id="save-card" type="button">Save Flashcard</button>
+</div>
+
+<div id="save-message"></div>
+
+<hr>
+
+<section class="library">
+<h2>My Flashcards</h2>
+<p class="library-note">Select a flashcard below to edit it.</p>
+<div id="card-list"></div>
+</section>
+
+</div>
+
+</section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
