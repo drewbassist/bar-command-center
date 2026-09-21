@@ -3599,6 +3599,25 @@ function setupBarCycleRotation() {
             saveData();
         });
     });
+
+    const clearButton = document.getElementById('bar-cycle-clear');
+
+    if (clearButton) {
+        clearButton.addEventListener('click', () => {
+            Object.keys(barCycleRotation).forEach((key) => {
+                if (!key.startsWith('essay-model-')) {
+                    delete barCycleRotation[key];
+                }
+            });
+            saveData();
+            renderBarCycleRotation();
+        });
+    }
+
+    const today = todayString();
+    document.querySelectorAll('[data-cycle-date]').forEach((row) => {
+        row.classList.toggle('today', row.dataset.cycleDate === today);
+    });
 }
 
 function renderBarCycleRotation() {
