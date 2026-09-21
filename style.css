@@ -1960,12 +1960,6 @@ h2 {
   font-weight: 600;
 }
 
-.bar-review-cycle-table th:first-child,
-.bar-review-cycle-table td:first-child {
-  width: 90px;
-  white-space: nowrap;
-}
-
 .bar-review-cycle-table label {
   display: flex;
   align-items: center;
@@ -1984,19 +1978,6 @@ h2 {
 .bar-review-cycle-table label:has(input:checked) {
   color: #888888;
   text-decoration: line-through;
-}
-
-.bar-review-cycle-table tr.today td {
-  background: #f2f2f2;
-  font-weight: 500;
-}
-
-.bar-review-cycle-table tr.today td:first-child::after {
-  content: "  TODAY";
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #666666;
 }
 
 @media (max-width: 760px) {
@@ -2056,11 +2037,6 @@ h2 {
   padding: 7px 7px;
   font-size: 11px;
   line-height: 1.25;
-}
-
-.bar-review-cycle-table th:first-child,
-.bar-review-cycle-table td:first-child {
-  width: 68px;
 }
 
 .bar-review-cycle-table th:not(:first-child),
@@ -2139,3 +2115,5 @@ h2 {
     min-width: 520px;
   }
 }
+
+
