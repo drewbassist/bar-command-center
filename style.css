@@ -1,898 +1,2141 @@
-<!DOCTYPE html>
+* {
+  box-sizing: border-box;
+}
 
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Drew's BarOS</title>
-<link href="favicon.png" rel="icon" type="image/png"/>
-<link href="favicon.png" rel="apple-touch-icon"/>
-<meta content="#111111" name="theme-color"/>
-<link href="style.css" rel="stylesheet"/>
-<link href="essay-grid.css" rel="stylesheet"/>
-</head>
-<body>
-<header class="bcc-header">
-<div>
-<div class="bcc-title">BarOS</div>
-<div class="bcc-subtitle">Powered by StudyLedgerOS</div>
-</div>
-<div class="bcc-cloud-controls" hidden="" id="cloud-controls">
-<div>
-<div class="bcc-signed-in-email" id="signed-in-email"></div>
-<div class="bcc-cloud-save-status" id="cloud-save-status">Cloud ready</div>
-</div>
-<button class="bcc-header-button" id="sign-out-button" type="button">Sign Out</button>
-</div>
-</header>
-<section class="bcc-auth-screen" id="auth-screen">
-<div class="bcc-auth-panel">
-<h1>Sign in to BarOS</h1>
-<p>
-Create an account to securely save your study progress and sync it across your devices.
-</p>
-<p class="bcc-help-text">
-New user? Follow instructions sent to your email before signing in.
-</p>
-<form class="bcc-form" id="auth-form">
-<label>
-          Email
-          <input autocomplete="email" id="auth-email" required="" type="email"/>
-</label>
-<label>
-          Password
-          <input autocomplete="current-password" id="auth-password" required="" type="password"/>
-</label>
-<div class="bcc-auth-actions">
-<button type="submit">Sign In</button>
-<button class="bcc-secondary-button" id="create-account-button" type="button">Create Account</button>
-</div>
-<div class="bcc-auth-message" id="auth-message"></div>
-</form>
-</div>
-</section>
-<div hidden="" id="app-shell">
-<nav class="bcc-nav">
-<button class="bcc-nav-button" data-view="dashboard">Today</button>
-<button class="bcc-nav-button" data-view="essays">Essays</button>
-<button class="bcc-nav-button" data-view="mcqs">MCQs</button>
-<button class="bcc-nav-button" data-view="flashcards">Flashcards</button>
-<button class="bcc-nav-button" data-view="reviews">Reviews</button>
-<button class="bcc-nav-button" data-view="study-log">Study Log</button>
-<button class="bcc-nav-button" data-view="essay-grid">Bar Cycle</button>
-<button class="bcc-nav-button" data-view="stats">Progress</button>
-<button class="bcc-nav-button" onclick="window.location.href='/flashcardsplus/'" type="button">Flashcards+</button>
-<button class="bcc-nav-button" data-view="settings">Settings</button>
-</nav>
-<main class="bcc-main">
-<section class="bcc-view" id="dashboard">
-<div class="bcc-panel">
-<h2>Today's Totals</h2>
-<div class="bcc-grid">
-<div class="bcc-card">
-<div class="bcc-card-label">Essays</div>
-<div class="bcc-card-number" id="dashboard-essays-target">0</div>
-</div>
-<div class="bcc-card">
-<div class="bcc-card-label">MCQs</div>
-<div class="bcc-card-number" id="dashboard-mcqs-target">0</div>
-</div>
-<div class="bcc-card">
-<div class="bcc-card-label">Flashcards</div>
-<div class="bcc-card-number" id="dashboard-flashcards-target">0</div>
-</div>
-<div class="bcc-card">
-<div class="bcc-card-label">Reviews Due</div>
-<div class="bcc-card-number" id="dashboard-reviews-due">0</div>
-</div>
-</div>
-</div>
-<div class="bcc-panel">
-<h2>Minimums</h2>
-<div class="bcc-list">
-<div class="bcc-item">
-<div class="bcc-item-title">Essays</div>
-<div class="bcc-item-meta">
-<span id="dashboard-essays-target-minimum">0</span> /
-                <span id="dashboard-essays-goal">0</span>
-                completed today
-              </div>
-</div>
-<div class="bcc-item">
-<div class="bcc-item-title">MCQs</div>
-<div class="bcc-item-meta">
-<span id="dashboard-mcqs-target-minimum">0</span> /
-                <span id="dashboard-mcqs-goal">0</span>
-                completed today
-              </div>
-</div>
-<div class="bcc-item">
-<div class="bcc-item-title">Flashcards</div>
-<div class="bcc-item-meta">
-<span id="dashboard-flashcards-target-minimum">0</span> /
-                <span id="dashboard-flashcards-goal">0</span>
-                completed today
-              </div>
-</div>
-</div>
-</div>
-<div class="bcc-panel">
-<h2>Due Today</h2>
-<div class="bcc-list-empty" id="today-list">No due items yet.</div>
-</div>
-</section>
-<section class="bcc-view" id="essays">
-<div class="bcc-panel">
-<h2>Log Essay</h2>
-<form class="bcc-form bcc-entry-form bcc-essay-form" id="essay-form">
-<label>Subject<select id="essay-subject"></select></label>
-<label>Source<select id="essay-source"></select></label>
-<label class="bcc-field-wide">Title<input id="essay-title" type="text"/></label>
-<label>Page Number<input id="essay-page-number" type="text"/></label>
-<label>Question Number<input id="essay-question-number" type="text"/></label>
-<label>Rating<select id="essay-rating"></select></label>
-<label class="bcc-field-wide">Notes<textarea id="essay-notes"></textarea></label>
-<button type="submit">Save Essay</button>
-</form>
-</div>
-<div class="bcc-panel">
-<h2>Recent Essays</h2>
-<div class="bcc-list-empty" id="essay-list">No essays added yet.</div>
-</div>
-</section>
-<section class="bcc-view" id="mcqs">
-<div class="bcc-panel">
-<h2>Log MCQ Session</h2>
-<form class="bcc-form bcc-entry-form bcc-mcq-form" id="mcq-form">
-<label>Subject<select id="mcq-subject"></select></label>
-<label>Source<select id="mcq-source"></select></label>
-<label>Questions Completed<input id="mcq-count" min="0" type="number"/></label>
-<label>Correct<input id="mcq-correct-count" min="0" type="number"/></label>
-<label>Question Numbers<input id="mcq-question-numbers" type="text" placeholder="e.g. 7–11 or 55–90"/></label>
-<label>Rating<select id="mcq-rating"></select></label>
-<label class="bcc-field-wide">Notes<textarea id="mcq-notes"></textarea></label>
-<button type="submit">Save MCQ Session</button>
-</form>
-</div>
-<div class="bcc-panel">
-<h2>Recent MCQ Sessions</h2>
-<div class="bcc-list-empty" id="mcq-list">No MCQ sessions added yet.</div>
-</div>
-</section>
-<section class="bcc-view" id="flashcards">
-<div class="bcc-panel">
-<h2>Log Flashcard Session</h2>
-<form class="bcc-form bcc-entry-form bcc-flashcard-form" id="flashcard-form">
-<label>Subject<select id="flashcard-subject"></select></label>
-<label>Source<select id="flashcard-source"></select></label>
-<label>Card Range<input id="flashcard-card-range" type="text"/></label>
-<label>Rating<select id="flashcard-rating"></select></label>
-<label class="bcc-field-wide">Notes<textarea id="flashcard-notes"></textarea></label>
-<button type="submit">Save Flashcard Session</button>
-</form>
-</div>
-<div class="bcc-panel">
-<h2>Recent Flashcard Sessions</h2>
-<div class="bcc-list-empty" id="flashcard-list">No flashcard sessions added yet.</div>
-</div>
-</section>
-<section class="bcc-view" id="reviews">
-<div class="bcc-panel">
-<h2>Review Queue</h2>
-<div class="bcc-list-empty" id="review-list">No reviews scheduled yet.</div>
-</div>
-</section>
-<section class="bcc-view" id="study-log">
-<div class="bcc-panel" id="study-log-setup-panel">
-<h2>Study Log Setup</h2>
-<p class="bcc-help-text">
-            Set up one course period. The complete weekly grid appears below before you save it.
-          </p>
-<form class="bcc-study-log-setup-grid" id="study-log-setup-form">
-<label>
-              Student Name
-              <input id="study-log-student-name" required="" type="text"/>
-</label>
-<label>
-              School
-              <input id="study-log-school" type="text"/>
-</label>
-<label>
-              Subject
-              <input id="study-log-subject" required="" type="text"/>
-</label>
-<label>
-              Start Date
-              <input id="study-log-start-date" required="" type="date"/>
-</label>
-<label>
-              Number of Weeks
-              <div class="bcc-week-stepper">
-<button aria-label="Subtract one week" class="bcc-stepper-button" id="study-log-weeks-minus" type="button">−</button>
-<input id="study-log-weeks" max="52" min="1" required="" type="number" value="18"/>
-<button aria-label="Add one week" class="bcc-stepper-button" id="study-log-weeks-plus" type="button">+</button>
-</div>
-</label>
-<label>
-              Required Hours
-              <div class="bcc-hour-stepper">
-<button aria-label="Subtract one required hour" class="bcc-stepper-button" id="study-log-hours-minus" type="button">−</button>
-<input id="study-log-required-hours" max="5000" min="0" required="" step="1" type="number" value="299"/>
-<button aria-label="Add one required hour" class="bcc-stepper-button" id="study-log-hours-plus" type="button">+</button>
-</div>
-</label>
-<label>
-              Other Activity Label
-              <input id="study-log-other-label" type="text" value="Other"/>
-</label>
-<div class="bcc-study-log-setup-actions">
-<button class="bcc-primary-button" type="submit">Create Study Log</button>
-<button class="bcc-secondary-button" id="study-log-reset-button" type="button">Reset Study Log</button>
-</div>
-</form>
-<div class="bcc-study-log-preview-heading">
-<h2>Weekly Grid Preview</h2>
-<p class="bcc-help-text">
-              The full weekly grid updates immediately. After creating the Study Log, every daily cell becomes editable.
-            </p>
-</div>
-<div class="bcc-study-log-full-grid" id="study-log-full-grid"></div>
-</div>
-<div hidden="" id="study-log-active-area">
-<div class="bcc-grid bcc-study-log-summary-grid">
-<div class="bcc-card">
-<div class="bcc-card-label">Required Hours</div>
-<div class="bcc-card-number" id="study-log-required-hours-summary">0.00</div>
-</div>
-<div class="bcc-card">
-<div class="bcc-card-label">Hours to Date</div>
-<div class="bcc-card-number" id="study-log-total-hours">0.00</div>
-</div>
-<div class="bcc-card">
-<div class="bcc-card-label">Hours Remaining</div>
-<div class="bcc-card-number" id="study-log-hours-remaining">0.00</div>
-</div>
-<div class="bcc-card">
-<div class="bcc-card-label">Completion</div>
-<div class="bcc-card-number" id="study-log-completion-percent">0.00%</div>
-</div>
-<div class="bcc-card">
-<div class="bcc-card-label">Needed Per Remaining Week</div>
-<div class="bcc-card-number" id="study-log-needed-per-week">0.00</div>
-</div>
-</div>
-<div class="bcc-panel bcc-progress-panel">
-<div class="bcc-progress-heading">
-<span>Course-hour progress</span>
-<strong id="study-log-progress-label">0.00%</strong>
-</div>
-<div aria-hidden="true" class="bcc-progress-track">
-<div class="bcc-progress-fill" id="study-log-progress-bar"></div>
-</div>
-</div>
-<div class="bcc-panel">
-<div class="bcc-study-log-heading-row">
-<div>
-<h2 id="study-log-heading">Study Log</h2>
-<div class="bcc-item-meta" id="study-log-period-meta"></div>
-</div>
-<div class="bcc-study-log-toolbar">
-<button class="bcc-small-button" id="study-log-edit-setup-button" type="button">Edit Setup</button>
-<button class="bcc-small-button" id="study-log-print-button" type="button">Download Excel Log</button>
-</div>
-</div>
-</div>
-<div class="bcc-panel">
-<h2>Log Study Time</h2>
-<form class="bcc-form bcc-study-log-entry-grid" id="study-log-entry-form">
-<label>
-                Date
-                <input id="study-log-entry-date" required="" type="date"/>
-</label>
-<label>
-                Activity
-                <select id="study-log-entry-activity" required=""></select>
-</label>
-<label>
-                Hours
-                <input id="study-log-entry-hours" min="0" required="" step="1" type="number" value="0"/>
-</label>
-<label>
-                Minutes
-                <input id="study-log-entry-minutes" max="59" min="0" required="" step="1" type="number" value="0"/>
-</label>
-<label class="bcc-study-log-notes-field">
-                Notes
-                <input id="study-log-entry-notes" type="text"/>
-</label>
-<div class="bcc-study-log-entry-actions">
-<button id="study-log-entry-submit" type="submit">Save Time Entry</button>
-<button class="bcc-secondary-button" hidden="" id="study-log-entry-cancel" type="button">Cancel Edit</button>
-</div>
-</form>
-<div class="bcc-auth-message" id="study-log-entry-message"></div>
-</div>
-<div class="bcc-panel">
-<h2>Recent Entries</h2>
-<div class="bcc-list-empty" id="study-log-entry-list">No study time entered yet.</div>
-</div>
-<div class="bcc-panel">
-<h2>Weekly Totals</h2>
-<div class="bcc-study-log-table-wrap">
-<table class="bcc-study-log-table">
-<thead>
-<tr>
-<th>Week</th>
-<th>Date Range</th>
-<th>This Week</th>
-<th>Cumulative</th>
-<th>Total %</th>
-</tr>
-</thead>
-<tbody id="study-log-weekly-body"></tbody>
-</table>
-</div>
-</div>
-<div class="bcc-panel">
-<h2>Totals by Activity</h2>
-<div class="bcc-study-log-activity-grid" id="study-log-activity-totals"></div>
-</div>
-</div>
-</section>
-<section class="bcc-view" id="essay-grid">
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: #111111;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+}
 
-    <div class="bcc-panel">
+body {
+  min-height: 100vh;
+}
 
-        <h2>Bar Cycle</h2>
+[hidden] {
+  display: none !important;
+}
 
-        <p class="bcc-help-text">
-            Every two weeks, one subject becomes the focus. Every day, all thirteen subjects remain
-            active through essays, mixed MCQs, active recall, and spaced repetition.
-        </p>
+.bcc-header {
+  min-height: 72px;
+  padding: 14px 26px 10px;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
 
-        <table class="bar-cycle-table">
+.bcc-title {
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
 
-            <thead>
+.bcc-subtitle {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #777;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
 
-                <tr>
-                    <th>2-Week Focus Cycle</th>
-                    <th>What Happens During These 14 Days</th>
-                </tr>
+.bcc-cloud-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  text-align: right;
+}
 
-            </thead>
+.bcc-signed-in-email {
+  font-size: 11px;
+  color: #555555;
+}
 
-            <tbody>
+.bcc-cloud-save-status {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #777777;
+}
 
-                <tr>
-                    <td><strong>Focus Subject</strong></td>
-                    <td>
-                        Learn the doctrine, understand the concepts, build or update your outline,
-                        create flashcards, and complete subject-specific essays and MCQs.
-                    </td>
-                </tr>
+.bcc-cloud-save-status[data-state="saved"] {
+  color: #1f6f36;
+}
 
-                <tr>
-                    <td><strong>Daily Essay</strong></td>
-                    <td>
-                        Write one essay every day, rotating through all thirteen bar subjects.
-                        Every subject is practiced at least once during each two-week cycle.
-                    </td>
-                </tr>
+.bcc-cloud-save-status[data-state="error"] {
+  color: #9a1c1c;
+}
 
-                <tr>
-                    <td><strong>Mixed MCQs</strong></td>
-                    <td>
-                        Complete 20–25 mixed MCQs daily using interleaving.
-                        Most questions come from previously completed subjects while gradually
-                        increasing questions from the current focus subject.
-                    </td>
-                </tr>
+.bcc-header-button,
+.bcc-secondary-button {
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #222222;
+  padding: 7px 11px;
+  font-size: 12px;
+  cursor: pointer;
+}
 
-                <tr>
-                    <td><strong>Active Recall</strong></td>
-                    <td>
-                        Recall rule statements before looking them up.
-                        Rewrite missed rules from essays and MCQs.
-                    </td>
-                </tr>
+.bcc-auth-screen {
+  min-height: calc(100vh - 72px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
 
-                <tr>
-                    <td><strong>Spaced Repetition</strong></td>
-                    <td>
-                        Review flashcards, previous essays, and missed MCQs according
-                        to your BarOS review schedule.
-                    </td>
-                </tr>
+.bcc-auth-panel {
+  width: min(420px, 100%);
+  border: 1px solid #e5e5e5;
+  padding: 22px;
+}
 
-                <tr>
-                    <td><strong>End of Cycle</strong></td>
-                    <td>
-                        Move the focus subject into permanent review and begin the next
-                        two-week focus subject.
-                    </td>
-                </tr>
+.bcc-auth-panel p {
+  margin: 0 0 16px;
+  color: #666666;
+  font-size: 13px;
+  line-height: 1.45;
+}
 
-            </tbody>
+.bcc-auth-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 
-        </table>
+.bcc-auth-message {
+  min-height: 18px;
+  font-size: 12px;
+  color: #9a1c1c;
+}
 
-</div>
+.bcc-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  padding: 7px 26px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+  overflow-x: auto;
+}
 
-<div class="bar-cycle-workspace">
+.bcc-nav-button {
+  width: 104px;
+  padding: 7px 0;
+  border: 1px solid #d9d9d9;
+  background: #ffffff;
+  color: #444444;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 2px;
+}
 
-<div class="bcc-panel bar-review-cycle-panel">
+.bcc-nav-button.active {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+}
 
-    <div class="bar-review-cycle-heading">
-        <div>
-            <h2>13-Day Subject Cycle</h2>
-            <p class="bcc-help-text">
-                Study one new subject each day. Check each subject when you have meaningfully reviewed it.
-                Log the actual work you did in Essays, MCQs, Flashcards, or Study Log.
-            </p>
-        </div>
+.bcc-main {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 14px 20px 24px;
+}
 
-        <button class="bar-cycle-clear-button" id="bar-cycle-clear" type="button">
-            Clear Checks
-        </button>
-    </div>
+.bcc-view {
+  display: none;
+}
 
-    <div class="bar-review-cycle-wrap">
-        <table class="bar-review-cycle-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>New Subject</th>
-                    <th>+1 Review</th>
-                    <th>+3 Review</th>
-                    <th>+7 Review</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr data-cycle-date="2026-09-21">
-                    <td>Sep 21</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-21-new-criminal"> Criminal Law &amp; Procedure</label></td>
-                    <td>—</td><td>—</td><td>—</td>
-                </tr>
-                <tr data-cycle-date="2026-09-22">
-                    <td>Sep 22</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-22-new-evidence"> Evidence</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-22-r1-criminal"> Criminal Law &amp; Procedure</label></td>
-                    <td>—</td><td>—</td>
-                </tr>
-                <tr data-cycle-date="2026-09-23">
-                    <td>Sep 23</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-23-new-ba"> Business Associations</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-23-r1-evidence"> Evidence</label></td>
-                    <td>—</td><td>—</td>
-                </tr>
-                <tr data-cycle-date="2026-09-24">
-                    <td>Sep 24</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-24-new-remedies"> Remedies</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-24-r1-ba"> Business Associations</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-24-r3-criminal"> Criminal Law &amp; Procedure</label></td>
-                    <td>—</td>
-                </tr>
-                <tr data-cycle-date="2026-09-25">
-                    <td>Sep 25</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-25-new-civpro"> Civil Procedure</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-25-r1-remedies"> Remedies</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-25-r3-evidence"> Evidence</label></td>
-                    <td>—</td>
-                </tr>
-                <tr data-cycle-date="2026-09-26">
-                    <td>Sep 26</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-26-new-property"> Real Property</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-26-r1-civpro"> Civil Procedure</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-26-r3-ba"> Business Associations</label></td>
-                    <td>—</td>
-                </tr>
-                <tr data-cycle-date="2026-09-27">
-                    <td>Sep 27</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-27-new-pr"> Professional Responsibility</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-27-r1-property"> Real Property</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-27-r3-remedies"> Remedies</label></td>
-                    <td>—</td>
-                </tr>
-                <tr data-cycle-date="2026-09-28">
-                    <td>Sep 28</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-28-new-cp"> Community Property</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-28-r1-pr"> Professional Responsibility</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-28-r3-civpro"> Civil Procedure</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-28-r7-criminal"> Criminal Law &amp; Procedure</label></td>
-                </tr>
-                <tr data-cycle-date="2026-09-29">
-                    <td>Sep 29</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-29-new-wills"> Wills</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-29-r1-cp"> Community Property</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-29-r3-property"> Real Property</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-29-r7-evidence"> Evidence</label></td>
-                </tr>
-                <tr data-cycle-date="2026-09-30">
-                    <td>Sep 30</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-30-new-trusts"> Trusts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-30-r1-wills"> Wills</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-30-r3-pr"> Professional Responsibility</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-30-r7-ba"> Business Associations</label></td>
-                </tr>
-                <tr data-cycle-date="2026-10-01">
-                    <td>Oct 1</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-01-new-conlaw"> Constitutional Law</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-01-r1-trusts"> Trusts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-01-r3-cp"> Community Property</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-01-r7-remedies"> Remedies</label></td>
-                </tr>
-                <tr data-cycle-date="2026-10-02">
-                    <td>Oct 2</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-02-new-contracts"> Contracts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-02-r1-conlaw"> Constitutional Law</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-02-r3-wills"> Wills</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-02-r7-civpro"> Civil Procedure</label></td>
-                </tr>
-                <tr data-cycle-date="2026-10-03">
-                    <td>Oct 3</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-03-new-torts"> Torts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-03-r1-contracts"> Contracts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-03-r3-trusts"> Trusts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-03-r7-property"> Real Property</label></td>
-                </tr>
-                <tr data-cycle-date="2026-10-04">
-                    <td>Oct 4</td><td>—</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-04-r1-torts"> Torts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-04-r3-conlaw"> Constitutional Law</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-04-r7-pr"> Professional Responsibility</label></td>
-                </tr>
-                <tr data-cycle-date="2026-10-05">
-                    <td>Oct 5</td><td>—</td><td>—</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-05-r3-contracts"> Contracts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-05-r7-cp"> Community Property</label></td>
-                </tr>
-                <tr data-cycle-date="2026-10-06">
-                    <td>Oct 6</td><td>—</td><td>—</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-06-r3-torts"> Torts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-06-r7-wills"> Wills</label></td>
-                </tr>
-                <tr data-cycle-date="2026-10-07">
-                    <td>Oct 7</td><td>—</td><td>—</td><td>—</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-07-r7-trusts"> Trusts</label></td>
-                </tr>
-                <tr data-cycle-date="2026-10-08">
-                    <td>Oct 8</td><td>—</td><td>—</td><td>—</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-08-r7-conlaw"> Constitutional Law</label></td>
-                </tr>
-                <tr data-cycle-date="2026-10-09">
-                    <td>Oct 9</td><td>—</td><td>—</td><td>—</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-09-r7-contracts"> Contracts</label></td>
-                </tr>
-                <tr data-cycle-date="2026-10-10">
-                    <td>Oct 10</td><td>—</td><td>—</td><td>—</td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-10-r7-torts"> Torts</label></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+.bcc-view.active {
+  display: block;
+}
 
-</div>
+h1 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 300;
+}
+
+h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.bcc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.bcc-card {
+  border: 1px solid #e5e5e5;
+  padding: 12px 16px;
+  min-height: 74px;
+  background: #ffffff;
+}
+
+.bcc-card-label {
+  font-size: 12px;
+  color: #666666;
+}
+
+.bcc-card-number {
+  margin-top: 4px;
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.bcc-panel {
+  border: 1px solid #e5e5e5;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  background: #ffffff;
+}
+
+.bcc-form {
+  display: grid;
+  gap: 8px;
+}
+
+.bcc-form label {
+  display: grid;
+  gap: 3px;
+  font-size: 12px;
+  color: #444444;
+}
+
+.bcc-form input,
+.bcc-form select,
+.bcc-form textarea {
+  width: 100%;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #111111;
+  padding: 7px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bcc-form textarea {
+  min-height: 58px;
+  resize: vertical;
+}
+
+.bcc-form button {
+  justify-self: start;
+  border: 1px solid #111111;
+  background: #111111;
+  color: #ffffff;
+  padding: 8px 13px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.bcc-form .bcc-secondary-button {
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #222222;
+}
+
+.bcc-list-empty {
+  font-size: 12px;
+  color: #777777;
+}
+
+.bcc-item {
+  border-top: 1px solid #eeeeee;
+  padding: 6px 0;
+}
+
+.bcc-item:first-child {
+  border-top: none;
+}
+
+.bcc-item-title {
+  font-size: 14px;
+}
+
+.bcc-item-meta {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #666666;
+}
+
+.bcc-item-notes {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: #333333;
+}
+
+.bcc-rating {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.bcc-small-button {
+  margin-top: 5px;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #222222;
+  padding: 5px 9px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.bcc-cycle-map {
+  display: grid;
+  grid-template-columns: repeat(15, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.bcc-cycle-day {
+  border: 1px solid #dddddd;
+  min-height: 38px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 10px;
+  line-height: 1.15;
+  color: #555555;
+}
+
+.bcc-cycle-day.active {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+}
+
+.bcc-cycle-day.completed {
+  background: #f1f1f1;
+  color: #111111;
+}
+
+.bcc-mission-subjects {
+  margin-top: 5px;
+  margin-bottom: 4px;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.bcc-session-button {
+  margin-top: 4px;
+  width: 220px;
+  height: 36px;
+  border: none;
+  background: #111111;
+  color: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.bcc-session-button:hover {
+  background: #2f2f2f;
+}
+
+.bcc-today-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.bcc-backup-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.bcc-backup-actions .bcc-session-button {
+  margin-top: 0;
+}
+
+.bcc-backup-actions label.bcc-session-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#import-backup-input {
+  display: none;
+}
+
+.bcc-review-row {
+  padding: 4px 0;
+}
+
+.bcc-review-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(88px,1fr));
+  gap:6px;
+  margin-top:6px;
+}
+
+.bcc-review-cell {
+  border:1px solid #dddddd;
+  border-radius:6px;
+  padding:6px;
+  background:#fff;
+  min-height:68px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.bcc-review-cell.due {
+  border-color: #111111;
+}
+
+.bcc-review-cell.completed {
+  background: #f2f2f2;
+  color: #777777;
+}
+
+.bcc-review-label {
+  font-size: 10px;
+  color: #666666;
+  margin-bottom: 4px;
+}
+
+.bcc-review-date {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.bcc-review-cell .bcc-small-button {
+  width: 100%;
+  border: 1px solid #111111;
+  background: #111111;
+  color: #ffffff;
+  padding: 3px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.bcc-review-cell .bcc-small-button:disabled {
+  background: #cccccc;
+  border-color: #cccccc;
+  color: #666666;
+  cursor: default;
+}
+
+@media (max-width: 760px) {
+  .bcc-header {
+    padding: 16px 18px 10px;
+    align-items: flex-start;
+  }
+
+  .bcc-title {
+    font-size: 24px;
+  }
+
+  .bcc-cloud-controls {
+    align-items: flex-end;
+  }
+
+  .bcc-nav {
+    padding: 8px 18px;
+  }
+
+  .bcc-main {
+    padding: 16px 18px 32px;
+  }
+
+  .bcc-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bcc-cycle-map {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .bcc-card-number {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 700px) {
+  .bcc-review-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .bcc-header {
+    display: block;
+  }
+
+  .bcc-cloud-controls {
+    margin-top: 10px;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
+@media (max-width: 460px) {
+  .bcc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bcc-nav-button {
+    width: 92px;
+  }
+
+  .bcc-session-button {
+    width: 100%;
+  }
+
+  .bcc-backup-actions,
+  .bcc-auth-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
 
 
-<div class="bcc-panel model-essay-panel">
-    <div class="model-essay-heading">
-        <div>
-            <h2>Model Essays</h2>
-            <p class="bcc-help-text">Track six model essays for each bar subject.</p>
-        </div>
-    </div>
+/* Study Log */
 
-    <div class="model-essay-wrap">
-        <table class="model-essay-table">
-            <thead>
-                <tr>
-                    <th>Subject</th>
-                    <th>1</th>
-                    <th>2</th>
-                    <th>3</th>
-                    <th>4</th>
-                    <th>5</th>
-                    <th>6</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">Civil Procedure</th>
-                    <td><input aria-label="Civil Procedure model essay 1" type="checkbox" data-bar-cycle-check="essay-model-civil-procedure-1"></td>
-                    <td><input aria-label="Civil Procedure model essay 2" type="checkbox" data-bar-cycle-check="essay-model-civil-procedure-2"></td>
-                    <td><input aria-label="Civil Procedure model essay 3" type="checkbox" data-bar-cycle-check="essay-model-civil-procedure-3"></td>
-                    <td><input aria-label="Civil Procedure model essay 4" type="checkbox" data-bar-cycle-check="essay-model-civil-procedure-4"></td>
-                    <td><input aria-label="Civil Procedure model essay 5" type="checkbox" data-bar-cycle-check="essay-model-civil-procedure-5"></td>
-                    <td><input aria-label="Civil Procedure model essay 6" type="checkbox" data-bar-cycle-check="essay-model-civil-procedure-6"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Real Property</th>
-                    <td><input aria-label="Real Property model essay 1" type="checkbox" data-bar-cycle-check="essay-model-real-property-1"></td>
-                    <td><input aria-label="Real Property model essay 2" type="checkbox" data-bar-cycle-check="essay-model-real-property-2"></td>
-                    <td><input aria-label="Real Property model essay 3" type="checkbox" data-bar-cycle-check="essay-model-real-property-3"></td>
-                    <td><input aria-label="Real Property model essay 4" type="checkbox" data-bar-cycle-check="essay-model-real-property-4"></td>
-                    <td><input aria-label="Real Property model essay 5" type="checkbox" data-bar-cycle-check="essay-model-real-property-5"></td>
-                    <td><input aria-label="Real Property model essay 6" type="checkbox" data-bar-cycle-check="essay-model-real-property-6"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Professional Responsibility</th>
-                    <td><input aria-label="Professional Responsibility model essay 1" type="checkbox" data-bar-cycle-check="essay-model-professional-responsibility-1"></td>
-                    <td><input aria-label="Professional Responsibility model essay 2" type="checkbox" data-bar-cycle-check="essay-model-professional-responsibility-2"></td>
-                    <td><input aria-label="Professional Responsibility model essay 3" type="checkbox" data-bar-cycle-check="essay-model-professional-responsibility-3"></td>
-                    <td><input aria-label="Professional Responsibility model essay 4" type="checkbox" data-bar-cycle-check="essay-model-professional-responsibility-4"></td>
-                    <td><input aria-label="Professional Responsibility model essay 5" type="checkbox" data-bar-cycle-check="essay-model-professional-responsibility-5"></td>
-                    <td><input aria-label="Professional Responsibility model essay 6" type="checkbox" data-bar-cycle-check="essay-model-professional-responsibility-6"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Community Property</th>
-                    <td><input aria-label="Community Property model essay 1" type="checkbox" data-bar-cycle-check="essay-model-community-property-1"></td>
-                    <td><input aria-label="Community Property model essay 2" type="checkbox" data-bar-cycle-check="essay-model-community-property-2"></td>
-                    <td><input aria-label="Community Property model essay 3" type="checkbox" data-bar-cycle-check="essay-model-community-property-3"></td>
-                    <td><input aria-label="Community Property model essay 4" type="checkbox" data-bar-cycle-check="essay-model-community-property-4"></td>
-                    <td><input aria-label="Community Property model essay 5" type="checkbox" data-bar-cycle-check="essay-model-community-property-5"></td>
-                    <td><input aria-label="Community Property model essay 6" type="checkbox" data-bar-cycle-check="essay-model-community-property-6"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Wills</th>
-                    <td><input aria-label="Wills model essay 1" type="checkbox" data-bar-cycle-check="essay-model-wills-1"></td>
-                    <td><input aria-label="Wills model essay 2" type="checkbox" data-bar-cycle-check="essay-model-wills-2"></td>
-                    <td><input aria-label="Wills model essay 3" type="checkbox" data-bar-cycle-check="essay-model-wills-3"></td>
-                    <td><input aria-label="Wills model essay 4" type="checkbox" data-bar-cycle-check="essay-model-wills-4"></td>
-                    <td><input aria-label="Wills model essay 5" type="checkbox" data-bar-cycle-check="essay-model-wills-5"></td>
-                    <td><input aria-label="Wills model essay 6" type="checkbox" data-bar-cycle-check="essay-model-wills-6"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Trusts</th>
-                    <td><input aria-label="Trusts model essay 1" type="checkbox" data-bar-cycle-check="essay-model-trusts-1"></td>
-                    <td><input aria-label="Trusts model essay 2" type="checkbox" data-bar-cycle-check="essay-model-trusts-2"></td>
-                    <td><input aria-label="Trusts model essay 3" type="checkbox" data-bar-cycle-check="essay-model-trusts-3"></td>
-                    <td><input aria-label="Trusts model essay 4" type="checkbox" data-bar-cycle-check="essay-model-trusts-4"></td>
-                    <td><input aria-label="Trusts model essay 5" type="checkbox" data-bar-cycle-check="essay-model-trusts-5"></td>
-                    <td><input aria-label="Trusts model essay 6" type="checkbox" data-bar-cycle-check="essay-model-trusts-6"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Constitutional Law</th>
-                    <td><input aria-label="Constitutional Law model essay 1" type="checkbox" data-bar-cycle-check="essay-model-constitutional-law-1"></td>
-                    <td><input aria-label="Constitutional Law model essay 2" type="checkbox" data-bar-cycle-check="essay-model-constitutional-law-2"></td>
-                    <td><input aria-label="Constitutional Law model essay 3" type="checkbox" data-bar-cycle-check="essay-model-constitutional-law-3"></td>
-                    <td><input aria-label="Constitutional Law model essay 4" type="checkbox" data-bar-cycle-check="essay-model-constitutional-law-4"></td>
-                    <td><input aria-label="Constitutional Law model essay 5" type="checkbox" data-bar-cycle-check="essay-model-constitutional-law-5"></td>
-                    <td><input aria-label="Constitutional Law model essay 6" type="checkbox" data-bar-cycle-check="essay-model-constitutional-law-6"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Contracts</th>
-                    <td><input aria-label="Contracts model essay 1" type="checkbox" data-bar-cycle-check="essay-model-contracts-1"></td>
-                    <td><input aria-label="Contracts model essay 2" type="checkbox" data-bar-cycle-check="essay-model-contracts-2"></td>
-                    <td><input aria-label="Contracts model essay 3" type="checkbox" data-bar-cycle-check="essay-model-contracts-3"></td>
-                    <td><input aria-label="Contracts model essay 4" type="checkbox" data-bar-cycle-check="essay-model-contracts-4"></td>
-                    <td><input aria-label="Contracts model essay 5" type="checkbox" data-bar-cycle-check="essay-model-contracts-5"></td>
-                    <td><input aria-label="Contracts model essay 6" type="checkbox" data-bar-cycle-check="essay-model-contracts-6"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Torts</th>
-                    <td><input aria-label="Torts model essay 1" type="checkbox" data-bar-cycle-check="essay-model-torts-1"></td>
-                    <td><input aria-label="Torts model essay 2" type="checkbox" data-bar-cycle-check="essay-model-torts-2"></td>
-                    <td><input aria-label="Torts model essay 3" type="checkbox" data-bar-cycle-check="essay-model-torts-3"></td>
-                    <td><input aria-label="Torts model essay 4" type="checkbox" data-bar-cycle-check="essay-model-torts-4"></td>
-                    <td><input aria-label="Torts model essay 5" type="checkbox" data-bar-cycle-check="essay-model-torts-5"></td>
-                    <td><input aria-label="Torts model essay 6" type="checkbox" data-bar-cycle-check="essay-model-torts-6"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Criminal Law & Procedure</th>
-                    <td><input aria-label="Criminal Law & Procedure model essay 1" type="checkbox" data-bar-cycle-check="essay-model-criminal-law-procedure-1"></td>
-                    <td><input aria-label="Criminal Law & Procedure model essay 2" type="checkbox" data-bar-cycle-check="essay-model-criminal-law-procedure-2"></td>
-                    <td><input aria-label="Criminal Law & Procedure model essay 3" type="checkbox" data-bar-cycle-check="essay-model-criminal-law-procedure-3"></td>
-                    <td><input aria-label="Criminal Law & Procedure model essay 4" type="checkbox" data-bar-cycle-check="essay-model-criminal-law-procedure-4"></td>
-                    <td><input aria-label="Criminal Law & Procedure model essay 5" type="checkbox" data-bar-cycle-check="essay-model-criminal-law-procedure-5"></td>
-                    <td><input aria-label="Criminal Law & Procedure model essay 6" type="checkbox" data-bar-cycle-check="essay-model-criminal-law-procedure-6"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Evidence</th>
-                    <td><input aria-label="Evidence model essay 1" type="checkbox" data-bar-cycle-check="essay-model-evidence-1"></td>
-                    <td><input aria-label="Evidence model essay 2" type="checkbox" data-bar-cycle-check="essay-model-evidence-2"></td>
-                    <td><input aria-label="Evidence model essay 3" type="checkbox" data-bar-cycle-check="essay-model-evidence-3"></td>
-                    <td><input aria-label="Evidence model essay 4" type="checkbox" data-bar-cycle-check="essay-model-evidence-4"></td>
-                    <td><input aria-label="Evidence model essay 5" type="checkbox" data-bar-cycle-check="essay-model-evidence-5"></td>
-                    <td><input aria-label="Evidence model essay 6" type="checkbox" data-bar-cycle-check="essay-model-evidence-6"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Business Associations</th>
-                    <td><input aria-label="Business Associations model essay 1" type="checkbox" data-bar-cycle-check="essay-model-business-associations-1"></td>
-                    <td><input aria-label="Business Associations model essay 2" type="checkbox" data-bar-cycle-check="essay-model-business-associations-2"></td>
-                    <td><input aria-label="Business Associations model essay 3" type="checkbox" data-bar-cycle-check="essay-model-business-associations-3"></td>
-                    <td><input aria-label="Business Associations model essay 4" type="checkbox" data-bar-cycle-check="essay-model-business-associations-4"></td>
-                    <td><input aria-label="Business Associations model essay 5" type="checkbox" data-bar-cycle-check="essay-model-business-associations-5"></td>
-                    <td><input aria-label="Business Associations model essay 6" type="checkbox" data-bar-cycle-check="essay-model-business-associations-6"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Remedies</th>
-                    <td><input aria-label="Remedies model essay 1" type="checkbox" data-bar-cycle-check="essay-model-remedies-1"></td>
-                    <td><input aria-label="Remedies model essay 2" type="checkbox" data-bar-cycle-check="essay-model-remedies-2"></td>
-                    <td><input aria-label="Remedies model essay 3" type="checkbox" data-bar-cycle-check="essay-model-remedies-3"></td>
-                    <td><input aria-label="Remedies model essay 4" type="checkbox" data-bar-cycle-check="essay-model-remedies-4"></td>
-                    <td><input aria-label="Remedies model essay 5" type="checkbox" data-bar-cycle-check="essay-model-remedies-5"></td>
-                    <td><input aria-label="Remedies model essay 6" type="checkbox" data-bar-cycle-check="essay-model-remedies-6"></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+.bcc-help-text {
+  margin: 0 0 12px;
+  color: #666666;
+  font-size: 12px;
+  line-height: 1.4;
+}
 
-</div>
+.bcc-study-log-setup-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 
-</section>
-<section class="bcc-view" id="stats">
-<div class="bcc-grid">
-<div class="bcc-card">
-<div class="bcc-card-label">Essays Done</div>
-<div class="bcc-card-number" id="stats-essays">0</div>
-</div>
-<div class="bcc-card">
-<div class="bcc-card-label">MCQs Done</div>
-<div class="bcc-card-number" id="stats-mcqs">0</div>
-</div>
-<div class="bcc-card">
-<div class="bcc-card-label">Flashcards Done</div>
-<div class="bcc-card-number" id="stats-flashcards">0</div>
-</div>
-<div class="bcc-card">
-<div class="bcc-card-label">Pending Reviews</div>
-<div class="bcc-card-number" id="stats-reviews">0</div>
-</div>
-</div>
-<div class="bcc-panel bcc-progress-panel">
-<div class="bcc-progress-heading">
-<span>Today's minimums completed</span>
-<strong id="stats-overall-progress-label">0%</strong>
-</div>
-<div aria-hidden="true" class="bcc-progress-track">
-<div class="bcc-progress-fill" id="stats-overall-progress-bar"></div>
-</div>
-</div>
-<div class="bcc-panel">
-<h2>Study Progress</h2>
-<div class="bcc-item bcc-progress-summary-item">
-<div class="bcc-item-title">Essays</div>
-<div class="bcc-progress-summary-metrics">
-<span><strong id="stats-essay-learned">0</strong> Learned</span>
-<span><strong id="stats-essay-cycles">0</strong> Cycles Completed</span>
-<span><strong id="stats-essay-review-events">0</strong> Review Events</span>
-</div>
-</div>
-<div class="bcc-item bcc-progress-summary-item">
-<div class="bcc-item-title">MCQ Sessions</div>
-<div class="bcc-progress-summary-metrics">
-<span><strong id="stats-mcq-learned">0</strong> Learned</span>
-<span><strong id="stats-mcq-cycles">0</strong> Cycles Completed</span>
-<span><strong id="stats-mcq-review-events">0</strong> Review Events</span>
-</div>
-</div>
-<div class="bcc-item bcc-progress-summary-item">
-<div class="bcc-item-title">Flashcard Sessions</div>
-<div class="bcc-progress-summary-metrics">
-<span><strong id="stats-flashcard-learned">0</strong> Learned</span>
-<span><strong id="stats-flashcard-cycles">0</strong> Cycles Completed</span>
-<span><strong id="stats-flashcard-review-events">0</strong> Review Events</span>
-</div>
-</div>
-</div>
-</section>
+.bcc-study-log-setup-actions,
+.bcc-study-log-entry-actions {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 
-<section class="bcc-view" id="settings">
-<div class="bcc-settings-header">
-<div>
-<h1>Settings</h1>
-<p>Manage goals, review timing, courses, sources, backups, and account access.</p>
-</div>
-</div>
-<div class="bcc-panel">
-<h2>Daily Minimums</h2>
-<form class="bcc-settings-goals-grid" id="daily-goals-form">
-<label>
-              Essays per day
-              <input id="settings-essay-goal" min="0" step="1" type="number"/>
-</label>
-<label>
-              MCQs per day
-              <input id="settings-mcq-goal" min="0" step="1" type="number"/>
-</label>
-<label>
-              Flashcards per day
-              <input id="settings-flashcard-goal" min="0" step="1" type="number"/>
-</label>
-<div class="bcc-settings-actions">
-<button type="submit">Save Minimums</button>
-</div>
-</form>
-<div class="bcc-auth-message" id="daily-goals-message"></div>
-</div>
-<div class="bcc-panel">
-<h2>Spaced Repetition</h2>
-<form class="bcc-compact-review-form" id="review-frequency-form">
-<label for="review-frequency-input">Review Days</label>
-<input aria-describedby="review-frequency-help" id="review-frequency-input" inputmode="numeric" type="text" value="1, 3, 7, 30"/>
-<div class="bcc-settings-actions">
-<button type="submit">Save Schedule</button>
-<button class="bcc-secondary-button" id="review-frequency-reset-button" type="button">
-                Use Recommended
-              </button>
-</div>
-<div class="bcc-review-recommended-line">
-              Recommended: <strong>1, 3, 7, 30 days</strong>
-</div>
-<div class="bcc-help-text" id="review-frequency-help">
-              Positive whole-number days separated by commas. New entries use this schedule; existing review dates do not change.
-            </div>
-<div class="bcc-auth-message" id="review-frequency-message"></div>
-</form>
-</div>
-<div class="bcc-panel">
-<h2>Customize Courses and Sources</h2>
-<p class="bcc-help-text">
-            Add your own courses or subjects and source names. Custom entries appear in the Essay,
-            MCQ, and Flashcard dropdowns and are saved to your account.
-          </p>
-<div class="bcc-customization-grid">
-<section class="bcc-customization-section">
-<h3>Courses / Subjects</h3>
-<form class="bcc-inline-add-form" id="custom-subject-form">
-<input id="custom-subject-input" placeholder="Course or subject name" type="text"/>
-<button type="submit">Add</button>
-</form>
-<div class="bcc-custom-item-list" id="custom-subject-list"></div>
-</section>
-<section class="bcc-customization-section">
-<h3>Essay Sources</h3>
-<form class="bcc-inline-add-form" id="custom-essay-source-form">
-<input id="custom-essay-source-input" placeholder="Essay source" type="text"/>
-<button type="submit">Add</button>
-</form>
-<div class="bcc-custom-item-list" id="custom-essay-source-list"></div>
-</section>
-<section class="bcc-customization-section">
-<h3>MCQ Sources</h3>
-<form class="bcc-inline-add-form" id="custom-mcq-source-form">
-<input id="custom-mcq-source-input" placeholder="MCQ source" type="text"/>
-<button type="submit">Add</button>
-</form>
-<div class="bcc-custom-item-list" id="custom-mcq-source-list"></div>
-</section>
-<section class="bcc-customization-section">
-<h3>Flashcard Sources</h3>
-<form class="bcc-inline-add-form" id="custom-flashcard-source-form">
-<input id="custom-flashcard-source-input" placeholder="Flashcard source" type="text"/>
-<button type="submit">Add</button>
-</form>
-<div class="bcc-custom-item-list" id="custom-flashcard-source-list"></div>
-</section>
-</div>
-<div class="bcc-auth-message" id="customization-message"></div>
-</div>
-<div class="bcc-panel">
-<h2>Backup</h2>
-<div class="bcc-backup-actions">
-<button class="bcc-session-button" id="export-backup-button">Export Backup</button>
-<label class="bcc-session-button" for="import-backup-input">Import Backup</label>
-<input accept=".json" id="import-backup-input" type="file"/>
-</div>
-</div>
-<div class="bcc-panel">
-<h2>Account</h2>
-<div class="bcc-account-row">
-<div>
-<div class="bcc-account-label">Signed in as</div>
-<div class="bcc-account-value" id="settings-account-email"></div>
-<div class="bcc-item-meta" id="settings-cloud-status"></div>
-</div>
-<button class="bcc-secondary-button" id="settings-sign-out-button" type="button">Sign Out</button>
-</div>
-</div>
-</section>
-</main>
-</div>
-<footer class="bcc-footer">BarOS v1.1.1</footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-<script src="app.js"></script>
-</body>
-</html>
+.bcc-study-log-setup-actions {
+  grid-column: 1 / -1;
+}
+
+.bcc-study-log-setup-actions button,
+.bcc-study-log-entry-actions button {
+  height: 34px;
+}
+
+.bcc-study-log-heading-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.bcc-study-log-toolbar,
+.bcc-entry-button-row {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.bcc-study-log-entry-grid {
+  grid-template-columns: 1.2fr 1.5fr 0.7fr 0.7fr 2fr auto;
+  align-items: end;
+}
+
+.bcc-study-log-entry-grid label {
+  min-width: 0;
+}
+
+.bcc-study-log-entry-actions {
+  align-self: end;
+}
+
+.bcc-study-log-entry-actions button {
+  white-space: nowrap;
+}
+
+.bcc-study-log-summary-grid .bcc-card-number {
+  font-size: 28px;
+}
+
+.bcc-study-log-table-wrap {
+  overflow-x: auto;
+}
+
+.bcc-study-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 650px;
+}
+
+.bcc-study-log-table th,
+.bcc-study-log-table td {
+  padding: 5px 8px;
+  border: 1px solid #dddddd;
+  text-align: left;
+  font-size: 12px;
+}
+
+.bcc-study-log-table th {
+  background: #f5f5f5;
+  font-weight: 500;
+}
+
+.bcc-study-log-activity-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.bcc-study-log-activity-number {
+  margin-top: 5px;
+  font-size: 25px;
+  font-weight: 300;
+}
+
+@media (max-width: 980px) {
+  .bcc-study-log-entry-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bcc-study-log-entry-actions,
+  .bcc-study-log-notes-field {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .bcc-study-log-setup-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bcc-study-log-activity-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bcc-study-log-heading-row {
+    display: block;
+  }
+
+  .bcc-study-log-toolbar {
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 460px) {
+  .bcc-study-log-setup-grid,
+  .bcc-study-log-entry-grid,
+  .bcc-study-log-activity-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bcc-study-log-entry-actions,
+  .bcc-study-log-notes-field {
+    grid-column: auto;
+  }
+
+  .bcc-study-log-toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.bcc-study-log-full-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.bcc-study-log-week-card {
+  border: 1px solid #cfcfcf;
+  background: #ffffff;
+}
+
+.bcc-study-log-week-summary {
+  display: grid;
+  grid-template-columns: 1.1fr 1.6fr repeat(3, minmax(120px, 1fr));
+  align-items: stretch;
+  border-bottom: 1px solid #111111;
+  background: #9fd4e4;
+}
+
+.bcc-study-log-week-summary > div {
+  padding: 5px 8px;
+  border-right: 1px solid #111111;
+  font-size: 12px;
+}
+
+.bcc-study-log-week-summary > div:last-child {
+  border-right: none;
+}
+
+.bcc-study-log-week-summary span {
+  display: block;
+  font-size: 10px;
+  color: #333333;
+}
+
+.bcc-study-log-week-summary strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+}
+
+.bcc-study-log-matrix {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.bcc-study-log-matrix th,
+.bcc-study-log-matrix td {
+  border: 1px solid #d2d2d2;
+  padding: 5px 6px;
+  text-align: center;
+  font-size: 11px;
+}
+
+.bcc-study-log-matrix thead th {
+  background: #f2f2f2;
+  font-weight: 600;
+}
+
+.bcc-study-log-matrix tbody th {
+  width: 180px;
+  text-align: right;
+  background: #fafafa;
+  font-weight: 600;
+}
+
+.bcc-study-log-matrix tbody tr:nth-child(odd) td {
+  background: #f7f7f7;
+}
+
+@media (max-width: 760px) {
+  .bcc-study-log-week-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .bcc-study-log-week-summary > div {
+    border-bottom: 1px solid #111111;
+  }
+}
+
+
+.bcc-study-log-preview-heading {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #e5e5e5;
+}
+
+#study-log-setup-panel .bcc-study-log-full-grid {
+  margin-top: 12px;
+}
+
+#study-log-setup-panel .bcc-study-log-week-card {
+  background: #ffffff;
+}
+
+#study-log-active-area[hidden] + * {
+  display: none;
+}
+
+
+.bcc-week-stepper {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+  align-items: stretch;
+}
+
+.bcc-week-stepper input {
+  text-align: center;
+  border-left: none;
+  border-right: none;
+}
+
+.bcc-stepper-button {
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #111111;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.bcc-stepper-button:hover {
+  background: #f2f2f2;
+}
+
+.bcc-study-log-summary-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+@media (max-width: 980px) {
+  .bcc-study-log-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .bcc-study-log-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 460px) {
+  .bcc-study-log-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.bcc-study-time-input {
+  width: 100%;
+  min-width: 58px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #111111;
+  padding: 5px 3px;
+  font: inherit;
+  font-size: 11px;
+  text-align: center;
+}
+
+.bcc-study-time-input:hover:not(:disabled) {
+  border-color: #b8b8b8;
+  background: #ffffff;
+}
+
+.bcc-study-time-input:focus {
+  outline: 2px solid #111111;
+  outline-offset: -1px;
+  border-color: #111111;
+  background: #ffffff;
+}
+
+.bcc-study-time-input:disabled {
+  color: #777777;
+  cursor: not-allowed;
+}
+
+.bcc-study-row-total {
+  font-weight: 600;
+  background: #f4f4f4;
+}
+
+.bcc-study-log-instructions {
+  position: sticky;
+  top: 51px;
+  z-index: 4;
+}
+
+
+/* User-managed spaced-repetition schedule */
+
+.bcc-review-recommendation {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-left: 3px solid #111111;
+  background: #f5f5f5;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.bcc-review-frequency-form {
+  display: grid;
+  gap: 8px;
+  max-width: 640px;
+}
+
+.bcc-review-frequency-form label {
+  display: grid;
+  gap: 3px;
+  font-size: 12px;
+  color: #444444;
+}
+
+.bcc-review-frequency-form input {
+  width: 100%;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #111111;
+  padding: 7px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bcc-review-frequency-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bcc-review-frequency-actions button {
+  border: 1px solid #111111;
+  background: #111111;
+  color: #ffffff;
+  padding: 8px 13px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.bcc-review-frequency-actions .bcc-secondary-button {
+  border-color: #cccccc;
+  background: #ffffff;
+  color: #222222;
+}
+
+@media (max-width: 460px) {
+  .bcc-review-frequency-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Custom courses and source lists */
+
+.bcc-customization-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.bcc-customization-section {
+  border: 1px solid #e5e5e5;
+  padding: 12px;
+}
+
+.bcc-customization-section h3 {
+  margin: 0 0 9px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bcc-inline-add-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px;
+}
+
+.bcc-inline-add-form input {
+  width: 100%;
+  border: 1px solid #cccccc;
+  padding: 7px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bcc-inline-add-form button {
+  border: 1px solid #111111;
+  background: #111111;
+  color: #ffffff;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.bcc-custom-item-list {
+  margin-top: 10px;
+}
+
+.bcc-custom-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid #eeeeee;
+  padding: 6px 0;
+  font-size: 12px;
+}
+
+.bcc-custom-item:first-child {
+  border-top: none;
+}
+
+.bcc-custom-item .bcc-small-button {
+  margin-top: 0;
+}
+
+@media (max-width: 760px) {
+  .bcc-customization-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Final UI polish */
+
+/* Reviews */
+.bcc-review-settings-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.bcc-review-recommendation {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #111111;
+  background: #f7f7f7;
+}
+
+.bcc-review-setting-label {
+  font-size: 11px;
+  color: #666666;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bcc-review-setting-value {
+  margin-top: 5px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.bcc-review-frequency-form {
+  display: grid;
+  gap: 8px;
+  max-width: none;
+}
+
+.bcc-review-frequency-form > label {
+  display: block;
+  font-size: 12px;
+  color: #444444;
+}
+
+.bcc-review-frequency-control-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto auto;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.bcc-review-frequency-control-row input {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid #cccccc;
+  padding: 5px 8px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bcc-review-frequency-control-row button {
+  min-height: 38px;
+  border: 1px solid #111111;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.bcc-review-frequency-control-row button[type="submit"] {
+  background: #111111;
+  color: #ffffff;
+}
+
+.bcc-review-frequency-control-row .bcc-secondary-button {
+  background: #ffffff;
+  color: #111111;
+  border-color: #cccccc;
+}
+
+/* Study Log */
+.bcc-study-log-setup-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 16px;
+  align-items: end;
+}
+
+.bcc-study-log-setup-grid > label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  font-size: 12px;
+  color: #444444;
+}
+
+.bcc-study-log-setup-grid > label > input {
+  width: 100%;
+  height: 38px;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #111111;
+  padding: 5px 8px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bcc-week-stepper {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  width: 100%;
+  height: 38px;
+}
+
+.bcc-week-stepper input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  border: 1px solid #cccccc !important;
+  border-left: none !important;
+  border-right: none !important;
+  padding: 7px 8px;
+  text-align: center;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bcc-week-stepper .bcc-stepper-button {
+  flex: 0 0 40px;
+  width: 40px !important;
+  height: 38px !important;
+  min-width: 40px;
+  margin: 0 !important;
+  padding: 0 !important;
+  justify-self: auto !important;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #111111;
+  font-size: 18px;
+  line-height: 36px;
+  text-align: center;
+}
+
+.bcc-study-log-setup-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.bcc-study-log-setup-actions button {
+  min-height: 38px;
+  margin: 0;
+  padding: 8px 15px;
+  border: 1px solid #111111;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.bcc-study-log-setup-actions .bcc-primary-button {
+  background: #111111;
+  color: #ffffff;
+}
+
+.bcc-study-log-setup-actions .bcc-secondary-button {
+  background: #ffffff;
+  color: #111111;
+  border-color: #cccccc;
+}
+
+.bcc-study-log-preview-heading {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.bcc-study-log-preview-heading h2 {
+  margin-bottom: 4px;
+}
+
+.bcc-study-log-week-card {
+  overflow: hidden;
+}
+
+.bcc-study-log-week-summary {
+  grid-template-columns: 0.8fr 1.35fr repeat(3, minmax(105px, 1fr));
+}
+
+.bcc-study-log-week-summary > div {
+  min-height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .bcc-review-settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .bcc-review-frequency-control-row {
+    grid-template-columns: 1fr;
+  }
+
+  .bcc-study-log-setup-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .bcc-study-log-setup-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bcc-study-log-setup-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .bcc-study-log-setup-actions button {
+    width: 100%;
+  }
+}
+
+
+/* BarOS version footer */
+.bcc-footer {
+  padding: 14px 20px 20px;
+  text-align: center;
+  font-size: 11px;
+  color: #888888;
+}
+
+/* Matching week and hour steppers */
+.bcc-hour-stepper {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  height: 38px;
+}
+
+.bcc-hour-stepper input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  border: 1px solid #cccccc !important;
+  border-left: none !important;
+  border-right: none !important;
+  padding: 7px 8px;
+  text-align: center;
+  font: inherit;
+  font-size: 13px;
+}
+
+.bcc-hour-stepper .bcc-stepper-button {
+  flex: 0 0 40px;
+  width: 40px !important;
+  height: 38px !important;
+  min-width: 40px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #111111;
+  font-size: 18px;
+  line-height: 36px;
+  text-align: center;
+}
+
+
+/* Uniform spaced-repetition settings block */
+.bcc-review-settings-layout {
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 24px;
+  padding: 16px 18px;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #111111;
+  background: #f7f7f7;
+  align-items: center;
+}
+
+.bcc-review-recommendation {
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-left: none;
+  background: transparent;
+}
+
+.bcc-review-frequency-form {
+  padding: 0;
+  background: transparent;
+}
+
+.bcc-review-frequency-control-row {
+  align-items: stretch;
+}
+
+.bcc-review-frequency-control-row input,
+.bcc-review-frequency-control-row button {
+  height: 40px;
+}
+
+#review-frequency-help {
+  margin-top: 2px;
+}
+
+@media (max-width: 900px) {
+  .bcc-review-settings-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    align-items: stretch;
+  }
+}
+
+
+/* v1.0.4 compact review settings */
+.bcc-review-settings-layout{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+.bcc-review-recommendation{
+  order:2;
+  border:none;
+  background:transparent;
+  padding:0;
+}
+.bcc-review-frequency-form{
+  order:1;
+}
+.bcc-review-frequency-actions{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+
+/* BarOS v1.1.0 interface system */
+:root {
+  --bcc-border: #dedede;
+  --bcc-soft: #f7f7f7;
+  --bcc-muted: #666666;
+  --bcc-control-height: 40px;
+}
+
+.bcc-main {
+  max-width: 1440px;
+  padding-top: 18px;
+}
+
+.bcc-panel {
+  border-color: var(--bcc-border);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+
+.bcc-panel h2 {
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.bcc-card {
+  border-color: var(--bcc-border);
+  min-height: 92px;
+  padding: 16px 18px;
+}
+
+.bcc-card-number {
+  margin-top: 8px;
+}
+
+.bcc-form input,
+.bcc-form select,
+.bcc-form textarea,
+.bcc-inline-add-form input,
+.bcc-settings-goals-grid input,
+.bcc-compact-review-form input {
+  border-color: #cfcfcf;
+  border-radius: 0;
+}
+
+.bcc-form input,
+.bcc-form select,
+.bcc-inline-add-form input,
+.bcc-settings-goals-grid input,
+.bcc-compact-review-form input {
+  min-height: var(--bcc-control-height);
+}
+
+.bcc-entry-form {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.bcc-entry-form label {
+  min-width: 0;
+}
+
+.bcc-entry-form .bcc-field-wide {
+  grid-column: 1 / -1;
+}
+
+.bcc-entry-form textarea {
+  min-height: 76px;
+}
+
+.bcc-entry-form > button[type="submit"] {
+  min-height: var(--bcc-control-height);
+  align-self: end;
+}
+
+.bcc-essay-form label:nth-child(1),
+.bcc-essay-form label:nth-child(2) {
+  grid-column: span 3;
+}
+
+.bcc-essay-form label:nth-child(4),
+.bcc-essay-form label:nth-child(5),
+.bcc-essay-form label:nth-child(6) {
+  grid-column: span 2;
+}
+
+.bcc-mcq-form label:nth-child(1),
+.bcc-mcq-form label:nth-child(2) {
+  grid-column: span 3;
+}
+
+.bcc-mcq-form label:nth-child(3),
+.bcc-mcq-form label:nth-child(4),
+.bcc-mcq-form label:nth-child(5) {
+  grid-column: span 2;
+}
+
+.bcc-flashcard-form label:nth-child(1),
+.bcc-flashcard-form label:nth-child(2) {
+  grid-column: span 3;
+}
+
+.bcc-flashcard-form label:nth-child(3),
+.bcc-flashcard-form label:nth-child(4) {
+  grid-column: span 3;
+}
+
+.bcc-settings-header {
+  margin: 0 0 14px;
+}
+
+.bcc-settings-header h1 {
+  margin-bottom: 4px;
+}
+
+.bcc-settings-header p {
+  margin: 0;
+  color: var(--bcc-muted);
+  font-size: 13px;
+}
+
+.bcc-settings-goals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.bcc-settings-goals-grid label,
+.bcc-compact-review-form > label {
+  display: grid;
+  gap: 5px;
+  font-size: 12px;
+  color: #444444;
+}
+
+.bcc-settings-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bcc-settings-actions button,
+.bcc-compact-review-form button {
+  min-height: var(--bcc-control-height);
+  border: 1px solid #111111;
+  background: #111111;
+  color: #ffffff;
+  padding: 8px 15px;
+  cursor: pointer;
+}
+
+.bcc-settings-actions .bcc-secondary-button,
+.bcc-compact-review-form .bcc-secondary-button {
+  border-color: #cccccc;
+  background: #ffffff;
+  color: #111111;
+}
+
+.bcc-compact-review-form {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto;
+  gap: 9px 12px;
+  align-items: end;
+}
+
+.bcc-compact-review-form > label {
+  grid-column: 1;
+}
+
+.bcc-compact-review-form > input {
+  grid-column: 1;
+  width: 100%;
+  padding: 5px 8px;
+}
+
+.bcc-compact-review-form > .bcc-settings-actions {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.bcc-review-recommended-line,
+.bcc-compact-review-form .bcc-help-text,
+.bcc-compact-review-form .bcc-auth-message {
+  grid-column: 1 / -1;
+}
+
+.bcc-review-recommended-line {
+  font-size: 12px;
+  color: #444444;
+}
+
+.bcc-progress-panel {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.bcc-progress-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 9px;
+  font-size: 12px;
+}
+
+.bcc-progress-track {
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+  background: #ececec;
+}
+
+.bcc-progress-fill {
+  width: 0;
+  height: 100%;
+  background: #111111;
+  transition: width 180ms ease;
+}
+
+.bcc-account-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+}
+
+.bcc-account-label {
+  font-size: 11px;
+  color: var(--bcc-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.bcc-account-value {
+  margin-top: 4px;
+  font-size: 15px;
+}
+
+#settings .bcc-customization-grid {
+  gap: 12px;
+}
+
+#settings .bcc-customization-section {
+  background: var(--bcc-soft);
+}
+
+#settings .bcc-backup-actions .bcc-session-button {
+  min-height: var(--bcc-control-height);
+  height: auto;
+}
+
+@media (max-width: 1000px) {
+  .bcc-entry-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bcc-entry-form label,
+  .bcc-entry-form .bcc-field-wide,
+  .bcc-essay-form label:nth-child(n),
+  .bcc-mcq-form label:nth-child(n),
+  .bcc-flashcard-form label:nth-child(n) {
+    grid-column: span 1;
+  }
+
+  .bcc-entry-form .bcc-field-wide {
+    grid-column: 1 / -1;
+  }
+
+  .bcc-settings-goals-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bcc-settings-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .bcc-entry-form,
+  .bcc-settings-goals-grid,
+  .bcc-compact-review-form {
+    grid-template-columns: 1fr;
+  }
+
+  .bcc-entry-form .bcc-field-wide,
+  .bcc-compact-review-form > label,
+  .bcc-compact-review-form > input,
+  .bcc-compact-review-form > .bcc-settings-actions,
+  .bcc-review-recommended-line,
+  .bcc-compact-review-form .bcc-help-text,
+  .bcc-compact-review-form .bcc-auth-message {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .bcc-account-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* ===== Ultra Compact Reviews ===== */
+.bcc-review-row{
+  padding:2px 0 !important;
+  margin:0 !important;
+}
+
+.bcc-review-grid{
+  display:grid !important;
+  grid-template-columns:repeat(auto-fill,160px) !important;
+  justify-content:start !important;
+  gap:8px !important;
+  margin-top:4px !important;
+}
+
+.bcc-review-cell{
+  min-height:46px !important;
+  padding:4px !important;
+  border-radius:4px !important;
+}
+
+.bcc-review-label{
+  font-size:9px !important;
+  margin-bottom:2px !important;
+  line-height:1 !important;
+}
+
+.bcc-review-date{
+  font-size:11px !important;
+  margin-bottom:2px !important;
+  line-height:1.1 !important;
+}
+
+.bcc-review-cell .bcc-small-button{
+  padding:2px 4px !important;
+  font-size:9px !important;
+  line-height:1.1 !important;
+  margin-top:2px !important;
+  min-height:18px !important;
+}
+
+.bcc-item{
+  padding:4px 0 !important;
+}
+
+.bcc-item-title{
+  font-size:13px !important;
+  margin-bottom:1px !important;
+}
+
+.bcc-item-meta,
+.bcc-rating{
+  font-size:10px !important;
+  line-height:1.15 !important;
+  margin-top:1px !important;
+}
+
+/* Review lifecycle summaries */
+.bcc-review-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 14px;
+  margin-top: 5px;
+  font-size: 11px;
+  color: #555555;
+}
+
+.bcc-review-summary strong {
+  color: #111111;
+  font-weight: 500;
+}
+
+.bcc-review-grid {
+  grid-template-columns: repeat(auto-fill, 160px);
+  justify-content: start;
+  align-items: center;
+}
+
+.bcc-review-chip {
+  width: fit-content;
+  min-width: 48px;
+  padding: 5px 8px;
+  border: 1px solid #d8d8d8;
+  border-radius: 999px;
+  background: #f3f3f3;
+  color: #555555;
+  font-size: 10px;
+  text-align: center;
+}
+
+.bcc-progress-summary-item {
+  padding: 10px 0;
+}
+
+.bcc-progress-summary-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 20px;
+  margin-top: 5px;
+  font-size: 12px;
+  color: #555555;
+}
+
+.bcc-progress-summary-metrics strong {
+  color: #111111;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+@media (max-width: 700px) {
+  .bcc-review-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .bcc-progress-summary-metrics {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+/* ========================================
+   BAR CYCLE — TWO-DAY MCQ ROTATION
+   ======================================== */
+
+.bar-mcq-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.bar-mcq-heading h2 {
+    margin: 0;
+}
+
+.bar-mcq-clear-button {
+    width: auto;
+    padding: 7px 12px;
+    font-size: 12px;
+    background: #fff;
+    color: #555;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.bar-mcq-clear-button:hover {
+    background: #f4f4f4;
+}
+
+.bar-mcq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 22px;
+}
+
+.bar-mcq-column {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.bar-mcq-column h3 {
+    margin: 0;
+    padding: 14px 18px;
+    font-size: 18px;
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+    background: #f7f7f7;
+}
+
+.bar-mcq-column h3 span {
+    margin-left: 6px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #777;
+}
+
+.bar-mcq-column label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 43px;
+    padding: 8px 18px;
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.bar-mcq-column label:hover {
+    background: #fafafa;
+}
+
+.bar-mcq-column input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+    cursor: pointer;
+}
+
+.bar-mcq-column label:has(input:checked) {
+    color: #888;
+    text-decoration: line-through;
+    background: #fafafa;
+}
+
+.bar-mcq-total {
+    padding: 12px 18px;
+    font-size: 15px;
+    font-weight: 700;
+    background: #f7f7f7;
+}
+
+@media (max-width: 800px) {
+
+    .bar-mcq-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+/* ========================================
+   BAR CYCLE LAYOUT
+   ======================================== */
+
+.bar-cycle-bottom {
+
+    display: grid;
+
+    grid-template-columns: 240px 1fr;
+
+    gap: 20px;
+
+    margin-top: 20px;
+
+    align-items: start;
+
+}
+
+@media (max-width: 1100px) {
+
+    .bar-cycle-bottom {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+/* Left Bar Cycle panel */
+
+.bar-cycle-bottom > .bcc-panel:first-child{
+
+    padding:14px;
+
+}
+
+.bar-cycle-bottom > .bcc-panel:first-child h2{
+
+    font-size:16px;
+
+    margin-bottom:10px;
+
+}
+
+.bar-cycle-bottom > .bcc-panel:first-child label{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:8px;
+
+    font-size:13px;
+
+    line-height:1.35;
+
+    margin-bottom:8px;
+
+}
+
+
+/* ========================================
+   BAR CYCLE — 13-DAY SUBJECT REVIEW TABLE
+   ======================================== */
+
+.bar-review-cycle-panel {
+  margin-top: 20px;
+}
+
+.bar-review-cycle-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+.bar-review-cycle-heading .bcc-help-text {
+  margin-bottom: 0;
+  max-width: 820px;
+}
+
+.bar-cycle-clear-button {
+  flex: 0 0 auto;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  color: #222222;
+  padding: 6px 10px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.bar-review-cycle-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.bar-review-cycle-table {
+  width: 100%;
+  min-width: 960px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.bar-review-cycle-table th,
+.bar-review-cycle-table td {
+  border: 1px solid #e0e0e0;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 12px;
+}
+
+.bar-review-cycle-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+.bar-review-cycle-table th:first-child,
+.bar-review-cycle-table td:first-child {
+  width: 90px;
+  white-space: nowrap;
+}
+
+.bar-review-cycle-table label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  line-height: 1.3;
+}
+
+.bar-review-cycle-table input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.bar-review-cycle-table label:has(input:checked) {
+  color: #888888;
+  text-decoration: line-through;
+}
+
+.bar-review-cycle-table tr.today td {
+  background: #f2f2f2;
+  font-weight: 500;
+}
+
+.bar-review-cycle-table tr.today td:first-child::after {
+  content: "  TODAY";
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #666666;
+}
+
+@media (max-width: 760px) {
+  .bar-review-cycle-heading {
+    display: block;
+  }
+
+  .bar-cycle-clear-button {
+    margin-top: 10px;
+  }
+}
+
+
+/* ========================================
+   BAR CYCLE — SUBJECT CYCLE + MODEL ESSAYS
+   ======================================== */
+
+.bar-cycle-intro {
+  margin-bottom: 10px;
+}
+
+.bar-cycle-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(360px, .85fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.bar-cycle-workspace > .bcc-panel {
+  min-width: 0;
+  margin-top: 0;
+}
+
+.bar-review-cycle-heading {
+  gap: 12px;
+}
+
+.bar-review-cycle-heading h2,
+.model-essay-heading h2 {
+  margin-bottom: 4px;
+}
+
+.bar-review-cycle-wrap,
+.model-essay-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.bar-review-cycle-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.bar-review-cycle-table th,
+.bar-review-cycle-table td {
+  padding: 7px 7px;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.bar-review-cycle-table th:first-child,
+.bar-review-cycle-table td:first-child {
+  width: 68px;
+}
+
+.bar-review-cycle-table th:not(:first-child),
+.bar-review-cycle-table td:not(:first-child) {
+  width: auto;
+}
+
+.bar-review-cycle-table label {
+  gap: 5px;
+}
+
+.bar-review-cycle-table input[type="checkbox"],
+.model-essay-table input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  cursor: pointer;
+}
+
+.model-essay-heading {
+  margin-bottom: 10px;
+}
+
+.model-essay-heading .bcc-help-text {
+  margin: 0;
+}
+
+.model-essay-table {
+  width: 100%;
+  min-width: 350px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.model-essay-table th,
+.model-essay-table td {
+  border: 1px solid #e0e0e0;
+  padding: 7px 3px;
+  font-size: 11px;
+  vertical-align: middle;
+}
+
+.model-essay-table thead th {
+  background: #f5f5f5;
+  font-weight: 600;
+  text-align: center;
+}
+
+.model-essay-table thead th:first-child {
+  width: 48%;
+  text-align: left;
+}
+
+.model-essay-table tbody th {
+  width: 48%;
+  text-align: left;
+  font-weight: 500;
+  line-height: 1.2;
+  background: #fff;
+}
+
+.model-essay-table td {
+  text-align: center;
+}
+
+@media (max-width: 1180px) {
+  .bar-cycle-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .bar-review-cycle-table {
+    min-width: 760px;
+  }
+
+  .model-essay-table {
+    min-width: 520px;
+  }
+}
