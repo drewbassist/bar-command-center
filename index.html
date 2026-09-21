@@ -341,207 +341,314 @@ New user? Follow instructions sent to your email before signing in.
 </section>
 <section class="bcc-view" id="essay-grid">
 
-    <div class="bcc-panel">
-
+    <div class="bcc-panel bar-cycle-intro">
         <h2>Bar Cycle</h2>
-
         <p class="bcc-help-text">
-            Every two weeks, one subject becomes the focus. Every day, all thirteen subjects remain
-            active through essays, mixed MCQs, active recall, and spaced repetition.
+            One new subject each day, followed by +1, +3, and +7 reviews.
+            Use the checkboxes only to confirm that you touched the subject.
+            Log essays, MCQs, flashcards, and other work in their normal BarOS sections.
         </p>
+    </div>
 
-        <table class="bar-cycle-table">
+<div class="bar-cycle-workspace">
 
+<div class="bcc-panel bar-review-cycle-panel">
+
+    <div class="bar-review-cycle-heading">
+        <div>
+            <h2>13-Day Subject Cycle</h2>
+            <p class="bcc-help-text">
+                Study one new subject each day. Check each subject when you have meaningfully reviewed it.
+                Log the actual work you did in Essays, MCQs, Flashcards, or Study Log.
+            </p>
+        </div>
+
+        <button class="bar-cycle-clear-button" id="bar-cycle-clear" type="button">
+            Clear Checks
+        </button>
+    </div>
+
+    <div class="bar-review-cycle-wrap">
+        <table class="bar-review-cycle-table">
             <thead>
-
                 <tr>
-                    <th>2-Week Focus Cycle</th>
-                    <th>What Happens During These 14 Days</th>
+                    <th>Date</th>
+                    <th>New Subject</th>
+                    <th>+1 Review</th>
+                    <th>+3 Review</th>
+                    <th>+7 Review</th>
                 </tr>
-
             </thead>
-
             <tbody>
-
-                <tr>
-                    <td><strong>Focus Subject</strong></td>
-                    <td>
-                        Learn the doctrine, understand the concepts, build or update your outline,
-                        create flashcards, and complete subject-specific essays and MCQs.
-                    </td>
+                <tr data-cycle-date="2026-09-21">
+                    <td>Sep 21</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-21-new-criminal"> Criminal Law &amp; Procedure</label></td>
+                    <td>—</td><td>—</td><td>—</td>
                 </tr>
-
-                <tr>
-                    <td><strong>Daily Essay</strong></td>
-                    <td>
-                        Write one essay every day, rotating through all thirteen bar subjects.
-                        Every subject is practiced at least once during each two-week cycle.
-                    </td>
+                <tr data-cycle-date="2026-09-22">
+                    <td>Sep 22</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-22-new-evidence"> Evidence</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-22-r1-criminal"> Criminal Law &amp; Procedure</label></td>
+                    <td>—</td><td>—</td>
                 </tr>
-
-                <tr>
-                    <td><strong>Mixed MCQs</strong></td>
-                    <td>
-                        Complete 20–25 mixed MCQs daily using interleaving.
-                        Most questions come from previously completed subjects while gradually
-                        increasing questions from the current focus subject.
-                    </td>
+                <tr data-cycle-date="2026-09-23">
+                    <td>Sep 23</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-23-new-ba"> Business Associations</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-23-r1-evidence"> Evidence</label></td>
+                    <td>—</td><td>—</td>
                 </tr>
-
-                <tr>
-                    <td><strong>Active Recall</strong></td>
-                    <td>
-                        Recall rule statements before looking them up.
-                        Rewrite missed rules from essays and MCQs.
-                    </td>
+                <tr data-cycle-date="2026-09-24">
+                    <td>Sep 24</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-24-new-remedies"> Remedies</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-24-r1-ba"> Business Associations</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-24-r3-criminal"> Criminal Law &amp; Procedure</label></td>
+                    <td>—</td>
                 </tr>
-
-                <tr>
-                    <td><strong>Spaced Repetition</strong></td>
-                    <td>
-                        Review flashcards, previous essays, and missed MCQs according
-                        to your BarOS review schedule.
-                    </td>
+                <tr data-cycle-date="2026-09-25">
+                    <td>Sep 25</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-25-new-civpro"> Civil Procedure</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-25-r1-remedies"> Remedies</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-25-r3-evidence"> Evidence</label></td>
+                    <td>—</td>
                 </tr>
-
-                <tr>
-                    <td><strong>End of Cycle</strong></td>
-                    <td>
-                        Move the focus subject into permanent review and begin the next
-                        two-week focus subject.
-                    </td>
+                <tr data-cycle-date="2026-09-26">
+                    <td>Sep 26</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-26-new-property"> Real Property</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-26-r1-civpro"> Civil Procedure</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-26-r3-ba"> Business Associations</label></td>
+                    <td>—</td>
                 </tr>
-
+                <tr data-cycle-date="2026-09-27">
+                    <td>Sep 27</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-27-new-pr"> Professional Responsibility</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-27-r1-property"> Real Property</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-27-r3-remedies"> Remedies</label></td>
+                    <td>—</td>
+                </tr>
+                <tr data-cycle-date="2026-09-28">
+                    <td>Sep 28</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-28-new-cp"> Community Property</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-28-r1-pr"> Professional Responsibility</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-28-r3-civpro"> Civil Procedure</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-28-r7-criminal"> Criminal Law &amp; Procedure</label></td>
+                </tr>
+                <tr data-cycle-date="2026-09-29">
+                    <td>Sep 29</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-29-new-wills"> Wills</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-29-r1-cp"> Community Property</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-29-r3-property"> Real Property</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-29-r7-evidence"> Evidence</label></td>
+                </tr>
+                <tr data-cycle-date="2026-09-30">
+                    <td>Sep 30</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-30-new-trusts"> Trusts</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-30-r1-wills"> Wills</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-30-r3-pr"> Professional Responsibility</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-09-30-r7-ba"> Business Associations</label></td>
+                </tr>
+                <tr data-cycle-date="2026-10-01">
+                    <td>Oct 1</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-01-new-conlaw"> Constitutional Law</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-01-r1-trusts"> Trusts</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-01-r3-cp"> Community Property</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-01-r7-remedies"> Remedies</label></td>
+                </tr>
+                <tr data-cycle-date="2026-10-02">
+                    <td>Oct 2</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-02-new-contracts"> Contracts</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-02-r1-conlaw"> Constitutional Law</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-02-r3-wills"> Wills</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-02-r7-civpro"> Civil Procedure</label></td>
+                </tr>
+                <tr data-cycle-date="2026-10-03">
+                    <td>Oct 3</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-03-new-torts"> Torts</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-03-r1-contracts"> Contracts</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-03-r3-trusts"> Trusts</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-03-r7-property"> Real Property</label></td>
+                </tr>
+                <tr data-cycle-date="2026-10-04">
+                    <td>Oct 4</td><td>—</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-04-r1-torts"> Torts</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-04-r3-conlaw"> Constitutional Law</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-04-r7-pr"> Professional Responsibility</label></td>
+                </tr>
+                <tr data-cycle-date="2026-10-05">
+                    <td>Oct 5</td><td>—</td><td>—</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-05-r3-contracts"> Contracts</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-05-r7-cp"> Community Property</label></td>
+                </tr>
+                <tr data-cycle-date="2026-10-06">
+                    <td>Oct 6</td><td>—</td><td>—</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-06-r3-torts"> Torts</label></td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-06-r7-wills"> Wills</label></td>
+                </tr>
+                <tr data-cycle-date="2026-10-07">
+                    <td>Oct 7</td><td>—</td><td>—</td><td>—</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-07-r7-trusts"> Trusts</label></td>
+                </tr>
+                <tr data-cycle-date="2026-10-08">
+                    <td>Oct 8</td><td>—</td><td>—</td><td>—</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-08-r7-conlaw"> Constitutional Law</label></td>
+                </tr>
+                <tr data-cycle-date="2026-10-09">
+                    <td>Oct 9</td><td>—</td><td>—</td><td>—</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-09-r7-contracts"> Contracts</label></td>
+                </tr>
+                <tr data-cycle-date="2026-10-10">
+                    <td>Oct 10</td><td>—</td><td>—</td><td>—</td>
+                    <td><label><input type="checkbox" data-bar-cycle-check="2026-10-10-r7-torts"> Torts</label></td>
+                </tr>
             </tbody>
-
         </table>
+    </div>
 
 </div>
 
-<div class="bar-cycle-bottom">
 
-<div class="bcc-panel">
-
-    <h2>13-Week Subject Rotation</h2>
-        <div class="bar-cycle-checklist">
-
-           <label><input type="checkbox" data-bar-cycle-check="civil-procedure"> 1 &nbsp;&nbsp; Civil Procedure</label>
-
-<label><input type="checkbox" data-bar-cycle-check="real-property"> 2 &nbsp;&nbsp; Real Property</label>
-
-<label><input type="checkbox" data-bar-cycle-check="professional-responsibility"> 3 &nbsp;&nbsp; Professional Responsibility</label>
-
-<label><input type="checkbox" data-bar-cycle-check="community-property"> 4 &nbsp;&nbsp; Community Property</label>
-
-<label><input type="checkbox" data-bar-cycle-check="wills"> 5 &nbsp; Wills</label>
-
-<label><input type="checkbox" data-bar-cycle-check="trusts"> 6 Trusts</label>
-
-<label><input type="checkbox" data-bar-cycle-check="constitutional-law"> 7 Constitutional Law</label>
-
-<label><input type="checkbox" data-bar-cycle-check="contracts"> 8 Contracts</label>
-
-<label><input type="checkbox" data-bar-cycle-check="torts"> 9 Torts</label>
-
-<label><input type="checkbox" data-bar-cycle-check="criminal-law-procedure"> 10 Criminal Law &amp; Procedure</label>
-
-<label><input type="checkbox" data-bar-cycle-check="evidence"> 11 Evidence</label>
-
-<label><input type="checkbox" data-bar-cycle-check="business-associations"> 12 Business Associations</label>
-
-<label><input type="checkbox" data-bar-cycle-check="remedies"> 13 Remedies</label>
-
-                </div>
-
+<div class="bcc-panel model-essay-panel">
+    <div class="model-essay-heading">
+        <div>
+            <h2>Model Essays</h2>
+            <p class="bcc-help-text">Track six model essays for each bar subject.</p>
+        </div>
     </div>
 
-
-
-    <div class="bcc-panel">
-
-        <div class="bar-mcq-heading">
-            <h2>DAILY MCQ</h2>
-
-            <button
-                class="bar-mcq-clear-button"
-                id="bar-mcq-clear"
-                type="button">
-                Clear Checks
-            </button>
-        </div>
-
-        <p class="bcc-help-text">
-            Complete 16 MCQs each day. Check each subject after completing its two questions.
-        </p>
-
-        <div class="bar-mcq-grid">
-
-            <!-- DAY 1 -->
-
-            <div class="bar-mcq-column">
-
-                <h3><span>16 MCQs</span></h3>
-
-                <label>
-                    <input type="checkbox" data-mcq-check="day1-torts">
-                    Torts (2)
-                </label>
-
-                <label>
-                    <input type="checkbox" data-mcq-check="day1-contracts">
-                    Contracts (2)
-                </label>
-
-                <label>
-                    <input type="checkbox" data-mcq-check="day1-criminal-law">
-                    Criminal Law and Procedure(2)
-                </label>
-
-          
-
-                <label>
-                    <input type="checkbox" data-mcq-check="day1-con-law">
-                    Constitutional Law (2)
-                </label>
-
-                <label>
-                    <input type="checkbox" data-mcq-check="day1-evidence">
-                    Evidence (2)
-                </label>
-
-                
-
-                
-
-                <label>
-                    <input type="checkbox" data-mcq-check="day1-property">
-                    Real Property (2)
-                </label>
-
-                
-
-                
-                      
-
-                
-                      
-
-                <div class="bar-mcq-total">
-                    
-                </div>
-
-            </div>
-
-
-            <!-- DAY 2 -->
-
-            
-
-            </div>
-
-        </div>
-
+    <div class="model-essay-wrap">
+        <table class="model-essay-table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                    <th>6</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Civil Procedure</th>
+                    <td><input aria-label="Civil Procedure model essay 1" type="checkbox" data-bar-cycle-check="essay-model-civil-procedure-1"></td>
+                    <td><input aria-label="Civil Procedure model essay 2" type="checkbox" data-bar-cycle-check="essay-model-civil-procedure-2"></td>
+                    <td><input aria-label="Civil Procedure model essay 3" type="checkbox" data-bar-cycle-check="essay-model-civil-procedure-3"></td>
+                    <td><input aria-label="Civil Procedure model essay 4" type="checkbox" data-bar-cycle-check="essay-model-civil-procedure-4"></td>
+                    <td><input aria-label="Civil Procedure model essay 5" type="checkbox" data-bar-cycle-check="essay-model-civil-procedure-5"></td>
+                    <td><input aria-label="Civil Procedure model essay 6" type="checkbox" data-bar-cycle-check="essay-model-civil-procedure-6"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Real Property</th>
+                    <td><input aria-label="Real Property model essay 1" type="checkbox" data-bar-cycle-check="essay-model-real-property-1"></td>
+                    <td><input aria-label="Real Property model essay 2" type="checkbox" data-bar-cycle-check="essay-model-real-property-2"></td>
+                    <td><input aria-label="Real Property model essay 3" type="checkbox" data-bar-cycle-check="essay-model-real-property-3"></td>
+                    <td><input aria-label="Real Property model essay 4" type="checkbox" data-bar-cycle-check="essay-model-real-property-4"></td>
+                    <td><input aria-label="Real Property model essay 5" type="checkbox" data-bar-cycle-check="essay-model-real-property-5"></td>
+                    <td><input aria-label="Real Property model essay 6" type="checkbox" data-bar-cycle-check="essay-model-real-property-6"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Professional Responsibility</th>
+                    <td><input aria-label="Professional Responsibility model essay 1" type="checkbox" data-bar-cycle-check="essay-model-professional-responsibility-1"></td>
+                    <td><input aria-label="Professional Responsibility model essay 2" type="checkbox" data-bar-cycle-check="essay-model-professional-responsibility-2"></td>
+                    <td><input aria-label="Professional Responsibility model essay 3" type="checkbox" data-bar-cycle-check="essay-model-professional-responsibility-3"></td>
+                    <td><input aria-label="Professional Responsibility model essay 4" type="checkbox" data-bar-cycle-check="essay-model-professional-responsibility-4"></td>
+                    <td><input aria-label="Professional Responsibility model essay 5" type="checkbox" data-bar-cycle-check="essay-model-professional-responsibility-5"></td>
+                    <td><input aria-label="Professional Responsibility model essay 6" type="checkbox" data-bar-cycle-check="essay-model-professional-responsibility-6"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Community Property</th>
+                    <td><input aria-label="Community Property model essay 1" type="checkbox" data-bar-cycle-check="essay-model-community-property-1"></td>
+                    <td><input aria-label="Community Property model essay 2" type="checkbox" data-bar-cycle-check="essay-model-community-property-2"></td>
+                    <td><input aria-label="Community Property model essay 3" type="checkbox" data-bar-cycle-check="essay-model-community-property-3"></td>
+                    <td><input aria-label="Community Property model essay 4" type="checkbox" data-bar-cycle-check="essay-model-community-property-4"></td>
+                    <td><input aria-label="Community Property model essay 5" type="checkbox" data-bar-cycle-check="essay-model-community-property-5"></td>
+                    <td><input aria-label="Community Property model essay 6" type="checkbox" data-bar-cycle-check="essay-model-community-property-6"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Wills</th>
+                    <td><input aria-label="Wills model essay 1" type="checkbox" data-bar-cycle-check="essay-model-wills-1"></td>
+                    <td><input aria-label="Wills model essay 2" type="checkbox" data-bar-cycle-check="essay-model-wills-2"></td>
+                    <td><input aria-label="Wills model essay 3" type="checkbox" data-bar-cycle-check="essay-model-wills-3"></td>
+                    <td><input aria-label="Wills model essay 4" type="checkbox" data-bar-cycle-check="essay-model-wills-4"></td>
+                    <td><input aria-label="Wills model essay 5" type="checkbox" data-bar-cycle-check="essay-model-wills-5"></td>
+                    <td><input aria-label="Wills model essay 6" type="checkbox" data-bar-cycle-check="essay-model-wills-6"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Trusts</th>
+                    <td><input aria-label="Trusts model essay 1" type="checkbox" data-bar-cycle-check="essay-model-trusts-1"></td>
+                    <td><input aria-label="Trusts model essay 2" type="checkbox" data-bar-cycle-check="essay-model-trusts-2"></td>
+                    <td><input aria-label="Trusts model essay 3" type="checkbox" data-bar-cycle-check="essay-model-trusts-3"></td>
+                    <td><input aria-label="Trusts model essay 4" type="checkbox" data-bar-cycle-check="essay-model-trusts-4"></td>
+                    <td><input aria-label="Trusts model essay 5" type="checkbox" data-bar-cycle-check="essay-model-trusts-5"></td>
+                    <td><input aria-label="Trusts model essay 6" type="checkbox" data-bar-cycle-check="essay-model-trusts-6"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Constitutional Law</th>
+                    <td><input aria-label="Constitutional Law model essay 1" type="checkbox" data-bar-cycle-check="essay-model-constitutional-law-1"></td>
+                    <td><input aria-label="Constitutional Law model essay 2" type="checkbox" data-bar-cycle-check="essay-model-constitutional-law-2"></td>
+                    <td><input aria-label="Constitutional Law model essay 3" type="checkbox" data-bar-cycle-check="essay-model-constitutional-law-3"></td>
+                    <td><input aria-label="Constitutional Law model essay 4" type="checkbox" data-bar-cycle-check="essay-model-constitutional-law-4"></td>
+                    <td><input aria-label="Constitutional Law model essay 5" type="checkbox" data-bar-cycle-check="essay-model-constitutional-law-5"></td>
+                    <td><input aria-label="Constitutional Law model essay 6" type="checkbox" data-bar-cycle-check="essay-model-constitutional-law-6"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Contracts</th>
+                    <td><input aria-label="Contracts model essay 1" type="checkbox" data-bar-cycle-check="essay-model-contracts-1"></td>
+                    <td><input aria-label="Contracts model essay 2" type="checkbox" data-bar-cycle-check="essay-model-contracts-2"></td>
+                    <td><input aria-label="Contracts model essay 3" type="checkbox" data-bar-cycle-check="essay-model-contracts-3"></td>
+                    <td><input aria-label="Contracts model essay 4" type="checkbox" data-bar-cycle-check="essay-model-contracts-4"></td>
+                    <td><input aria-label="Contracts model essay 5" type="checkbox" data-bar-cycle-check="essay-model-contracts-5"></td>
+                    <td><input aria-label="Contracts model essay 6" type="checkbox" data-bar-cycle-check="essay-model-contracts-6"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Torts</th>
+                    <td><input aria-label="Torts model essay 1" type="checkbox" data-bar-cycle-check="essay-model-torts-1"></td>
+                    <td><input aria-label="Torts model essay 2" type="checkbox" data-bar-cycle-check="essay-model-torts-2"></td>
+                    <td><input aria-label="Torts model essay 3" type="checkbox" data-bar-cycle-check="essay-model-torts-3"></td>
+                    <td><input aria-label="Torts model essay 4" type="checkbox" data-bar-cycle-check="essay-model-torts-4"></td>
+                    <td><input aria-label="Torts model essay 5" type="checkbox" data-bar-cycle-check="essay-model-torts-5"></td>
+                    <td><input aria-label="Torts model essay 6" type="checkbox" data-bar-cycle-check="essay-model-torts-6"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Criminal Law & Procedure</th>
+                    <td><input aria-label="Criminal Law & Procedure model essay 1" type="checkbox" data-bar-cycle-check="essay-model-criminal-law-procedure-1"></td>
+                    <td><input aria-label="Criminal Law & Procedure model essay 2" type="checkbox" data-bar-cycle-check="essay-model-criminal-law-procedure-2"></td>
+                    <td><input aria-label="Criminal Law & Procedure model essay 3" type="checkbox" data-bar-cycle-check="essay-model-criminal-law-procedure-3"></td>
+                    <td><input aria-label="Criminal Law & Procedure model essay 4" type="checkbox" data-bar-cycle-check="essay-model-criminal-law-procedure-4"></td>
+                    <td><input aria-label="Criminal Law & Procedure model essay 5" type="checkbox" data-bar-cycle-check="essay-model-criminal-law-procedure-5"></td>
+                    <td><input aria-label="Criminal Law & Procedure model essay 6" type="checkbox" data-bar-cycle-check="essay-model-criminal-law-procedure-6"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Evidence</th>
+                    <td><input aria-label="Evidence model essay 1" type="checkbox" data-bar-cycle-check="essay-model-evidence-1"></td>
+                    <td><input aria-label="Evidence model essay 2" type="checkbox" data-bar-cycle-check="essay-model-evidence-2"></td>
+                    <td><input aria-label="Evidence model essay 3" type="checkbox" data-bar-cycle-check="essay-model-evidence-3"></td>
+                    <td><input aria-label="Evidence model essay 4" type="checkbox" data-bar-cycle-check="essay-model-evidence-4"></td>
+                    <td><input aria-label="Evidence model essay 5" type="checkbox" data-bar-cycle-check="essay-model-evidence-5"></td>
+                    <td><input aria-label="Evidence model essay 6" type="checkbox" data-bar-cycle-check="essay-model-evidence-6"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Business Associations</th>
+                    <td><input aria-label="Business Associations model essay 1" type="checkbox" data-bar-cycle-check="essay-model-business-associations-1"></td>
+                    <td><input aria-label="Business Associations model essay 2" type="checkbox" data-bar-cycle-check="essay-model-business-associations-2"></td>
+                    <td><input aria-label="Business Associations model essay 3" type="checkbox" data-bar-cycle-check="essay-model-business-associations-3"></td>
+                    <td><input aria-label="Business Associations model essay 4" type="checkbox" data-bar-cycle-check="essay-model-business-associations-4"></td>
+                    <td><input aria-label="Business Associations model essay 5" type="checkbox" data-bar-cycle-check="essay-model-business-associations-5"></td>
+                    <td><input aria-label="Business Associations model essay 6" type="checkbox" data-bar-cycle-check="essay-model-business-associations-6"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Remedies</th>
+                    <td><input aria-label="Remedies model essay 1" type="checkbox" data-bar-cycle-check="essay-model-remedies-1"></td>
+                    <td><input aria-label="Remedies model essay 2" type="checkbox" data-bar-cycle-check="essay-model-remedies-2"></td>
+                    <td><input aria-label="Remedies model essay 3" type="checkbox" data-bar-cycle-check="essay-model-remedies-3"></td>
+                    <td><input aria-label="Remedies model essay 4" type="checkbox" data-bar-cycle-check="essay-model-remedies-4"></td>
+                    <td><input aria-label="Remedies model essay 5" type="checkbox" data-bar-cycle-check="essay-model-remedies-5"></td>
+                    <td><input aria-label="Remedies model essay 6" type="checkbox" data-bar-cycle-check="essay-model-remedies-6"></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+</div>
 
 </div>
 
