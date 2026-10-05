@@ -3601,24 +3601,23 @@ function setupBarCycleRotation() {
         });
     });
 
-    const newModelEssayCycleButton = document.getElementById('model-essay-start-new-cycle');
+    const modelEssayCycleSelect = document.getElementById('model-essay-cycle-count');
 
-    if (newModelEssayCycleButton) {
-        newModelEssayCycleButton.addEventListener('click', () => {
-            const modelEssayCheckboxes = [...document.querySelectorAll('[data-bar-cycle-check^="essay-model-"]')];
-            const allComplete = modelEssayCheckboxes.length > 0 && modelEssayCheckboxes.every((checkbox) => checkbox.checked);
-
-            if (!allComplete) return;
-
-            const completedCount = getModelEssayCycleCount() + 1;
-            barCycleRotation[`essay-grid-cycle-completed-${completedCount}`] = true;
-
-            modelEssayCheckboxes.forEach((checkbox) => {
-                delete barCycleRotation[checkbox.dataset.barCycleCheck];
+    if (modelEssayCycleSelect) {
+        modelEssayCycleSelect.addEventListener('change', () => {
+            Object.keys(barCycleRotation).forEach((key) => {
+                if (key.startsWith('essay-grid-cycle-manual-')) {
+                    delete barCycleRotation[key];
+                }
             });
 
+            const count = Math.max(0, Math.min(999, Number(modelEssayCycleSelect.value) || 0));
+
+            if (count > 0) {
+                barCycleRotation[`essay-grid-cycle-manual-${count}`] = true;
+            }
+
             saveData();
-            renderBarCycleRotation();
         });
     }
 
@@ -3643,20 +3642,19 @@ function setupBarCycleRotation() {
 }
 
 function getModelEssayCycleCount() {
-    return Object.keys(barCycleRotation).filter((key) =>
-        key.startsWith('essay-grid-cycle-completed-') && barCycleRotation[key] === true
-    ).length;
+    const key = Object.keys(barCycleRotation).find((item) =>
+        item.startsWith('essay-grid-cycle-manual-') && barCycleRotation[item] === true
+    );
+
+    if (!key) return 0;
+
+    const count = Number(key.replace('essay-grid-cycle-manual-', ''));
+    return Number.isFinite(count) ? Math.max(0, Math.min(999, count)) : 0;
 }
 
 function renderModelEssayCycleCounter() {
-    const count = getModelEssayCycleCount();
-    const countElement = document.getElementById('model-essay-cycle-count');
-    const startButton = document.getElementById('model-essay-start-new-cycle');
-    const modelEssayCheckboxes = [...document.querySelectorAll('[data-bar-cycle-check^="essay-model-"]')];
-    const allComplete = modelEssayCheckboxes.length > 0 && modelEssayCheckboxes.every((checkbox) => checkbox.checked);
-
-    if (countElement) countElement.textContent = String(count);
-    if (startButton) startButton.disabled = !allComplete;
+    const select = document.getElementById('model-essay-cycle-count');
+    if (select) select.value = String(getModelEssayCycleCount());
 }
 
 function renderBarCycleRotation() {
