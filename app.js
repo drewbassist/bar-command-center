@@ -3597,8 +3597,30 @@ function setupBarCycleRotation() {
             }
 
             saveData();
+            renderModelEssayCycleCounter();
         });
     });
+
+    const newModelEssayCycleButton = document.getElementById('model-essay-start-new-cycle');
+
+    if (newModelEssayCycleButton) {
+        newModelEssayCycleButton.addEventListener('click', () => {
+            const modelEssayCheckboxes = [...document.querySelectorAll('[data-bar-cycle-check^="essay-model-"]')];
+            const allComplete = modelEssayCheckboxes.length > 0 && modelEssayCheckboxes.every((checkbox) => checkbox.checked);
+
+            if (!allComplete) return;
+
+            const completedCount = getModelEssayCycleCount() + 1;
+            barCycleRotation[`essay-grid-cycle-completed-${completedCount}`] = true;
+
+            modelEssayCheckboxes.forEach((checkbox) => {
+                delete barCycleRotation[checkbox.dataset.barCycleCheck];
+            });
+
+            saveData();
+            renderBarCycleRotation();
+        });
+    }
 
     const clearButton = document.getElementById('bar-cycle-clear');
 
@@ -3620,6 +3642,23 @@ function setupBarCycleRotation() {
     });
 }
 
+function getModelEssayCycleCount() {
+    return Object.keys(barCycleRotation).filter((key) =>
+        key.startsWith('essay-grid-cycle-completed-') && barCycleRotation[key] === true
+    ).length;
+}
+
+function renderModelEssayCycleCounter() {
+    const count = getModelEssayCycleCount();
+    const countElement = document.getElementById('model-essay-cycle-count');
+    const startButton = document.getElementById('model-essay-start-new-cycle');
+    const modelEssayCheckboxes = [...document.querySelectorAll('[data-bar-cycle-check^="essay-model-"]')];
+    const allComplete = modelEssayCheckboxes.length > 0 && modelEssayCheckboxes.every((checkbox) => checkbox.checked);
+
+    if (countElement) countElement.textContent = String(count);
+    if (startButton) startButton.disabled = !allComplete;
+}
+
 function renderBarCycleRotation() {
     const checkboxes = document.querySelectorAll('[data-bar-cycle-check]');
 
@@ -3627,6 +3666,8 @@ function renderBarCycleRotation() {
         const key = checkbox.dataset.barCycleCheck;
         checkbox.checked = barCycleRotation[key] === true;
     });
+
+    renderModelEssayCycleCounter();
 }
 
 /* ========================================
