@@ -113,6 +113,9 @@ function populateReviewFilters() {
 
 // ---------- Review ----------
 const REVIEW_POSITION_KEY="flashcardsPlusReviewPosition";
+function reviewPositionStorageKey(){
+ return currentUser?.id ? `${REVIEW_POSITION_KEY}::${currentUser.id}` : REVIEW_POSITION_KEY;
+}
 
 function getReviewKey(){
  const s=$("review-subject").value;
@@ -121,7 +124,7 @@ function getReviewKey(){
 }
 
 function getSavedReviewPositions(){
- try{return JSON.parse(localStorage.getItem(REVIEW_POSITION_KEY)||"{}");}
+ try{return JSON.parse(localStorage.getItem(reviewPositionStorageKey())||"{}");}
  catch{return {};}
 }
 
@@ -129,7 +132,7 @@ function saveReviewPosition(){
  if(!studyCards.length)return;
  const positions=getSavedReviewPositions();
  positions[getReviewKey()]=studyIndex;
- localStorage.setItem(REVIEW_POSITION_KEY,JSON.stringify(positions));
+ localStorage.setItem(reviewPositionStorageKey(),JSON.stringify(positions));
 }
 
 function beginReview(forceStart=false){

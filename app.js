@@ -114,7 +114,7 @@ async function loadData() {
   };
   studyCycle = await loadJson("studyCycle.json", []);
   studyModes = await loadJson("studyModes.json", {});
-  currentStudyMode = localStorage.getItem("bcc_study_mode") || "full";
+  currentStudyMode = getUserLocalItem("bcc_study_mode") || "full";
 
   essays = loadLocalData("bcc_essays", await loadJson("essays.json", []));
   mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
@@ -131,7 +131,7 @@ async function loadData() {
 
   normalizeReviewMetrics();
 
-  currentSession = Number(localStorage.getItem("bcc_current_session") || "1");
+  currentSession = Number(getUserLocalItem("bcc_current_session") || "1");
 
   if (!Number.isFinite(currentSession) || currentSession < 1) {
     currentSession = 1;
@@ -158,9 +158,25 @@ async function loadJson(path, fallback) {
   }
 }
 
+function userStorageKey(key) {
+  return currentUser?.id ? `${key}::${currentUser.id}` : key;
+}
+
+function getUserLocalItem(key) {
+  return localStorage.getItem(userStorageKey(key));
+}
+
+function setUserLocalItem(key, value) {
+  localStorage.setItem(userStorageKey(key), value);
+}
+
+function removeUserLocalItem(key) {
+  localStorage.removeItem(userStorageKey(key));
+}
+
 function loadLocalData(key, fallback) {
   try {
-    const saved = localStorage.getItem(key);
+    const saved = getUserLocalItem(key);
     return saved ? JSON.parse(saved) : fallback;
   } catch (error) {
     return fallback;
@@ -173,24 +189,24 @@ function saveData() {
 }
 
 function saveLocalData() {
-  localStorage.setItem("bcc_essays", JSON.stringify(essays));
-  localStorage.setItem("bcc_mcqs", JSON.stringify(mcqs));
-  localStorage.setItem("bcc_flashcards", JSON.stringify(flashcards));
-  localStorage.setItem("bcc_flashcards_plus", JSON.stringify(flashcardsPlus));
-  localStorage.setItem("bcc_lectures", JSON.stringify(lectures));
-  localStorage.setItem("bcc_reviews", JSON.stringify(reviews));
-  localStorage.setItem("bcc_session_history", JSON.stringify(sessionHistory));
-  localStorage.setItem("bcc_current_session", String(currentSession));
-  localStorage.setItem("bcc_study_mode", currentStudyMode);
-  localStorage.setItem("bcc_study_log", JSON.stringify(studyLog));
-  localStorage.setItem("bcc_essay_grid", JSON.stringify(essayGrid));
-  localStorage.setItem("bcc_bar_cycle_rotation", JSON.stringify(barCycleRotation));
-  localStorage.setItem("bcc_review_intervals", JSON.stringify(reviewIntervals));
-  localStorage.setItem("bcc_custom_subjects", JSON.stringify(customSubjects));
-  localStorage.setItem("bcc_custom_essay_sources", JSON.stringify(customEssaySources));
-  localStorage.setItem("bcc_custom_mcq_sources", JSON.stringify(customMcqSources));
-  localStorage.setItem("bcc_custom_flashcard_sources", JSON.stringify(customFlashcardSources));
-  localStorage.setItem("bcc_study_goals", JSON.stringify(studyGoals));
+  setUserLocalItem("bcc_essays", JSON.stringify(essays));
+  setUserLocalItem("bcc_mcqs", JSON.stringify(mcqs));
+  setUserLocalItem("bcc_flashcards", JSON.stringify(flashcards));
+  setUserLocalItem("bcc_flashcards_plus", JSON.stringify(flashcardsPlus));
+  setUserLocalItem("bcc_lectures", JSON.stringify(lectures));
+  setUserLocalItem("bcc_reviews", JSON.stringify(reviews));
+  setUserLocalItem("bcc_session_history", JSON.stringify(sessionHistory));
+  setUserLocalItem("bcc_current_session", String(currentSession));
+  setUserLocalItem("bcc_study_mode", currentStudyMode);
+  setUserLocalItem("bcc_study_log", JSON.stringify(studyLog));
+  setUserLocalItem("bcc_essay_grid", JSON.stringify(essayGrid));
+  setUserLocalItem("bcc_bar_cycle_rotation", JSON.stringify(barCycleRotation));
+  setUserLocalItem("bcc_review_intervals", JSON.stringify(reviewIntervals));
+  setUserLocalItem("bcc_custom_subjects", JSON.stringify(customSubjects));
+  setUserLocalItem("bcc_custom_essay_sources", JSON.stringify(customEssaySources));
+  setUserLocalItem("bcc_custom_mcq_sources", JSON.stringify(customMcqSources));
+  setUserLocalItem("bcc_custom_flashcard_sources", JSON.stringify(customFlashcardSources));
+  setUserLocalItem("bcc_study_goals", JSON.stringify(studyGoals));
 }
 
 function getCompleteBarOSData() {
@@ -433,6 +449,10 @@ async function openSignedInApp(user) {
   setText("signed-in-email", user.email || "");
   showSignedInState();
 
+  // Reload browser state in the namespace for this authenticated account.
+  // A brand-new account therefore starts from the empty bundled defaults.
+  await loadData();
+  refreshBarMcqChecklistForCurrentUser();
   await loadCloudData();
   renderAll();
 }
@@ -510,7 +530,7 @@ function setupNavigation() {
       view.classList.toggle("active", view.id === viewId);
     });
 
-    localStorage.setItem("bcc_active_view", viewId);
+    setUserLocalItem("bcc_active_view", viewId);
   };
 
   buttons.forEach((button) => {
@@ -519,7 +539,7 @@ function setupNavigation() {
     });
   });
 
-  const savedView = localStorage.getItem("bcc_active_view") || "dashboard";
+  const savedView = getUserLocalItem("bcc_active_view") || "dashboard";
   window.activateBccView(savedView);
 }
 
@@ -3672,54 +3692,44 @@ function renderBarCycleRotation() {
    BAR CYCLE — TWO-DAY MCQ CHECKLIST
    ======================================== */
 
-function initializeBarMcqChecklist() {
+function barMcqStorageKey(checkId) {
+    return userStorageKey('baros-mcq-' + checkId);
+}
 
-    const checkboxes = document.querySelectorAll(
-        '[data-mcq-check]'
-    );
+function refreshBarMcqChecklistForCurrentUser() {
+    document.querySelectorAll('[data-mcq-check]').forEach((checkbox) => {
+        checkbox.checked = localStorage.getItem(
+            barMcqStorageKey(checkbox.dataset.mcqCheck)
+        ) === 'true';
+    });
+}
+
+function initializeBarMcqChecklist() {
+    const checkboxes = document.querySelectorAll('[data-mcq-check]');
+
+    refreshBarMcqChecklistForCurrentUser();
 
     checkboxes.forEach((checkbox) => {
-
-        const key =
-            'baros-mcq-' +
-            checkbox.dataset.mcqCheck;
-
-        checkbox.checked =
-            localStorage.getItem(key) === 'true';
-
         checkbox.addEventListener('change', () => {
-
             localStorage.setItem(
-                key,
+                barMcqStorageKey(checkbox.dataset.mcqCheck),
                 checkbox.checked
             );
-
         });
-
     });
 
-    const clearButton =
-        document.getElementById('bar-mcq-clear');
+    const clearButton = document.getElementById('bar-mcq-clear');
 
     if (clearButton) {
-
         clearButton.addEventListener('click', () => {
-
             checkboxes.forEach((checkbox) => {
-
                 checkbox.checked = false;
-
                 localStorage.removeItem(
-                    'baros-mcq-' +
-                    checkbox.dataset.mcqCheck
+                    barMcqStorageKey(checkbox.dataset.mcqCheck)
                 );
-
             });
-
         });
-
     }
-
 }
 
 document.addEventListener(
