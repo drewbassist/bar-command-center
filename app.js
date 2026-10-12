@@ -2257,19 +2257,19 @@ function getCurrentSessionInfo() {
 
 function getEssayGoal() {
   const mode = getCurrentStudyMode();
-  return Number(mode.essaysPerDay ?? studyGoals.essaysPerDay ?? studyGoals.essayGoal ?? studyGoals.essays ?? 0);
+  return Number(studyGoals.essaysPerDay ?? mode.essaysPerDay ?? studyGoals.essayGoal ?? studyGoals.essays ?? 0);
 }
 
 function getMcqGoal() {
   const mode = getCurrentStudyMode();
-  return Number(mode.mcqsPerDay ?? studyGoals.mcqsPerDay ?? studyGoals.mcqGoal ?? studyGoals.mcqs ?? 0);
+  return Number(studyGoals.mcqsPerDay ?? mode.mcqsPerDay ?? studyGoals.mcqGoal ?? studyGoals.mcqs ?? 0);
 }
 
 function getFlashcardGoal() {
   const mode = getCurrentStudyMode();
   return Number(
-    mode.flashcardsPerDay ??
     studyGoals.flashcardsPerDay ??
+    mode.flashcardsPerDay ??
     studyGoals.flashcardGoal ??
     studyGoals.flashcards ??
     studyGoals.cardsPerDay ??
