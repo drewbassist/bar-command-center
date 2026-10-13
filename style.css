@@ -2132,3 +2132,16 @@ font-family: inherit;cursor:pointer}
 #model-essay-guide-frame{width:100%;flex:1;border:0;min-height:0}
 #model-essay-guide-empty{padding:24px}
 @media(max-width:600px){.model-essay-guide-modal{padding:8px}.model-essay-guide-dialog{height:94vh}}
+
+/* Historical essay PDF archive: independent of the existing model essay grid */
+.bar-essay-archive { margin-top: 14px; }
+.bar-essay-archive-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
+.bar-essay-archive-controls label { font-size: 12px; font-weight: 600; }
+.bar-essay-archive-controls select { max-width: 280px; min-width: 190px; padding: 8px; font: inherit; }
+.bar-essay-archive-open { display: inline-block; padding: 9px 14px; background: #1263c7; color: white !important; border-radius: 5px; text-decoration: none; font-size: 13px; }
+.bar-essay-archive-open:hover { background: #084d9f; }
+
+.bar-cycle-right-stack { display:flex; flex-direction:column; gap:12px; min-width:0; }
+.bar-cycle-right-stack .bar-essay-archive { margin-top:0; }
+.bar-cycle-right-stack .bar-essay-archive-controls { align-items:stretch; }
+.bar-cycle-right-stack .bar-essay-archive-controls select { min-width:0; max-width:100%; width:100%; }
