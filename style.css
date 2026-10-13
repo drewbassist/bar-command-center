@@ -2119,7 +2119,9 @@ h2 {
 
 
 /* Model essay study guides: additive styling only */
-.model-essay-table td .model-essay-guide-link{display:block;margin:4px auto 0;padding:1px 3px;border:0;background:none;color:#245b9b;text-decoration:underline;font:10px/1.3 inherit;cursor:pointer}
+.model-essay-table td .model-essay-guide-link{display:block;margin:4px auto 0;padding:1px 3px;border:0;background:none;color:#245b9b;text-decoration:underline;font-size: 8px;
+line-height: 1.3;
+font-family: inherit;cursor:pointer}
 .model-essay-table td .model-essay-guide-link:hover{color:#0d3567}
 .model-essay-modal-open{overflow:hidden}
 .model-essay-guide-modal[hidden],.model-essay-guide-modal [hidden]{display:none!important}
