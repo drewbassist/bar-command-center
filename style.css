@@ -2147,3 +2147,22 @@ font-family: inherit;cursor:pointer}
 .bar-cycle-right-stack .bar-essay-archive-controls select { min-width:0; max-width:100%; width:100%; }
 
 .bar-cycle-right-stack .bar-essay-archive,.bar-cycle-right-stack .model-essay-panel{margin-top:0}
+
+/* Three panels directly below the Bar Cycle introduction: 12-day / Model Essays / Archive. */
+.bar-cycle-workspace {
+  display:grid;
+  grid-template-columns:minmax(0,1.12fr) minmax(0,1.05fr) minmax(0,.75fr);
+  align-items:start;
+  gap:12px;
+}
+.bar-cycle-workspace > .bcc-panel {min-width:0;margin-top:0;}
+.bar-cycle-workspace .bar-essay-archive-controls {align-items:stretch;}
+.bar-cycle-workspace .bar-essay-archive-controls select {min-width:0;max-width:100%;width:100%;}
+@media(max-width:1100px){
+  .bar-cycle-workspace {grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
+  .bar-cycle-workspace > .bar-essay-archive {grid-column:1/-1;}
+}
+@media(max-width:680px){
+  .bar-cycle-workspace {grid-template-columns:minmax(0,1fr);}
+  .bar-cycle-workspace > .bar-essay-archive {grid-column:auto;}
+}
