@@ -1,6 +1,6 @@
 /* Model Essays study guide pop-ups. Independent of existing checkbox and cloud tracking. */
 (() => {
-  const guides = { 'essay-model-civil-procedure-1': 'study-guides/civil-procedure-1.html', 'essay-model-wills-trusts-1': 'study-guides/wills-trusts-1.html' };
+  const guides = { 'essay-model-civil-procedure-1': 'study-guides/civil-procedure-1.html', 'essay-model-wills-trusts-1': 'study-guides/wills-trusts-1.html', 'essay-model-business-associations-2': 'study-guides/business-associations-2.html' };
   const modal = document.getElementById('model-essay-guide-modal');
   const frame = document.getElementById('model-essay-guide-frame');
   const empty = document.getElementById('model-essay-guide-empty');
