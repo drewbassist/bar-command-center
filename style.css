@@ -2166,3 +2166,12 @@ font-family: inherit;cursor:pointer}
   .bar-cycle-workspace {grid-template-columns:minmax(0,1fr);}
   .bar-cycle-workspace > .bar-essay-archive {grid-column:auto;}
 }
+
+/* Archive-based Model Essays checklist */
+.model-essay-list{max-height:650px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;margin-top:12px;}
+.model-essay-list-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 12px;border-bottom:1px solid #e6e6e6;font-size:13px;cursor:pointer;}
+.model-essay-list-row:last-child{border-bottom:0;}
+.model-essay-list-row:nth-child(even){background:#f8f8f8;}
+.model-essay-list-row input{width:18px;height:18px;flex-shrink:0;cursor:pointer;}
+.model-essay-list-summary{margin-top:10px;font-size:13px;}
+.model-essay-index-note{margin-top:12px;}

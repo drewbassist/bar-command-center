@@ -3677,6 +3677,79 @@ function renderModelEssayCycleCounter() {
     if (select) select.value = String(getModelEssayCycleCount());
 }
 
+/* User-added model essay answers: persisted alongside the existing BarOS checklist. */
+function manualEssayKey(year, month, question, answer) {
+    return `essay-model-manual-${year}-${month.toLowerCase()}-q${question}-${answer.toLowerCase()}`;
+}
+function renderManualModelEssays() {
+    const host = document.getElementById('manual-model-essay-rows');
+    if (!host) return;
+    const entries = Object.keys(barCycleRotation).filter(key => key.startsWith('essay-model-manual-entry-'))
+        .map(key => ({ key, id: key.slice('essay-model-manual-entry-'.length) }))
+        .sort((a,b) => a.id.localeCompare(b.id));
+    host.replaceChildren();
+    for (const entry of entries) {
+        const match = entry.id.match(/^(\d{4})-(february|july)-q([1-6])-([ab])$/);
+        if (!match) continue;
+        const [,year,month,question,answer] = match;
+        const label = document.createElement('label');
+        label.className = 'model-essay-list-row';
+        const caption = document.createElement('span');
+        caption.textContent = `${year} ${month[0].toUpperCase()+month.slice(1)} · Question ${question} · Answer ${answer.toUpperCase()}`;
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.dataset.barCycleCheck = 'essay-model-archive-' + entry.id;
+        checkbox.checked = barCycleRotation[checkbox.dataset.barCycleCheck] === true;
+        checkbox.setAttribute('aria-label', 'Complete ' + caption.textContent);
+        checkbox.addEventListener('change', () => {
+            if (checkbox.checked) barCycleRotation[checkbox.dataset.barCycleCheck] = true;
+            else delete barCycleRotation[checkbox.dataset.barCycleCheck];
+            saveData(); updateModelEssayProgress();
+        });
+        const remove = document.createElement('button');
+        remove.type = 'button'; remove.textContent = 'Delete';
+        remove.setAttribute('aria-label', 'Delete ' + caption.textContent);
+        remove.addEventListener('click', () => {
+            delete barCycleRotation[entry.key];
+            delete barCycleRotation[checkbox.dataset.barCycleCheck];
+            saveData(); renderManualModelEssays(); updateModelEssayProgress();
+        });
+        label.append(caption, checkbox, remove); host.append(label);
+    }
+}
+function updateModelEssayProgress() {
+    const checks = document.querySelectorAll('[data-bar-cycle-check^="essay-model-archive-"]');
+    const completed = Array.from(checks).filter(check => check.checked).length;
+    const progress = document.getElementById('model-essay-progress');
+    if (progress) progress.textContent = `${completed} of ${checks.length} completed`;
+}
+function initializeManualModelEssays() {
+    const form = document.getElementById('manual-model-essay-form');
+    if (!form) return;
+    const year = document.getElementById('manual-essay-year');
+    for (let y=1982; y<=2011; y++) {
+        const option = document.createElement('option'); option.value=String(y); option.textContent=String(y); year.append(option);
+    }
+    form.addEventListener('submit', event => {
+        event.preventDefault();
+        const y=Number(year.value), month=document.getElementById('manual-essay-month').value;
+        const q=Number(document.getElementById('manual-essay-question').value);
+        const answer=document.getElementById('manual-essay-answer').value;
+        const message=document.getElementById('manual-essay-message');
+        if (y < 1982 || y > 2011 || (y < 1984 && month==='February')) {
+            message.textContent='Only July is available for 1982 and 1983.'; return;
+        }
+        const id=manualEssayKey(y,month,q,answer).slice('essay-model-manual-'.length);
+        const existing=document.querySelector(`[data-bar-cycle-check="essay-model-archive-${id}"]`);
+        if (existing) { message.textContent='That answer is already listed.'; return; }
+        barCycleRotation['essay-model-manual-entry-'+id]=true;
+        saveData(); renderManualModelEssays(); updateModelEssayProgress();
+        message.textContent='Essay added.';
+    });
+    renderManualModelEssays(); updateModelEssayProgress();
+}
+document.addEventListener('DOMContentLoaded', initializeManualModelEssays);
+
 function renderBarCycleRotation() {
     const checkboxes = document.querySelectorAll('[data-bar-cycle-check]');
 
@@ -3686,6 +3759,8 @@ function renderBarCycleRotation() {
     });
 
     renderModelEssayCycleCounter();
+    renderManualModelEssays();
+    updateModelEssayProgress();
 }
 
 /* ========================================
