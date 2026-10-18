@@ -3788,7 +3788,7 @@ function initializeManualModelEssays() {
     const form = document.getElementById('manual-model-essay-form');
     if (!form) return;
     const year = document.getElementById('manual-essay-year');
-    for (let y=1982; y<=2011; y++) {
+    for (let y=2012; y<=2026; y++) {
         const option = document.createElement('option'); option.value=String(y); option.textContent=String(y); year.append(option);
     }
     form.addEventListener('submit', event => {
@@ -3797,8 +3797,8 @@ function initializeManualModelEssays() {
         const q=Number(document.getElementById('manual-essay-question').value);
         const answer=document.getElementById('manual-essay-answer').value;
         const message=document.getElementById('manual-essay-message');
-        if (y < 1982 || y > 2011 || (y < 1984 && month==='February')) {
-            message.textContent='Only July is available for 1982 and 1983.'; return;
+        if (y < 2012 || y > 2026 || (month==='October' && y!==2020)) {
+            message.textContent='Choose a valid examination date (October is used for 2020).'; return;
         }
         const id=manualEssayKey(y,month,q,answer).slice('essay-model-manual-'.length);
         const existing=document.querySelector(`[data-bar-cycle-check="essay-model-archive-${id}"]`);
