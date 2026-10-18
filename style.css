@@ -2175,3 +2175,11 @@ font-family: inherit;cursor:pointer}
 .model-essay-list-row input{width:18px;height:18px;flex-shrink:0;cursor:pointer;}
 .model-essay-list-summary{margin-top:10px;font-size:13px;}
 .model-essay-index-note{margin-top:12px;}
+
+/* Model Essay checklist row controls */
+.model-essay-list-row {cursor:default;}
+.model-essay-list-row > span:first-child {flex:1;min-width:0;}
+.model-essay-row-actions {display:inline-flex;gap:6px;flex-shrink:0;}
+.model-essay-row-actions button {font:inherit;font-size:12px;padding:4px 9px;border:1px solid #c9ced7;border-radius:5px;background:#fff;color:#243b56;cursor:pointer;}
+.model-essay-row-actions button:hover {background:#eef3fa;}
+@media(max-width:600px){.model-essay-list-row{flex-wrap:wrap}.model-essay-row-actions{margin-left:auto}}

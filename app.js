@@ -40,6 +40,7 @@ let currentSession = 1;
 let editingEntry = null;
 let essayGrid = {};
 let barCycleRotation = {};
+let modelEssayTitles = {};
 
 const studyLogActivityIds = [
   "live_lectures",
@@ -128,6 +129,7 @@ async function loadData() {
   studyLog = normalizeStudyLog(loadLocalData("bcc_study_log", createEmptyStudyLog()));
   essayGrid = normalizeEssayGrid(loadLocalData("bcc_essay_grid", {}));
   barCycleRotation = normalizeBarCycleRotation(loadLocalData("bcc_bar_cycle_rotation", {}));
+  modelEssayTitles = loadLocalData("bcc_model_essay_titles", {});
 
   normalizeReviewMetrics();
 
@@ -201,6 +203,7 @@ function saveLocalData() {
   setUserLocalItem("bcc_study_log", JSON.stringify(studyLog));
   setUserLocalItem("bcc_essay_grid", JSON.stringify(essayGrid));
   setUserLocalItem("bcc_bar_cycle_rotation", JSON.stringify(barCycleRotation));
+  setUserLocalItem("bcc_model_essay_titles", JSON.stringify(modelEssayTitles));
   setUserLocalItem("bcc_review_intervals", JSON.stringify(reviewIntervals));
   setUserLocalItem("bcc_custom_subjects", JSON.stringify(customSubjects));
   setUserLocalItem("bcc_custom_essay_sources", JSON.stringify(customEssaySources));
@@ -223,6 +226,7 @@ function getCompleteBarOSData() {
     studyLog,
     essayGrid,
     barCycleRotation,
+    modelEssayTitles,
     reviewIntervals,
     customSubjects,
     customEssaySources,
@@ -244,6 +248,7 @@ function applyCompleteBarOSData(data) {
   studyLog = normalizeStudyLog(data?.studyLog);
   essayGrid = normalizeEssayGrid(data?.essayGrid);
   barCycleRotation = normalizeBarCycleRotation(data?.barCycleRotation);
+  modelEssayTitles = data?.modelEssayTitles && typeof data.modelEssayTitles === "object" ? data.modelEssayTitles : {};
   reviewIntervals = normalizeReviewIntervals(
     data?.reviewIntervals || recommendedReviewIntervals
   );
@@ -3710,12 +3715,68 @@ function renderManualModelEssays() {
         remove.type = 'button'; remove.textContent = 'Delete';
         remove.setAttribute('aria-label', 'Delete ' + caption.textContent);
         remove.addEventListener('click', () => {
+            delete modelEssayTitles[checkbox.dataset.barCycleCheck];
             delete barCycleRotation[entry.key];
             delete barCycleRotation[checkbox.dataset.barCycleCheck];
             saveData(); renderManualModelEssays(); updateModelEssayProgress();
         });
         label.append(caption, checkbox, remove); host.append(label);
+        enhanceModelEssayRow(label);
     }
+}
+function openChecklistEssayGuide(key, caption) {
+    const guidePaths = {
+        'essay-model-archive-1987-july-q2-a': 'study-guides/civil-procedure-1.html',
+        'essay-model-archive-1987-july-q2-b': 'study-guides/civil-procedure-1.html',
+        'essay-model-archive-2004-july-q3-a': 'study-guides/wills-trusts-1.html',
+        'essay-model-archive-2004-july-q3-b': 'study-guides/wills-trusts-1.html'
+    };
+    const modal = document.getElementById('model-essay-guide-modal');
+    const frame = document.getElementById('model-essay-guide-frame');
+    const empty = document.getElementById('model-essay-guide-empty');
+    if (!modal || !frame || !empty) return;
+    document.getElementById('model-essay-guide-title').textContent = caption;
+    const path = guidePaths[key];
+    frame.hidden = !path; empty.hidden = !!path;
+    if (path) frame.src = path; else frame.removeAttribute('src');
+    modal.hidden = false;
+    document.body.classList.add('model-essay-modal-open');
+    document.getElementById('model-essay-guide-close').focus();
+}
+function enhanceModelEssayRow(row) {
+    if (row.dataset.enhanced === 'yes') return;
+    row.dataset.enhanced = 'yes';
+    const checkbox = row.querySelector('input[data-bar-cycle-check]');
+    const caption = row.querySelector('span');
+    if (!checkbox || !caption) return;
+    const key = checkbox.dataset.barCycleCheck;
+    const original = caption.textContent;
+    const parts = original.match(/^(\d{4} (?:February|July) · Question [1-6])(?: · Answer ([AB]))$/);
+    if (!parts) return;
+    const base = parts[1], answer = parts[2];
+    const renderTitle = () => {
+        const subject = modelEssayTitles[key] || '';
+        caption.textContent = base + (subject ? ' ' + subject : '') + ' · Answer ' + answer;
+        checkbox.setAttribute('aria-label', 'Complete ' + caption.textContent);
+    };
+    renderTitle();
+    const actions = document.createElement('span'); actions.className = 'model-essay-row-actions';
+    const guide = document.createElement('button'); guide.type = 'button'; guide.textContent = 'Guide';
+    guide.addEventListener('click', e => { e.preventDefault(); openChecklistEssayGuide(key, caption.textContent); });
+    const edit = document.createElement('button'); edit.type = 'button'; edit.textContent = 'Edit';
+    edit.addEventListener('click', e => {
+        e.preventDefault();
+        const value = window.prompt('Subject or topic for ' + base + ' · Answer ' + answer, modelEssayTitles[key] || '');
+        if (value === null) return;
+        const clean = value.trim().slice(0, 120);
+        if (clean) modelEssayTitles[key] = clean; else delete modelEssayTitles[key];
+        renderTitle(); saveData();
+    });
+    actions.append(guide, edit);
+    row.insertBefore(actions, checkbox);
+}
+function enhanceAllModelEssayRows() {
+    document.querySelectorAll('.model-essay-list-row').forEach(enhanceModelEssayRow);
 }
 function updateModelEssayProgress() {
     const checks = document.querySelectorAll('[data-bar-cycle-check^="essay-model-archive-"]');
@@ -3746,7 +3807,7 @@ function initializeManualModelEssays() {
         saveData(); renderManualModelEssays(); updateModelEssayProgress();
         message.textContent='Essay added.';
     });
-    renderManualModelEssays(); updateModelEssayProgress();
+    renderManualModelEssays(); enhanceAllModelEssayRows(); updateModelEssayProgress();
 }
 document.addEventListener('DOMContentLoaded', initializeManualModelEssays);
 
@@ -3760,6 +3821,7 @@ function renderBarCycleRotation() {
 
     renderModelEssayCycleCounter();
     renderManualModelEssays();
+    enhanceAllModelEssayRows();
     updateModelEssayProgress();
 }
 
