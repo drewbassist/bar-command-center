@@ -2183,3 +2183,19 @@ font-family: inherit;cursor:pointer}
 .model-essay-row-actions button {font:inherit;font-size:12px;padding:4px 9px;border:1px solid #c9ced7;border-radius:5px;background:#fff;color:#243b56;cursor:pointer;}
 .model-essay-row-actions button:hover {background:#eef3fa;}
 @media(max-width:600px){.model-essay-list-row{flex-wrap:wrap}.model-essay-row-actions{margin-left:auto}}
+
+/* Bar Cycle only: expand workspace across the available browser width.
+   Preserve all existing panel contents, controls, and responsive behavior. */
+@media (min-width: 1101px) {
+  #essay-grid {
+    width: min(1760px, calc(100vw - 48px));
+    max-width: none;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  #essay-grid .bar-cycle-workspace {
+    grid-template-columns: minmax(0, 40fr) minmax(0, 38fr) minmax(0, 22fr);
+    gap: 12px;
+  }
+}
