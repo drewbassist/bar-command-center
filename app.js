@@ -3726,6 +3726,8 @@ function renderManualModelEssays() {
 }
 function openChecklistEssayGuide(key, caption) {
     const guidePaths = {
+        'essay-model-archive-2012-february-q1-a': 'study-guides/february-2012-trusts-q1.html',
+        'essay-model-archive-2012-february-q1-b': 'study-guides/february-2012-trusts-q1.html',
         'essay-model-archive-1987-july-q2-a': 'study-guides/civil-procedure-1.html',
         'essay-model-archive-1987-july-q2-b': 'study-guides/civil-procedure-1.html',
         'essay-model-archive-2004-july-q3-a': 'study-guides/wills-trusts-1.html',
@@ -3761,7 +3763,7 @@ function enhanceModelEssayRow(row) {
     };
     renderTitle();
     const actions = document.createElement('span'); actions.className = 'model-essay-row-actions';
-    const guide = document.createElement('button'); guide.type = 'button'; guide.textContent = 'Guide';
+    const guide = document.createElement('button'); guide.type = 'button'; guide.textContent = 'Guide'; if (['essay-model-archive-2012-february-q1-a','essay-model-archive-2012-february-q1-b','essay-model-archive-1987-july-q2-a','essay-model-archive-1987-july-q2-b','essay-model-archive-2004-july-q3-a','essay-model-archive-2004-july-q3-b'].includes(key)) { guide.classList.add('guide-available'); guide.title = 'Study guide available'; }
     guide.addEventListener('click', e => { e.preventDefault(); openChecklistEssayGuide(key, caption.textContent); });
     const edit = document.createElement('button'); edit.type = 'button'; edit.textContent = 'Edit';
     edit.addEventListener('click', e => {
@@ -3883,7 +3885,7 @@ function enhancePerformanceTestRows() {
   const original=caption.textContent; const base=original.replace(/ · (?:Performance Test|Question 1) · Answer [AB]$/, ' · Question 1'); const answer=original.slice(-1);
   const render=()=>{caption.textContent=base+(modelEssayTitles[key]?' '+modelEssayTitles[key]:'')+' · Answer '+answer;check.setAttribute('aria-label','Complete '+caption.textContent);};
   render(); const actions=document.createElement('span');actions.className='model-essay-row-actions';
-  const guide=document.createElement('button');guide.type='button';guide.textContent='Guide';guide.addEventListener('click',e=>{e.preventDefault();openChecklistEssayGuide(key,caption.textContent);});
+  const guide=document.createElement('button');guide.type='button';guide.textContent='Guide';if (['essay-model-archive-1987-july-q2-a','essay-model-archive-1987-july-q2-b','essay-model-archive-2004-july-q3-a','essay-model-archive-2004-july-q3-b'].includes(key)) {guide.classList.add('guide-available');guide.title='Study guide available';}guide.addEventListener('click',e=>{e.preventDefault();openChecklistEssayGuide(key,caption.textContent);});
   const edit=document.createElement('button');edit.type='button';edit.textContent='Edit';edit.addEventListener('click',e=>{e.preventDefault();const value=window.prompt('Topic for '+base+' · Answer '+answer,modelEssayTitles[key]||'');if(value===null)return;const clean=value.trim().slice(0,120);if(clean)modelEssayTitles[key]=clean;else delete modelEssayTitles[key];render();saveData();});
   actions.append(guide,edit);row.insertBefore(actions,check);
  });

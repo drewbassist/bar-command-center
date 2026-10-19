@@ -2230,3 +2230,11 @@ font-family: inherit;cursor:pointer}
 @media(min-width:1251px){#essay-grid .bar-cycle-workspace {grid-template-columns:minmax(0,1.15fr) minmax(0,1.15fr) minmax(0,1.15fr) minmax(0,.9fr);}}
 @media(max-width:1250px){#essay-grid .bar-cycle-workspace {grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media(max-width:680px){#essay-grid .bar-cycle-workspace {grid-template-columns:minmax(0,1fr);}}
+
+/* Highlight only checklist guides that have authored content. */
+.model-essay-row-actions button.guide-available{background:#d8eee3!important;border:1px solid #67a98b!important;color:#165d42!important;font-weight:650!important}
+.model-essay-row-actions button.guide-available:hover{background:#bce1ce!important}
+
+/* Authored guide indicators for legacy Business Associations guide. */
+.model-essay-guide-link[data-study-guide="essay-model-business-associations-2"]{background:#d8eee3!important;border:1px solid #67a98b!important;color:#165d42!important;font-weight:650!important}
+.model-essay-guide-link[data-study-guide="essay-model-business-associations-2"]:hover{background:#bce1ce!important}
