@@ -2199,3 +2199,12 @@ font-family: inherit;cursor:pointer}
     gap: 12px;
   }
 }
+
+/* Four aligned Bar Cycle panels; preserve narrower responsive layouts */
+#essay-grid .bar-cycle-workspace {grid-template-columns:minmax(0,1.4fr) minmax(0,1.28fr) minmax(0,1.1fr) minmax(0,1fr);align-items:start;gap:12px;}
+#essay-grid .bar-cycle-workspace > .bcc-panel {margin-top:0;min-width:0;}
+#essay-grid .performance-test-panel .model-essay-list-row {gap:5px;padding:9px 7px;font-size:12px;}
+#essay-grid .performance-test-panel .model-essay-row-actions {gap:3px;}
+#essay-grid .performance-test-panel .model-essay-row-actions button {padding:3px 5px;font-size:11px;}
+@media(max-width:1250px){#essay-grid .bar-cycle-workspace{grid-template-columns:repeat(2,minmax(0,1fr));}#essay-grid .bar-cycle-workspace>.bar-essay-archive{grid-column:auto;}}
+@media(max-width:680px){#essay-grid .bar-cycle-workspace{grid-template-columns:minmax(0,1fr);}}
