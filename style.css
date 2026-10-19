@@ -2208,3 +2208,14 @@ font-family: inherit;cursor:pointer}
 #essay-grid .performance-test-panel .model-essay-row-actions button {padding:3px 5px;font-size:11px;}
 @media(max-width:1250px){#essay-grid .bar-cycle-workspace{grid-template-columns:repeat(2,minmax(0,1fr));}#essay-grid .bar-cycle-workspace>.bar-essay-archive{grid-column:auto;}}
 @media(max-width:680px){#essay-grid .bar-cycle-workspace{grid-template-columns:minmax(0,1fr);}}
+
+/* Bar Cycle four-column alignment and compact archive controls */
+@media (min-width:1251px) {
+  #essay-grid { width:calc(100vw - 24px); max-width:none; left:50%; transform:translateX(-50%); }
+  #essay-grid .bar-cycle-workspace {grid-template-columns:minmax(0,1.55fr) minmax(0,1.35fr) minmax(0,1.35fr) minmax(0,.95fr);gap:10px;align-items:start;}
+}
+#essay-grid .bar-cycle-workspace > .bcc-panel {align-self:start;margin-top:0;}
+#essay-grid .bar-essay-archive-controls select {width:min(100%,245px);max-width:245px;min-width:0;}
+#essay-grid .bar-essay-archive-controls {align-items:flex-start;}
+#essay-grid .performance-test-panel .model-essay-list-row {padding:9px 9px;font-size:12px;}
+#essay-grid .performance-test-panel .model-essay-row-actions button {font-size:12px;padding:4px 7px;}

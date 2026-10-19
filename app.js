@@ -3880,7 +3880,7 @@ function enhancePerformanceTestRows() {
  document.querySelectorAll('.pt-checklist-row').forEach(row => {
   if(row.dataset.enhanced==='yes')return; row.dataset.enhanced='yes';
   const caption=row.querySelector('span'); const check=row.querySelector('input'); const key=check.dataset.barCycleCheck;
-  const original=caption.textContent; const base=original.replace(/ · Answer [AB]$/, ''); const answer=original.slice(-1);
+  const original=caption.textContent; const base=original.replace(/ · (?:Performance Test|Question 1) · Answer [AB]$/, ' · Question 1'); const answer=original.slice(-1);
   const render=()=>{caption.textContent=base+(modelEssayTitles[key]?' '+modelEssayTitles[key]:'')+' · Answer '+answer;check.setAttribute('aria-label','Complete '+caption.textContent);};
   render(); const actions=document.createElement('span');actions.className='model-essay-row-actions';
   const guide=document.createElement('button');guide.type='button';guide.textContent='Guide';guide.addEventListener('click',e=>{e.preventDefault();openChecklistEssayGuide(key,caption.textContent);});
