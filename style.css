@@ -2219,3 +2219,14 @@ font-family: inherit;cursor:pointer}
 #essay-grid .bar-essay-archive-controls {align-items:flex-start;}
 #essay-grid .performance-test-panel .model-essay-list-row {padding:9px 9px;font-size:12px;}
 #essay-grid .performance-test-panel .model-essay-row-actions button {font-size:12px;padding:4px 7px;}
+
+/* Historical checklist and full-width subject cycle below four aligned archive panels */
+#essay-grid .bar-cycle-workspace {grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;}
+#essay-grid .bar-cycle-workspace > .bar-review-cycle-panel {grid-column:1/-1;width:100%;margin-top:12px;}
+#essay-grid .bar-cycle-workspace > .bcc-panel {min-width:0;}
+#essay-grid .historical-essay-panel .model-essay-list-row {gap:5px;padding:9px 7px;font-size:12px;}
+#essay-grid .historical-essay-panel .model-essay-row-actions {gap:3px;}
+#essay-grid .historical-essay-panel .model-essay-row-actions button {padding:4px 6px;font-size:11px;}
+@media(min-width:1251px){#essay-grid .bar-cycle-workspace {grid-template-columns:minmax(0,1.15fr) minmax(0,1.15fr) minmax(0,1.15fr) minmax(0,.9fr);}}
+@media(max-width:1250px){#essay-grid .bar-cycle-workspace {grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:680px){#essay-grid .bar-cycle-workspace {grid-template-columns:minmax(0,1fr);}}

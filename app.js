@@ -3890,3 +3890,21 @@ function enhancePerformanceTestRows() {
 }
 function updatePerformanceTestProgress(){const checks=[...document.querySelectorAll('.pt-checklist-row input[data-bar-cycle-check]')];const el=document.getElementById('performance-test-progress');if(el)el.textContent=checks.filter(c=>c.checked).length+' of '+checks.length+' completed';}
 document.addEventListener('DOMContentLoaded',()=>{enhancePerformanceTestRows();updatePerformanceTestProgress();document.querySelectorAll('.pt-checklist-row input').forEach(c=>c.addEventListener('change',updatePerformanceTestProgress));});
+
+/* Independent historical essay checklist, retaining existing BarOS storage and guide system. */
+function enhanceHistoricalEssayRows() {
+ document.querySelectorAll('.historical-essay-row').forEach(row => {
+  if (row.dataset.enhanced === 'yes') return; row.dataset.enhanced='yes';
+  const caption=row.querySelector('span'), check=row.querySelector('input');
+  const key=check.dataset.barCycleCheck, original=caption.textContent;
+  const parts=original.match(/^(.* · Question [1-5]) · Answer ([AB])$/);
+  if(!parts)return;const base=parts[1],answer=parts[2];
+  const render=()=>{caption.textContent=base+(modelEssayTitles[key]?' '+modelEssayTitles[key]:'')+' · Answer '+answer;check.setAttribute('aria-label','Complete '+caption.textContent);};
+  render();const actions=document.createElement('span');actions.className='model-essay-row-actions';
+  const guide=document.createElement('button');guide.type='button';guide.textContent='Guide';guide.addEventListener('click',e=>{e.preventDefault();openChecklistEssayGuide(key,caption.textContent);});
+  const edit=document.createElement('button');edit.type='button';edit.textContent='Edit';edit.addEventListener('click',e=>{e.preventDefault();const value=window.prompt('Subject or topic for '+base+' · Answer '+answer,modelEssayTitles[key]||'');if(value===null)return;const clean=value.trim().slice(0,120);if(clean)modelEssayTitles[key]=clean;else delete modelEssayTitles[key];render();saveData();});
+  actions.append(guide,edit);row.insertBefore(actions,check);
+ });
+}
+function updateHistoricalEssayProgress(){const checks=[...document.querySelectorAll('.historical-essay-row input[data-bar-cycle-check]')];const el=document.getElementById('historical-essay-progress');if(el)el.textContent=checks.filter(c=>c.checked).length+' of '+checks.length+' completed';}
+document.addEventListener('DOMContentLoaded',()=>{enhanceHistoricalEssayRows();updateHistoricalEssayProgress();document.querySelectorAll('.historical-essay-row input').forEach(c=>c.addEventListener('change',updateHistoricalEssayProgress));});
