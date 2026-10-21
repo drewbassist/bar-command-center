@@ -3771,7 +3771,7 @@ function enhanceModelEssayRow(row) {
     };
     renderTitle();
     const actions = document.createElement('span'); actions.className = 'model-essay-row-actions';
-    const guide = document.createElement('button'); guide.type = 'button'; guide.textContent = 'Guide'; if (['essay-model-archive-2012-february-q1-a','essay-model-archive-2012-february-q1-b','essay-model-archive-1987-july-q2-a','essay-model-archive-1987-july-q2-b','essay-model-archive-2004-july-q3-a','essay-model-archive-2004-july-q3-b'].includes(key)) { guide.classList.add('guide-available'); guide.title = 'Study guide available'; }
+    const guide = document.createElement('button'); guide.type = 'button'; guide.textContent = 'Guide'; if (['essay-model-archive-2012-february-q2-a','essay-model-archive-2012-february-q2-b','essay-model-archive-2012-february-q1-a','essay-model-archive-2012-february-q1-b','essay-model-archive-1987-july-q2-a','essay-model-archive-1987-july-q2-b','essay-model-archive-2004-july-q3-a','essay-model-archive-2004-july-q3-b'].includes(key)) { guide.classList.add('guide-available'); guide.title = 'Study guide available'; }
     guide.addEventListener('click', e => { e.preventDefault(); openChecklistEssayGuide(key, caption.textContent); });
     const edit = document.createElement('button'); edit.type = 'button'; edit.textContent = 'Edit';
     edit.addEventListener('click', e => {
