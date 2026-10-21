@@ -3728,6 +3728,8 @@ function openChecklistEssayGuide(key, caption) {
     const guidePaths = {
         'essay-model-archive-2012-february-q1-a': 'study-guides/february-2012-trusts-q1.html',
         'essay-model-archive-2012-february-q1-b': 'study-guides/february-2012-trusts-q1.html',
+        'essay-model-archive-2012-february-q2-a': 'study-guides/february-2012-constitutional-law-q2.html',
+        'essay-model-archive-2012-february-q2-b': 'study-guides/february-2012-constitutional-law-q2.html',
         'essay-model-archive-1987-july-q2-a': 'study-guides/civil-procedure-1.html',
         'essay-model-archive-1987-july-q2-b': 'study-guides/civil-procedure-1.html',
         'essay-model-archive-2004-july-q3-a': 'study-guides/wills-trusts-1.html',
