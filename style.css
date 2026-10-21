@@ -2243,3 +2243,11 @@ font-family: inherit;cursor:pointer}
 @media(min-width:1251px){#essay-grid .bar-cycle-workspace{grid-template-columns:repeat(4,minmax(0,1fr));}}
 #essay-grid .bar-cycle-workspace > .bcc-panel{min-width:0;}
 #essay-grid .model-essay-list-summary{min-height:2.8em;line-height:1.4;}
+
+/* Keep all four archive cards aligned at the same top edge.
+   Earlier panel-specific margins must not offset the first card. */
+#essay-grid .bar-cycle-workspace > .bcc-panel {
+  margin-block-start: 0 !important;
+  align-self: start;
+}
+#essay-grid .bar-cycle-workspace { align-items: start; }

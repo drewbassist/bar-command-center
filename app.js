@@ -3850,6 +3850,8 @@ function renderBarCycleRotation() {
     updateModelEssayProgress();
     enhancePerformanceTestRows();
     updatePerformanceTestProgress();
+    enhanceHistoricalEssayRows();
+    updateHistoricalEssayProgress();
 }
 
 /* ========================================
