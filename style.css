@@ -2238,3 +2238,8 @@ font-family: inherit;cursor:pointer}
 /* Authored guide indicators for legacy Business Associations guide. */
 .model-essay-guide-link[data-study-guide="essay-model-business-associations-2"]{background:#d8eee3!important;border:1px solid #67a98b!important;color:#165d42!important;font-weight:650!important}
 .model-essay-guide-link[data-study-guide="essay-model-business-associations-2"]:hover{background:#bce1ce!important}
+
+/* Equal-width archive panels at desktop sizes; preserve the existing mobile stack. */
+@media(min-width:1251px){#essay-grid .bar-cycle-workspace{grid-template-columns:repeat(4,minmax(0,1fr));}}
+#essay-grid .bar-cycle-workspace > .bcc-panel{min-width:0;}
+#essay-grid .model-essay-list-summary{min-height:2.8em;line-height:1.4;}

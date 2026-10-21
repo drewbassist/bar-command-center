@@ -3788,12 +3788,27 @@ function enhanceModelEssayRow(row) {
 function enhanceAllModelEssayRows() {
     document.querySelectorAll('.model-essay-list-row').forEach(enhanceModelEssayRow);
 }
-function updateModelEssayProgress() {
-    const checks = document.querySelectorAll('[data-bar-cycle-check^="essay-model-archive-"]');
-    const completed = Array.from(checks).filter(check => check.checked).length;
-    const progress = document.getElementById('model-essay-progress');
-    if (progress) progress.textContent = `${completed} of ${checks.length} completed`;
+function updateAnswerAndQuestionProgress(selector, targetId, noun) {
+    const checks = [...document.querySelectorAll(selector)];
+    const groups = new Map();
+    for (const check of checks) {
+        const key = check.dataset.barCycleCheck || '';
+        // The final suffix identifies a selected answer, not a distinct essay or PT.
+        const questionKey = key.replace(/-[ab]$/i, '');
+        if (!groups.has(questionKey)) groups.set(questionKey, []);
+        groups.get(questionKey).push(check);
+    }
+    const answered = checks.filter(c => c.checked).length;
+    const finished = [...groups.values()].filter(group => group.every(c => c.checked)).length;
+    const progress = document.getElementById(targetId);
+    if (progress) {
+        progress.textContent = `${finished} of ${groups.size} ${noun} completed · ${answered} of ${checks.length} model answers studied`;
+    }
 }
+function updateModelEssayProgress() {
+    updateAnswerAndQuestionProgress('[data-bar-cycle-check^="essay-model-archive-"]', 'model-essay-progress', 'essays');
+}
+
 function initializeManualModelEssays() {
     const form = document.getElementById('manual-model-essay-form');
     if (!form) return;
@@ -3898,7 +3913,7 @@ function enhancePerformanceTestRows() {
   actions.append(guide,edit);row.insertBefore(actions,check);
  });
 }
-function updatePerformanceTestProgress(){const checks=[...document.querySelectorAll('.pt-checklist-row input[data-bar-cycle-check]')];const el=document.getElementById('performance-test-progress');if(el)el.textContent=checks.filter(c=>c.checked).length+' of '+checks.length+' completed';}
+function updatePerformanceTestProgress(){updateAnswerAndQuestionProgress('.pt-checklist-row input[data-bar-cycle-check]', 'performance-test-progress', 'performance tests');}
 document.addEventListener('DOMContentLoaded',()=>{enhancePerformanceTestRows();updatePerformanceTestProgress();document.querySelectorAll('.pt-checklist-row input').forEach(c=>c.addEventListener('change',updatePerformanceTestProgress));});
 
 /* Independent historical essay checklist, retaining existing BarOS storage and guide system. */
@@ -3916,5 +3931,5 @@ function enhanceHistoricalEssayRows() {
   actions.append(guide,edit);row.insertBefore(actions,check);
  });
 }
-function updateHistoricalEssayProgress(){const checks=[...document.querySelectorAll('.historical-essay-row input[data-bar-cycle-check]')];const el=document.getElementById('historical-essay-progress');if(el)el.textContent=checks.filter(c=>c.checked).length+' of '+checks.length+' completed';}
+function updateHistoricalEssayProgress(){updateAnswerAndQuestionProgress('.historical-essay-row input[data-bar-cycle-check]', 'historical-essay-progress', 'essays');}
 document.addEventListener('DOMContentLoaded',()=>{enhanceHistoricalEssayRows();updateHistoricalEssayProgress();document.querySelectorAll('.historical-essay-row input').forEach(c=>c.addEventListener('change',updateHistoricalEssayProgress));});
