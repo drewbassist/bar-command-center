@@ -3974,7 +3974,14 @@ function renderBasickTracker() {
         });
         label.append(checkbox, document.createTextNode(answer)); pair.appendChild(label);
       }
-      cell.appendChild(pair); tr.appendChild(cell);
+      cell.appendChild(pair);
+      if (si === 2 && essay === 3) {
+        const date = document.createElement("small");
+        date.textContent = "Feb 1997";
+        date.className = "basick-essay-date";
+        cell.appendChild(date);
+      }
+      tr.appendChild(cell);
     }
     body.appendChild(tr);
   });
