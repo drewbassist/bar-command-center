@@ -3944,51 +3944,77 @@ function updateHistoricalEssayProgress(){updateAnswerAndQuestionProgress('.histo
 document.addEventListener('DOMContentLoaded',()=>{enhanceHistoricalEssayRows();updateHistoricalEssayProgress();document.querySelectorAll('.historical-essay-row input').forEach(c=>c.addEventListener('change',updateHistoricalEssayProgress));});
 
 
-// Compact Basick essay answer tracker. Separate from the model-essay archive.
-function renderBasickTracker() {
-  const root = document.getElementById("basick-answer-grid");
-  if (!root) return;
-  const subjects = ["Criminal Law & Procedure", "Evidence", "Business Associations", "Remedies", "Civil Procedure", "Real Property", "Professional Responsibility", "Community Property", "Wills & Trusts", "Constitutional Law", "Contracts", "Torts"];
-  root.replaceChildren();
-  const table = document.createElement("table");
-  table.className = "basick-mini-table";
-  const head = document.createElement("thead");
-  const hr = document.createElement("tr");
-  const first = document.createElement("th"); first.textContent = "Subject"; hr.appendChild(first);
-  for (let i = 1; i <= 6; i++) { const th = document.createElement("th"); th.textContent = String(i); hr.appendChild(th); }
-  head.appendChild(hr); table.appendChild(head);
-  const body = document.createElement("tbody");
-  subjects.forEach((subject, si) => {
-    const tr = document.createElement("tr");
-    const td = document.createElement("td"); td.textContent = subject; tr.appendChild(td);
-    for (let essay = 1; essay <= 6; essay++) {
-      const cell = document.createElement("td");
-      const pair = document.createElement("span"); pair.className = "basick-mini-pair";
-      for (const answer of ["a", "b"]) {
-        const key = `${si}-${essay}-${answer}`;
-        const label = document.createElement("label"); label.title = `${subject}, essay ${essay}, answer ${answer.toUpperCase()}`;
-        const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.checked = !!basickAnswers[key];
-        checkbox.addEventListener("change", () => {
-          if (checkbox.checked) basickAnswers[key] = true; else delete basickAnswers[key];
-          saveData(); updateBasickCount();
-        });
-        label.append(checkbox, document.createTextNode(answer)); pair.appendChild(label);
-      }
-      cell.appendChild(pair);
-      if (si === 2 && essay === 3) {
-        const date = document.createElement("small");
-        date.textContent = "Feb 1997";
-        date.className = "basick-essay-date";
-        cell.appendChild(date);
-      }
-      tr.appendChild(cell);
-    }
-    body.appendChild(tr);
-  });
-  table.appendChild(body); root.appendChild(table); updateBasickCount();
+// Basick 12-subject x 6-essay tracker. Keep stable saved keys for existing checkmarks.
+const BASICK_DATES = [["Feb 1996", "Jul 2009", "Feb 2003", "Jul 1993", "Jul 1999", "Jul 1994"], ["Feb 1993", "Jul 2009", "Jul 2005", "Jul 1999", "Feb 2002", "Feb 1998"], ["Jul 1998", "Jul 2010", "Feb 1997", "Feb 2002", "Feb 1999", "Jul 2005"], ["Jul 2008", "Feb 2000", "Feb 2002", "Jul 1986", "Jul 2007", "Feb 1998"], ["Jul 1987", "Feb 1992", "Feb 1994", "Feb 2002", "Jul 1999", "Feb 2004"], ["Jul 2005", "Feb 1994", "Jul 2008", "Jul 2001", "Jul 2007", "Feb 2005"], ["Jul 2006", "Jul 2011", "Jul 1993", "Feb 1990", "Feb 2005", "Feb 2001"], ["Feb 2008", "Feb 2001", "Jul 1990", "Jul 1992", "Feb 1997", "Feb 2000"], ["Jul 2004", "Jul 2000", "Jul 2003", "Feb 2008", "Feb 2010", "Feb 2007"], ["Jul 1985", "Feb 2005", "Feb 2002", "Jul 2006", "Jul 2009", "Jul 2001"], ["Feb 2005", "Feb 1996", "Feb 2006", "Jul 2005", "Feb 2000", "Jul 2011"], ["Jul 1995", "Feb 1987", "Jul 1993", "Jul 2007", "Feb 2009", "Jul 2003"]];
+const BASICK_SUBJECTS = ["Criminal Law & Procedure","Evidence","Business Associations","Remedies","Civil Procedure","Real Property","Professional Responsibility","Community Property","Wills & Trusts","Constitutional Law","Contracts","Torts"];
+// Only verified essay-question mappings synchronize. A date alone does not identify a question.
+const BASICK_CONFIRMED = {"2-2":"historical-essay-2010-july-q4","4-1":"historical-essay-1987-july-q2","8-1":"historical-essay-2004-july-q3"};
+function basickLinkedInput(si, essay, answer) {
+  const prefix=BASICK_CONFIRMED[`${si}-${essay}`];
+  return prefix ? document.querySelector(`input[data-bar-cycle-check="${prefix}-${answer}"]`) : null;
 }
 function updateBasickCount() {
-  const el = document.getElementById("basick-answer-count");
-  if (el) el.textContent = `${Object.values(basickAnswers).filter(Boolean).length} / 144 answers`;
+  const el=document.getElementById("basick-answer-count");
+  if (!el) return;
+  let count=0;
+  BASICK_DATES.forEach((row,si)=>row.forEach((_,ei)=>["a","b"].forEach(a=>{
+    const linked=basickLinkedInput(si,ei+1,a);
+    if (linked ? linked.checked : !!basickAnswers[`${si}-${ei+1}-${a}`]) count++;
+  })));
+  el.textContent=`${count} / 144 answers`;
 }
-document.addEventListener("DOMContentLoaded", renderBasickTracker);
+function refreshBasickLinkedChecks() {
+  document.querySelectorAll("[data-basick-key]").forEach(box=>{
+    const [si,essay,a]=box.dataset.basickKey.split("-");
+    const linked=basickLinkedInput(Number(si),Number(essay),a);
+    box.checked=linked ? linked.checked : !!basickAnswers[box.dataset.basickKey];
+  });
+  updateBasickCount();
+}
+function renderBasickTracker() {
+  const root=document.getElementById("basick-answer-grid");
+  if (!root) return;
+  root.replaceChildren();
+  const table=document.createElement("table"); table.className="basick-mini-table";
+  const head=document.createElement("thead"), hr=document.createElement("tr");
+  ["Subject","1","2","3","4","5","6"].forEach(t=>{const th=document.createElement("th");th.textContent=t;hr.appendChild(th);});
+  head.appendChild(hr);table.appendChild(head);
+  const body=document.createElement("tbody");
+  BASICK_SUBJECTS.forEach((subject,si)=>{
+    const tr=document.createElement("tr"),name=document.createElement("td");
+    name.textContent=subject;tr.appendChild(name);
+    BASICK_DATES[si].forEach((date,ei)=>{
+      const essay=ei+1, cell=document.createElement("td");
+      const dateEl=document.createElement("div");dateEl.className="basick-mini-date";dateEl.textContent=date;
+      const pair=document.createElement("div");pair.className="basick-mini-pair";
+      ["a","b"].forEach(a=>{
+        const key=`${si}-${essay}-${a}`,label=document.createElement("label");
+        const box=document.createElement("input");box.type="checkbox";box.dataset.basickKey=key;
+        const linked=basickLinkedInput(si,essay,a);
+        box.checked=linked ? linked.checked : !!basickAnswers[key];
+        label.title=`${subject} ${date}, essay ${essay}, answer ${a.toUpperCase()}${linked?" (linked to archive)":""}`;
+        box.addEventListener("change",()=>{
+          if(box.checked)basickAnswers[key]=true;else delete basickAnswers[key];
+          const target=basickLinkedInput(si,essay,a);
+          if(target && target.checked!==box.checked){
+            target.checked=box.checked;
+            target.dispatchEvent(new Event("change",{bubbles:true}));
+          }
+          saveData();refreshBasickLinkedChecks();
+        });
+        label.append(box,document.createTextNode(a.toUpperCase()));pair.appendChild(label);
+      });
+      cell.append(dateEl,pair);tr.appendChild(cell);
+    });
+    body.appendChild(tr);
+  });
+  table.appendChild(body);root.appendChild(table);
+  refreshBasickLinkedChecks();
+}
+document.addEventListener("DOMContentLoaded",()=>{
+  renderBasickTracker();
+  document.addEventListener("change",e=>{
+    if(e.target.matches('input[data-bar-cycle-check]')) refreshBasickLinkedChecks();
+  });
+});
+

@@ -2265,3 +2265,11 @@ font-family: inherit;cursor:pointer}
 .basick-mini-pair { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
 .basick-mini-pair label { display:inline-flex; align-items:center; gap:2px; cursor:pointer; font-size:10px; color:#475569; }
 .basick-mini-pair input { width:12px; height:12px; margin:0; accent-color:#2563eb; }
+
+/* Compact Basick date + A/B cells */
+.basick-mini-panel {max-width:1050px !important;}
+.basick-mini-table {min-width:790px !important;table-layout:fixed;}
+.basick-mini-table th:first-child,.basick-mini-table td:first-child {width:190px !important;}
+.basick-mini-table td {vertical-align:middle !important;padding:5px 4px !important;}
+.basick-mini-date {font-size:11px;line-height:1.3;white-space:nowrap;color:#334155;margin-bottom:3px;}
+.basick-mini-pair {display:flex !important;gap:12px !important;}
