@@ -252,7 +252,6 @@ function applyCompleteBarOSData(data) {
   studyLog = normalizeStudyLog(data?.studyLog);
   essayGrid = normalizeEssayGrid(data?.essayGrid);
   basickAnswers = data?.basickAnswers && typeof data.basickAnswers === "object" ? data.basickAnswers : {};
-  renderBasickTracker();
   barCycleRotation = normalizeBarCycleRotation(data?.barCycleRotation);
   modelEssayTitles = data?.modelEssayTitles && typeof data.modelEssayTitles === "object" ? data.modelEssayTitles : {};
   reviewIntervals = normalizeReviewIntervals(
@@ -1580,6 +1579,7 @@ function exportBackup() {
     essayGrid,
     basickAnswers,
     barCycleRotation,
+    modelEssayTitles,
     reviewIntervals,
     customSubjects,
     customEssaySources,
@@ -1624,6 +1624,9 @@ function importBackup(event) {
       currentStudyMode = backup.currentStudyMode || currentStudyMode || "full";
       studyLog = normalizeStudyLog(backup.studyLog);
       essayGrid = normalizeEssayGrid(backup.essayGrid);
+      if (backup.basickAnswers && typeof backup.basickAnswers === "object") basickAnswers = backup.basickAnswers;
+      if (backup.barCycleRotation && typeof backup.barCycleRotation === "object") barCycleRotation = normalizeBarCycleRotation(backup.barCycleRotation);
+      if (backup.modelEssayTitles && typeof backup.modelEssayTitles === "object") modelEssayTitles = backup.modelEssayTitles;
       reviewIntervals = normalizeReviewIntervals(
         backup.reviewIntervals || recommendedReviewIntervals
       );
@@ -1670,6 +1673,7 @@ function renderAll() {
   renderDashboard();
   renderStudyLog();
   renderStats();
+  renderBasickTracker();
 }
 
 function renderPlanner() {
@@ -3859,6 +3863,7 @@ function renderBarCycleRotation() {
     updatePerformanceTestProgress();
     enhanceHistoricalEssayRows();
     updateHistoricalEssayProgress();
+    refreshBasickLinkedChecks();
 }
 
 /* ========================================
