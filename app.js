@@ -5,6 +5,7 @@ const SUPABASE_URL = "https://rudhrifkjhretilqdncy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_TGTjuqPmo8AOx_P2OpxnOw_NGT-1Z9l";
 
 let supabaseClient = null;
+let basickAnswers = {};
 let currentUser = null;
 let cloudSaveTimer = null;
 let appControlsReady = false;
@@ -128,6 +129,7 @@ async function loadData() {
   );
   studyLog = normalizeStudyLog(loadLocalData("bcc_study_log", createEmptyStudyLog()));
   essayGrid = normalizeEssayGrid(loadLocalData("bcc_essay_grid", {}));
+  basickAnswers = loadLocalData("bcc_basick_answers", {});
   barCycleRotation = normalizeBarCycleRotation(loadLocalData("bcc_bar_cycle_rotation", {}));
   modelEssayTitles = loadLocalData("bcc_model_essay_titles", {});
 
@@ -202,6 +204,7 @@ function saveLocalData() {
   setUserLocalItem("bcc_study_mode", currentStudyMode);
   setUserLocalItem("bcc_study_log", JSON.stringify(studyLog));
   setUserLocalItem("bcc_essay_grid", JSON.stringify(essayGrid));
+  setUserLocalItem("bcc_basick_answers", JSON.stringify(basickAnswers));
   setUserLocalItem("bcc_bar_cycle_rotation", JSON.stringify(barCycleRotation));
   setUserLocalItem("bcc_model_essay_titles", JSON.stringify(modelEssayTitles));
   setUserLocalItem("bcc_review_intervals", JSON.stringify(reviewIntervals));
@@ -225,6 +228,7 @@ function getCompleteBarOSData() {
     currentStudyMode,
     studyLog,
     essayGrid,
+    basickAnswers,
     barCycleRotation,
     modelEssayTitles,
     reviewIntervals,
@@ -247,6 +251,8 @@ function applyCompleteBarOSData(data) {
   currentStudyMode = data?.currentStudyMode || currentStudyMode || "full";
   studyLog = normalizeStudyLog(data?.studyLog);
   essayGrid = normalizeEssayGrid(data?.essayGrid);
+  basickAnswers = data?.basickAnswers && typeof data.basickAnswers === "object" ? data.basickAnswers : {};
+  renderBasickTracker();
   barCycleRotation = normalizeBarCycleRotation(data?.barCycleRotation);
   modelEssayTitles = data?.modelEssayTitles && typeof data.modelEssayTitles === "object" ? data.modelEssayTitles : {};
   reviewIntervals = normalizeReviewIntervals(
@@ -1572,6 +1578,7 @@ function exportBackup() {
     currentStudyMode,
     studyLog,
     essayGrid,
+    basickAnswers,
     barCycleRotation,
     reviewIntervals,
     customSubjects,
@@ -3935,3 +3942,46 @@ function enhanceHistoricalEssayRows() {
 }
 function updateHistoricalEssayProgress(){updateAnswerAndQuestionProgress('.historical-essay-row input[data-bar-cycle-check]', 'historical-essay-progress', 'essays');}
 document.addEventListener('DOMContentLoaded',()=>{enhanceHistoricalEssayRows();updateHistoricalEssayProgress();document.querySelectorAll('.historical-essay-row input').forEach(c=>c.addEventListener('change',updateHistoricalEssayProgress));});
+
+
+// Compact Basick essay answer tracker. Separate from the model-essay archive.
+function renderBasickTracker() {
+  const root = document.getElementById("basick-answer-grid");
+  if (!root) return;
+  const subjects = ["Criminal Law & Procedure", "Evidence", "Business Associations", "Remedies", "Civil Procedure", "Real Property", "Professional Responsibility", "Community Property", "Wills & Trusts", "Constitutional Law", "Contracts", "Torts"];
+  root.replaceChildren();
+  const table = document.createElement("table");
+  table.className = "basick-mini-table";
+  const head = document.createElement("thead");
+  const hr = document.createElement("tr");
+  const first = document.createElement("th"); first.textContent = "Subject"; hr.appendChild(first);
+  for (let i = 1; i <= 6; i++) { const th = document.createElement("th"); th.textContent = String(i); hr.appendChild(th); }
+  head.appendChild(hr); table.appendChild(head);
+  const body = document.createElement("tbody");
+  subjects.forEach((subject, si) => {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td"); td.textContent = subject; tr.appendChild(td);
+    for (let essay = 1; essay <= 6; essay++) {
+      const cell = document.createElement("td");
+      const pair = document.createElement("span"); pair.className = "basick-mini-pair";
+      for (const answer of ["a", "b"]) {
+        const key = `${si}-${essay}-${answer}`;
+        const label = document.createElement("label"); label.title = `${subject}, essay ${essay}, answer ${answer.toUpperCase()}`;
+        const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.checked = !!basickAnswers[key];
+        checkbox.addEventListener("change", () => {
+          if (checkbox.checked) basickAnswers[key] = true; else delete basickAnswers[key];
+          saveData(); updateBasickCount();
+        });
+        label.append(checkbox, document.createTextNode(answer)); pair.appendChild(label);
+      }
+      cell.appendChild(pair); tr.appendChild(cell);
+    }
+    body.appendChild(tr);
+  });
+  table.appendChild(body); root.appendChild(table); updateBasickCount();
+}
+function updateBasickCount() {
+  const el = document.getElementById("basick-answer-count");
+  if (el) el.textContent = `${Object.values(basickAnswers).filter(Boolean).length} / 144 answers`;
+}
+document.addEventListener("DOMContentLoaded", renderBasickTracker);

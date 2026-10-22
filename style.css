@@ -2251,3 +2251,17 @@ font-family: inherit;cursor:pointer}
   align-self: start;
 }
 #essay-grid .bar-cycle-workspace { align-items: start; }
+
+/* Small standalone Basick grid below the archive panels. */
+.basick-mini-panel { margin: 12px 0 !important; padding: 10px 14px !important; max-width: 780px; }
+.basick-mini-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px; }
+.basick-mini-heading h2 { margin:0 !important; font-size:15px !important; }
+.basick-mini-heading span { color:#64748b; font-size:11px; white-space:nowrap; }
+.basick-mini-scroll { overflow-x:auto; }
+.basick-mini-table { border-collapse:collapse; width:100%; min-width:520px; table-layout:fixed; font-size:11px; }
+.basick-mini-table th, .basick-mini-table td { padding:3px 5px; border-bottom:1px solid #edf0f2; text-align:center; }
+.basick-mini-table th:first-child, .basick-mini-table td:first-child { text-align:left; width:185px; white-space:nowrap; }
+.basick-mini-table thead th { font-size:11px; color:#475569; }
+.basick-mini-pair { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+.basick-mini-pair label { display:inline-flex; align-items:center; gap:2px; cursor:pointer; font-size:10px; color:#475569; }
+.basick-mini-pair input { width:12px; height:12px; margin:0; accent-color:#2563eb; }
