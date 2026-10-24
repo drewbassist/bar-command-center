@@ -3750,7 +3750,11 @@ function openChecklistEssayGuide(key, caption) {
         'historical-essay-2004-july-q3-a': 'study-guides/wills-trusts-1.html',
         'historical-essay-2004-july-q3-b': 'study-guides/wills-trusts-1.html',
         'historical-essay-2010-july-q4-a': 'study-guides/business-associations-2.html',
-        'historical-essay-2010-july-q4-b': 'study-guides/business-associations-2.html'
+        'historical-essay-2010-july-q4-b': 'study-guides/business-associations-2.html',
+        'historical-essay-2003-july-q4-a': 'study-guides/july-2003-torts-q4.html',
+        'historical-essay-2003-july-q4-b': 'study-guides/july-2003-torts-q4.html',
+        'essay-model-archive-2003-july-q4-a': 'study-guides/july-2003-torts-q4.html',
+        'essay-model-archive-2003-july-q4-b': 'study-guides/july-2003-torts-q4.html'
     };
     const modal = document.getElementById('model-essay-guide-modal');
     const frame = document.getElementById('model-essay-guide-frame');

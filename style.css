@@ -2273,3 +2273,32 @@ font-family: inherit;cursor:pointer}
 .basick-mini-table td {vertical-align:middle !important;padding:5px 4px !important;}
 .basick-mini-date {font-size:11px;line-height:1.3;white-space:nowrap;color:#334155;margin-bottom:3px;}
 .basick-mini-pair {display:flex !important;gap:12px !important;}
+
+/* California Bar Archives: three aligned compact rows, archive-only scope */
+#essay-grid .bar-essay-archive {padding:20px 22px;}
+#essay-grid .bar-essay-archive > h2 {margin:0 0 5px;}
+#essay-grid .bar-essay-archive > .bcc-help-text {margin:0 0 15px;font-size:12px;line-height:1.4;}
+#essay-grid .bar-essay-archive .bar-essay-archive-controls,
+#essay-grid .bar-essay-archive .bar-essay-archive-controls[style] {
+  display:grid;grid-template-columns:minmax(120px,1fr) minmax(130px,1.25fr) auto;
+  gap:10px;align-items:center;margin:0!important;padding:10px 0;
+  border-top:1px solid #e7ebef;
+}
+#essay-grid .bar-essay-archive .bar-essay-archive-controls label {font-size:12px;line-height:1.35;font-weight:650;margin:0;}
+#essay-grid .bar-essay-archive .archive-date-range {display:block;color:#718096;font-size:11px;font-weight:400;margin-top:2px;}
+#essay-grid .bar-essay-archive .bar-essay-archive-controls select {
+  width:100%;max-width:none;min-width:0;box-sizing:border-box;
+  height:36px;padding:5px 9px;font-size:12px;margin:0;
+}
+#essay-grid .bar-essay-archive .bar-essay-archive-open {
+  box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+  height:36px;white-space:nowrap;padding:0 11px;font-size:12px;margin:0;
+}
+@media(max-width:650px){
+  #essay-grid .bar-essay-archive {padding:16px;}
+  #essay-grid .bar-essay-archive .bar-essay-archive-controls,
+  #essay-grid .bar-essay-archive .bar-essay-archive-controls[style] {
+    grid-template-columns:minmax(0,1fr) auto;gap:8px;
+  }
+  #essay-grid .bar-essay-archive .bar-essay-archive-controls label {grid-column:1/-1;}
+}
