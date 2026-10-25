@@ -2302,3 +2302,16 @@ font-family: inherit;cursor:pointer}
   }
   #essay-grid .bar-essay-archive .bar-essay-archive-controls label {grid-column:1/-1;}
 }
+
+/* Two-week Basick rotation, placed beside the existing essay grid. */
+.basick-tracker-layout { display:flex; align-items:flex-start; gap:16px; width:100%; margin:12px 0; }
+.basick-tracker-layout .basick-mini-panel { flex:0 1 1050px; min-width:0; margin:0 !important; }
+.basick-rotation-panel { flex:1 1 300px; min-width:270px; margin:0 !important; padding:14px 16px !important; }
+.basick-rotation-panel h2 { font-size:16px !important; margin:0 0 5px !important; }
+.basick-rotation-note { font-size:11px; color:#64748b; margin:0 0 12px; }
+.basick-rotation-row { display:grid; grid-template-columns:minmax(115px,1fr) 100px 100px; align-items:center; gap:8px; padding:13px 0; border-top:1px solid #edf0f2; font-size:12px; }
+.basick-rotation-row strong { font-size:12px; }
+.basick-rotation-option { display:flex; align-items:center; gap:6px; cursor:pointer; white-space:nowrap; color:#334155; }
+.basick-rotation-option input { width:15px; height:15px; margin:0; accent-color:#2563eb; cursor:pointer; }
+@media (max-width:1250px) { .basick-tracker-layout { flex-wrap:wrap; } .basick-tracker-layout .basick-mini-panel { flex:1 1 100%; } .basick-rotation-panel { flex:1 1 100%; } }
+@media (max-width:500px) { .basick-rotation-row { grid-template-columns:1fr 95px 95px; gap:4px; } }

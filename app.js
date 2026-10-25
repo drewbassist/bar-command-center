@@ -6,6 +6,7 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_TGTjuqPmo8AOx_P2OpxnOw_NGT-1Z9l
 
 let supabaseClient = null;
 let basickAnswers = {};
+let basickColumnRotation = {};
 let currentUser = null;
 let cloudSaveTimer = null;
 let appControlsReady = false;
@@ -130,6 +131,7 @@ async function loadData() {
   studyLog = normalizeStudyLog(loadLocalData("bcc_study_log", createEmptyStudyLog()));
   essayGrid = normalizeEssayGrid(loadLocalData("bcc_essay_grid", {}));
   basickAnswers = loadLocalData("bcc_basick_answers", {});
+  basickColumnRotation = loadLocalData("bcc_basick_column_rotation", {});
   barCycleRotation = normalizeBarCycleRotation(loadLocalData("bcc_bar_cycle_rotation", {}));
   modelEssayTitles = loadLocalData("bcc_model_essay_titles", {});
 
@@ -205,6 +207,7 @@ function saveLocalData() {
   setUserLocalItem("bcc_study_log", JSON.stringify(studyLog));
   setUserLocalItem("bcc_essay_grid", JSON.stringify(essayGrid));
   setUserLocalItem("bcc_basick_answers", JSON.stringify(basickAnswers));
+  setUserLocalItem("bcc_basick_column_rotation", JSON.stringify(basickColumnRotation));
   setUserLocalItem("bcc_bar_cycle_rotation", JSON.stringify(barCycleRotation));
   setUserLocalItem("bcc_model_essay_titles", JSON.stringify(modelEssayTitles));
   setUserLocalItem("bcc_review_intervals", JSON.stringify(reviewIntervals));
@@ -229,6 +232,7 @@ function getCompleteBarOSData() {
     studyLog,
     essayGrid,
     basickAnswers,
+    basickColumnRotation,
     barCycleRotation,
     modelEssayTitles,
     reviewIntervals,
@@ -252,6 +256,7 @@ function applyCompleteBarOSData(data) {
   studyLog = normalizeStudyLog(data?.studyLog);
   essayGrid = normalizeEssayGrid(data?.essayGrid);
   basickAnswers = data?.basickAnswers && typeof data.basickAnswers === "object" ? data.basickAnswers : {};
+  basickColumnRotation = data?.basickColumnRotation && typeof data.basickColumnRotation === "object" ? data.basickColumnRotation : {};
   barCycleRotation = normalizeBarCycleRotation(data?.barCycleRotation);
   modelEssayTitles = data?.modelEssayTitles && typeof data.modelEssayTitles === "object" ? data.modelEssayTitles : {};
   reviewIntervals = normalizeReviewIntervals(
@@ -1578,6 +1583,7 @@ function exportBackup() {
     studyLog,
     essayGrid,
     basickAnswers,
+    basickColumnRotation,
     barCycleRotation,
     modelEssayTitles,
     reviewIntervals,
@@ -1625,6 +1631,7 @@ function importBackup(event) {
       studyLog = normalizeStudyLog(backup.studyLog);
       essayGrid = normalizeEssayGrid(backup.essayGrid);
       if (backup.basickAnswers && typeof backup.basickAnswers === "object") basickAnswers = backup.basickAnswers;
+      if (backup.basickColumnRotation && typeof backup.basickColumnRotation === "object") basickColumnRotation = backup.basickColumnRotation;
       if (backup.barCycleRotation && typeof backup.barCycleRotation === "object") barCycleRotation = normalizeBarCycleRotation(backup.barCycleRotation);
       if (backup.modelEssayTitles && typeof backup.modelEssayTitles === "object") modelEssayTitles = backup.modelEssayTitles;
       reviewIntervals = normalizeReviewIntervals(
@@ -4025,7 +4032,39 @@ function renderBasickTracker() {
   table.appendChild(body);root.appendChild(table);
   refreshBasickLinkedChecks();
 }
+function renderBasickColumnRotation() {
+  const root = document.getElementById("basick-column-rotation");
+  if (!root) return;
+  root.replaceChildren();
+  const months = [["November 2026",1,2],["December 2026",3,4],["January 2027",5,6]];
+  months.forEach(([month, first, second]) => {
+    const row = document.createElement("div");
+    row.className = "basick-rotation-row";
+    const heading = document.createElement("strong");
+    heading.textContent = month;
+    row.appendChild(heading);
+    [first, second].forEach((col, i) => {
+      const label = document.createElement("label");
+      label.className = "basick-rotation-option";
+      const box = document.createElement("input");
+      box.type = "checkbox";
+      box.checked = !!basickColumnRotation[`2026-27-${col}`];
+      box.setAttribute("aria-label", `${month}, ${i ? "second" : "first"} two weeks, column ${col} complete`);
+      box.addEventListener("change", () => {
+        if (box.checked) basickColumnRotation[`2026-27-${col}`] = true;
+        else delete basickColumnRotation[`2026-27-${col}`];
+        saveData();
+      });
+      const name = document.createElement("span");
+      name.textContent = `Column ${col}`;
+      label.append(box,name);
+      row.appendChild(label);
+    });
+    root.appendChild(row);
+  });
+}
 document.addEventListener("DOMContentLoaded",()=>{
+  renderBasickColumnRotation();
   renderBasickTracker();
   document.addEventListener("change",e=>{
     if(e.target.matches('input[data-bar-cycle-check]')) refreshBasickLinkedChecks();
