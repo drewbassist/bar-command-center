@@ -2315,3 +2315,9 @@ font-family: inherit;cursor:pointer}
 .basick-rotation-option input { width:15px; height:15px; margin:0; accent-color:#2563eb; cursor:pointer; }
 @media (max-width:1250px) { .basick-tracker-layout { flex-wrap:wrap; } .basick-tracker-layout .basick-mini-panel { flex:1 1 100%; } .basick-rotation-panel { flex:1 1 100%; } }
 @media (max-width:500px) { .basick-rotation-row { grid-template-columns:1fr 95px 95px; gap:4px; } }
+
+/* Six-week essay rotation: ten compact dated rows, one checkbox each. */
+.basick-rotation-row { grid-template-columns: 85px minmax(0, 1fr) 105px; padding: 9px 0; gap: 10px; }
+.basick-rotation-dates { color:#475569; font-size:12px; }
+.basick-rotation-row .basick-rotation-option { justify-self:end; }
+@media (max-width:500px) { .basick-rotation-row { grid-template-columns: 65px minmax(0, 1fr) 85px; gap:5px; } .basick-rotation-dates {font-size:11px;} }

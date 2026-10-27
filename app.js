@@ -4041,32 +4041,38 @@ function renderBasickColumnRotation() {
   const root = document.getElementById("basick-column-rotation");
   if (!root) return;
   root.replaceChildren();
-  const months = [["November 2026",1,2],["December 2026",3,4],["January 2027",5,6]];
-  months.forEach(([month, first, second]) => {
+  const startDate = new Date(Date.UTC(2026, 10, 1));
+  const formatDate = date => date.toLocaleDateString("en-US", {month:"short", day:"numeric", year:"numeric", timeZone:"UTC"});
+  for (let i = 0; i < 10; i++) {
+    const from = new Date(startDate.getTime() + i * 42 * 86400000);
+    const to = new Date(from.getTime() + 41 * 86400000);
     const row = document.createElement("div");
     row.className = "basick-rotation-row";
     const heading = document.createElement("strong");
-    heading.textContent = month;
-    row.appendChild(heading);
-    [first, second].forEach((col, i) => {
-      const label = document.createElement("label");
-      label.className = "basick-rotation-option";
-      const box = document.createElement("input");
-      box.type = "checkbox";
-      box.checked = !!basickColumnRotation[`2026-27-${col}`];
-      box.setAttribute("aria-label", `${month}, ${i ? "second" : "first"} two weeks, column ${col} complete`);
-      box.addEventListener("change", () => {
-        if (box.checked) basickColumnRotation[`2026-27-${col}`] = true;
-        else delete basickColumnRotation[`2026-27-${col}`];
-        saveData();
-      });
-      const name = document.createElement("span");
-      name.textContent = `Column ${col}`;
-      label.append(box,name);
-      row.appendChild(label);
+    heading.textContent = `Period ${i + 1}`;
+    const dates = document.createElement("span");
+    dates.className = "basick-rotation-dates";
+    dates.textContent = `${formatDate(from)} – ${formatDate(to)}`;
+    const label = document.createElement("label");
+    label.className = "basick-rotation-option";
+    const box = document.createElement("input");
+    box.type = "checkbox";
+    const key = `six-week-2026-27-${i + 1}`;
+    box.checked = !!basickColumnRotation[key];
+    box.setAttribute("aria-label", `Period ${i + 1}, ${formatDate(from)} to ${formatDate(to)}, complete`);
+    box.addEventListener("change", () => {
+      if (box.checked) basickColumnRotation[key] = true;
+      else delete basickColumnRotation[key];
+      saveData();
     });
+    label.append(box, document.createTextNode("Complete"));
+    row.append(heading, dates, label);
     root.appendChild(row);
-  });
+  }
+  const note = document.createElement("p");
+  note.className = "basick-rotation-note";
+  note.textContent = "Dec 26–31, 2027: final review / catch-up (6 days after the ten six-week periods).";
+  root.appendChild(note);
 }
 document.addEventListener("DOMContentLoaded",()=>{
   renderBasickColumnRotation();
