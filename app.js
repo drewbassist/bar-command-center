@@ -3765,7 +3765,11 @@ function openChecklistEssayGuide(key, caption) {
         'historical-essay-2003-july-q4-a': 'study-guides/july-2003-torts-q4.html',
         'historical-essay-2003-july-q4-b': 'study-guides/july-2003-torts-q4.html',
         'essay-model-archive-2003-july-q4-a': 'study-guides/july-2003-torts-q4.html',
-        'essay-model-archive-2003-july-q4-b': 'study-guides/july-2003-torts-q4.html'
+        'essay-model-archive-2003-july-q4-b': 'study-guides/july-2003-torts-q4.html',
+        'historical-essay-2001-july-q4-a': 'study-guides/july-2001-constitutional-law-q4.html',
+        'historical-essay-2001-july-q4-b': 'study-guides/july-2001-constitutional-law-q4.html',
+        'essay-model-archive-2001-july-q4-a': 'study-guides/july-2001-constitutional-law-q4.html',
+        'essay-model-archive-2001-july-q4-b': 'study-guides/july-2001-constitutional-law-q4.html'
     };
     const modal = document.getElementById('model-essay-guide-modal');
     const frame = document.getElementById('model-essay-guide-frame');
@@ -3798,6 +3802,7 @@ function enhanceModelEssayRow(row) {
     renderTitle();
     const actions = document.createElement('span'); actions.className = 'model-essay-row-actions';
     const guide = document.createElement('button'); guide.type = 'button'; guide.textContent = 'Guide'; if (['essay-model-archive-2012-february-q2-a','essay-model-archive-2012-february-q2-b','essay-model-archive-2012-february-q1-a','essay-model-archive-2012-february-q1-b','essay-model-archive-1987-july-q2-a','essay-model-archive-1987-july-q2-b','essay-model-archive-2004-july-q3-a','essay-model-archive-2004-july-q3-b'].includes(key)) { guide.classList.add('guide-available'); guide.title = 'Study guide available'; }
+    if (/^(?:historical-essay|essay-model-archive)-2001-july-q4-[ab]$/.test(key)) { guide.classList.add('guide-available'); guide.title = 'Study guide available'; }
     if (/^(?:historical-essay|essay-model-archive)-2011-july-q3-[ab]$/.test(key)) { guide.classList.add('guide-available'); guide.title = 'Study guide available'; }
     guide.addEventListener('click', e => { e.preventDefault(); openChecklistEssayGuide(key, caption.textContent); });
     const edit = document.createElement('button'); edit.type = 'button'; edit.textContent = 'Edit';
@@ -3938,7 +3943,8 @@ function enhancePerformanceTestRows() {
   const original=caption.textContent; const base=original.replace(/ · (?:Performance Test|Question 1) · Answer [AB]$/, ' · Question 1'); const answer=original.slice(-1);
   const render=()=>{caption.textContent=base+(modelEssayTitles[key]?' '+modelEssayTitles[key]:'')+' · Answer '+answer;check.setAttribute('aria-label','Complete '+caption.textContent);};
   render(); const actions=document.createElement('span');actions.className='model-essay-row-actions';
-  const guide=document.createElement('button');guide.type='button';guide.textContent='Guide';if (['essay-model-archive-1987-july-q2-a','essay-model-archive-1987-july-q2-b','essay-model-archive-2004-july-q3-a','essay-model-archive-2004-july-q3-b'].includes(key)) {guide.classList.add('guide-available');guide.title='Study guide available';}if (/^(?:historical-essay|essay-model-archive)-2011-july-q3-[ab]$/.test(key)){guide.classList.add('guide-available');guide.title='Study guide available';}guide.addEventListener('click',e=>{e.preventDefault();openChecklistEssayGuide(key,caption.textContent);});
+  const guide=document.createElement('button');guide.type='button';guide.textContent='Guide';if (['essay-model-archive-1987-july-q2-a','essay-model-archive-1987-july-q2-b','essay-model-archive-2004-july-q3-a','essay-model-archive-2004-july-q3-b'].includes(key)) {guide.classList.add('guide-available');guide.title='Study guide available';}if (/^(?:historical-essay|essay-model-archive)-2001-july-q4-[ab]$/.test(key)) { guide.classList.add('guide-available'); guide.title = 'Study guide available'; }
+    if (/^(?:historical-essay|essay-model-archive)-2001-july-q4-[ab]$/.test(key)){guide.classList.add('guide-available');guide.title='Study guide available';}if (/^(?:historical-essay|essay-model-archive)-2011-july-q3-[ab]$/.test(key)){guide.classList.add('guide-available');guide.title='Study guide available';}guide.addEventListener('click',e=>{e.preventDefault();openChecklistEssayGuide(key,caption.textContent);});
   const edit=document.createElement('button');edit.type='button';edit.textContent='Edit';edit.addEventListener('click',e=>{e.preventDefault();const value=window.prompt('Topic for '+base+' · Answer '+answer,modelEssayTitles[key]||'');if(value===null)return;const clean=value.trim().slice(0,120);if(clean)modelEssayTitles[key]=clean;else delete modelEssayTitles[key];render();saveData();});
   actions.append(guide,edit);row.insertBefore(actions,check);
  });
@@ -3956,7 +3962,8 @@ function enhanceHistoricalEssayRows() {
   if(!parts)return;const base=parts[1],answer=parts[2];
   const render=()=>{caption.textContent=base+(modelEssayTitles[key]?' '+modelEssayTitles[key]:'')+' · Answer '+answer;check.setAttribute('aria-label','Complete '+caption.textContent);};
   render();const actions=document.createElement('span');actions.className='model-essay-row-actions';
-  const guide=document.createElement('button');guide.type='button';guide.textContent='Guide';if (['historical-essay-1987-july-q2-a','historical-essay-1987-july-q2-b','historical-essay-2004-july-q3-a','historical-essay-2004-july-q3-b','historical-essay-2010-july-q4-a','historical-essay-2010-july-q4-b'].includes(key)){guide.classList.add('guide-available');guide.title='Study guide available';}if (/^(?:historical-essay|essay-model-archive)-2011-july-q3-[ab]$/.test(key)){guide.classList.add('guide-available');guide.title='Study guide available';}guide.addEventListener('click',e=>{e.preventDefault();openChecklistEssayGuide(key,caption.textContent);});
+  const guide=document.createElement('button');guide.type='button';guide.textContent='Guide';if (['historical-essay-1987-july-q2-a','historical-essay-1987-july-q2-b','historical-essay-2004-july-q3-a','historical-essay-2004-july-q3-b','historical-essay-2010-july-q4-a','historical-essay-2010-july-q4-b'].includes(key)){guide.classList.add('guide-available');guide.title='Study guide available';}if (/^(?:historical-essay|essay-model-archive)-2001-july-q4-[ab]$/.test(key)) { guide.classList.add('guide-available'); guide.title = 'Study guide available'; }
+    if (/^(?:historical-essay|essay-model-archive)-2001-july-q4-[ab]$/.test(key)){guide.classList.add('guide-available');guide.title='Study guide available';}if (/^(?:historical-essay|essay-model-archive)-2011-july-q3-[ab]$/.test(key)){guide.classList.add('guide-available');guide.title='Study guide available';}guide.addEventListener('click',e=>{e.preventDefault();openChecklistEssayGuide(key,caption.textContent);});
   const edit=document.createElement('button');edit.type='button';edit.textContent='Edit';edit.addEventListener('click',e=>{e.preventDefault();const value=window.prompt('Subject or topic for '+base+' · Answer '+answer,modelEssayTitles[key]||'');if(value===null)return;const clean=value.trim().slice(0,120);if(clean)modelEssayTitles[key]=clean;else delete modelEssayTitles[key];render();saveData();});
   actions.append(guide,edit);row.insertBefore(actions,check);
  });
