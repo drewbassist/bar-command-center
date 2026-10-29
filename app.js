@@ -3744,10 +3744,10 @@ function renderManualModelEssays() {
 }
 function openChecklistEssayGuide(key, caption) {
     const guidePaths = {
-        'essay-model-archive-2007-february-q4-a': 'study-guides/february-2007-wills-q4.html',
-        'essay-model-archive-2007-february-q4-b': 'study-guides/february-2007-wills-q4.html',
         'historical-essay-2007-february-q4-a': 'study-guides/february-2007-wills-q4.html',
         'historical-essay-2007-february-q4-b': 'study-guides/february-2007-wills-q4.html',
+        'essay-model-archive-2007-february-q4-a': 'study-guides/february-2007-wills-q4.html',
+        'essay-model-archive-2007-february-q4-b': 'study-guides/february-2007-wills-q4.html',
         'essay-model-archive-2012-february-q1-a': 'study-guides/february-2012-trusts-q1.html',
         'essay-model-archive-2012-february-q1-b': 'study-guides/february-2012-trusts-q1.html',
         'essay-model-archive-2012-february-q2-a': 'study-guides/february-2012-constitutional-law-q2.html',
@@ -3808,6 +3808,7 @@ function enhanceModelEssayRow(row) {
     const guide = document.createElement('button'); guide.type = 'button'; guide.textContent = 'Guide'; if (['essay-model-archive-2012-february-q2-a','essay-model-archive-2012-february-q2-b','essay-model-archive-2012-february-q1-a','essay-model-archive-2012-february-q1-b','essay-model-archive-1987-july-q2-a','essay-model-archive-1987-july-q2-b','essay-model-archive-2004-july-q3-a','essay-model-archive-2004-july-q3-b'].includes(key)) { guide.classList.add('guide-available'); guide.title = 'Study guide available'; }
     if (/^(?:historical-essay|essay-model-archive)-2001-july-q4-[ab]$/.test(key)) { guide.classList.add('guide-available'); guide.title = 'Study guide available'; }
     if (/^(?:historical-essay|essay-model-archive)-2011-july-q3-[ab]$/.test(key)) { guide.classList.add('guide-available'); guide.title = 'Study guide available'; }
+    if (/^(?:historical-essay|essay-model-archive)-2007-february-q4-[ab]$/.test(key)) { guide.classList.add('guide-available'); guide.title = 'Study guide available'; }
     guide.addEventListener('click', e => { e.preventDefault(); openChecklistEssayGuide(key, caption.textContent); });
     const edit = document.createElement('button'); edit.type = 'button'; edit.textContent = 'Edit';
     edit.addEventListener('click', e => {
