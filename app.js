@@ -3744,6 +3744,10 @@ function renderManualModelEssays() {
 }
 function openChecklistEssayGuide(key, caption) {
     const guidePaths = {
+        'essay-model-archive-2007-february-q4-a': 'study-guides/february-2007-wills-q4.html',
+        'essay-model-archive-2007-february-q4-b': 'study-guides/february-2007-wills-q4.html',
+        'historical-essay-2007-february-q4-a': 'study-guides/february-2007-wills-q4.html',
+        'historical-essay-2007-february-q4-b': 'study-guides/february-2007-wills-q4.html',
         'essay-model-archive-2012-february-q1-a': 'study-guides/february-2012-trusts-q1.html',
         'essay-model-archive-2012-february-q1-b': 'study-guides/february-2012-trusts-q1.html',
         'essay-model-archive-2012-february-q2-a': 'study-guides/february-2012-constitutional-law-q2.html',
