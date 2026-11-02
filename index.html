@@ -60,6 +60,7 @@ New user? Follow instructions sent to your email before signing in.
 <button class="bcc-nav-button" data-view="reviews">Reviews</button>
 <button class="bcc-nav-button" data-view="study-log">Study Log</button>
 <button class="bcc-nav-button" data-view="essay-grid">Bar Cycle</button>
+<button class="bcc-nav-button" data-view="blind-struggle">Blind-Struggle</button>
 <button class="bcc-nav-button" data-view="stats">Progress</button>
 <button class="bcc-nav-button" onclick="window.location.href='/flashcardsplus/'" type="button">Flashcards+</button>
 <button class="bcc-nav-button" data-view="settings">Settings</button>
@@ -1045,6 +1046,28 @@ New user? Follow instructions sent to your email before signing in.
 </div>
 </div>
 </section>
+<section class="bcc-view" id="blind-struggle">
+<div class="bcc-panel bs-page">
+<h2>Blind-Struggle · 72-Essay Intensive</h2>
+<p>November 2, 2026 – June 5, 2027 · 3 days per essay · 5 hours per day · Speak, write, verify.</p>
+<div class="bs-stats"><div><strong id="bs-cycles">0 / 72</strong><small>Cycles completed</small></div><div><strong id="bs-hours">0 / 1,080</strong><small>Logged hours / planned</small></div><div><strong id="bs-date">June 5, 2027</strong><small>Planned finish</small></div></div>
+<div class="bs-controls"><label>Essay <select id="bs-essay"></select></label><label>Cycle day <select id="bs-day"><option value="0">Day 1 · Cold Examination</option><option value="1">Day 2 · Reconstruction</option><option value="2">Day 3 · Transfer & Retention</option></select></label></div>
+<div id="bs-assignment" class="bs-assignment"></div>
+<h3 id="bs-day-title"></h3><p id="bs-day-note"></p><div id="bs-tasks"></div>
+<div class="bs-actions"><button type="button" id="bs-prev">Previous day</button><button type="button" id="bs-next">Next day</button></div>
+<h3>Essay workspace</h3><p>Keep the model answers closed during the cold draft and blind rewrite. Your writing is saved locally as you type.</p>
+<label class="bs-label">Cold draft <textarea id="bs-draft" rows="7" placeholder="Write a complete IRAC answer, without notes..."></textarea></label>
+<label class="bs-label">Blind rewrite <textarea id="bs-rewrite" rows="7" placeholder="Reconstruct the answer without consulting your first draft..."></textarea></label>
+<h3>Master Error Log</h3><p>Record the error, factual trigger, correct rule, and why the issue was missed. Speak the corrected rule aloud, then write it from memory.</p>
+<label class="bs-label">Error / trigger / correct rule / reason <textarea id="bs-errors" rows="6" placeholder="Issue missed: …
+Fact trigger: …
+Correct rule: …
+Why I missed it: …"></textarea></label>
+<div class="bs-controls"><label>Cold draft issue accuracy (%) <input id="bs-issue-score" type="number" min="0" max="100" placeholder="0–100"></label><label>Rule accuracy (%) <input id="bs-rule-score" type="number" min="0" max="100" placeholder="0–100"></label><label>Actual hours studied <input id="bs-actual-hours" type="number" min="0" max="24" step="0.25" placeholder="Hours"></label></div>
+<h3>Spaced retrieval queue</h3><p>Recall at 7 and 21 days after the first essay day. Check off only after speaking and writing rules without looking.</p><div id="bs-retrieval"></div>
+<p class="bs-warning">Training data are stored separately in this browser. Export a backup regularly; this page does not modify your Basick A/B checkmarks or essay titles.</p>
+<div class="bs-actions"><button type="button" id="bs-export">Export training backup</button><label class="bs-import">Import training backup <input type="file" id="bs-import" accept="application/json,.json"></label></div>
+</div></section>
 </main>
 </div>
 <div id="model-essay-guide-modal" class="model-essay-guide-modal" hidden role="dialog" aria-modal="true" aria-labelledby="model-essay-guide-title"><div class="model-essay-guide-dialog"><div class="model-essay-guide-toolbar"><strong id="model-essay-guide-title">Essay Study Guide</strong><button type="button" id="model-essay-guide-close" aria-label="Close study guide">Close ×</button></div><iframe id="model-essay-guide-frame" title="Essay study guide" loading="lazy"></iframe><div id="model-essay-guide-empty" hidden><h3>Study guide not yet added</h3><p>This essay slot is ready. Its issue-spotting guide will appear here once we prepare it.</p></div></div></div>
@@ -1053,6 +1076,8 @@ New user? Follow instructions sent to your email before signing in.
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="app.js"></script>
 <script src="study-guides.js"></script>
+<link rel="stylesheet" href="blind-struggle.css">
+<script src="blind-struggle.js"></script>
 
 <script>
 (function () {
