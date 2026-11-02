@@ -2325,3 +2325,18 @@ font-family: inherit;cursor:pointer}
 /* Blind-Struggle training page */
 #essay-grid .basick-tracker-layout{display:block}#essay-grid .basick-mini-panel{width:100%;max-width:none;flex:none}
 .struggle-panel{margin-top:16px;padding:18px!important}.struggle-header{display:flex;justify-content:space-between;gap:12px;align-items:center}.struggle-header p,.struggle-hint{font-size:12px;color:#64748b}.struggle-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}.struggle-metric{padding:12px;background:#f4f6fa;border-radius:8px}.struggle-metric strong{display:block;font-size:19px}.struggle-metric span{font-size:11px;color:#64748b}.struggle-assignment{background:#eef3fa;border:1px solid #d9e3f2;border-radius:8px;padding:14px;margin-bottom:12px}.struggle-assignment strong{display:block;font-size:16px}.struggle-assignment small{display:block;color:#52637a;margin-top:5px}.struggle-day-tabs{display:flex;gap:8px;margin:12px 0}.struggle-day-tabs button,.struggle-actions button,.struggle-header button{padding:8px 12px;border:1px solid #b9c5d4;border-radius:6px;background:white;cursor:pointer}.struggle-day-tabs button.active,.struggle-actions button{background:#142b4c;color:white}.struggle-task{display:flex;align-items:center;gap:12px;padding:11px;border-bottom:1px solid #e5e7eb}.struggle-task label{flex:1}.struggle-task small{color:#64748b}.struggle-actions{display:flex;align-items:center;gap:14px;margin:14px 0}.struggle-actions button:disabled{opacity:.5;cursor:not-allowed}.struggle-columns{display:grid;grid-template-columns:1fr 1fr;gap:20px;border-top:1px solid #ddd;padding-top:16px}.struggle-columns label{display:block;margin:12px 0;font-size:12px;font-weight:600}.struggle-columns textarea{display:block;box-sizing:border-box;width:100%;margin-top:5px;padding:10px;border:1px solid #cbd5e1;border-radius:6px;font:13px/1.5 inherit;resize:vertical}.struggle-columns input[type=number]{display:block;padding:8px;margin-top:6px;width:100px}.struggle-review,.struggle-upcoming-row{padding:9px;border-bottom:1px solid #e5e7eb;font-size:12px}.struggle-review button{margin-left:8px}.struggle-review.overdue{background:#fff4ed}.struggle-review.done{opacity:.65}.struggle-review strong,.struggle-upcoming-row strong{display:block}.struggle-hint{line-height:1.5}@media(max-width:760px){.struggle-columns{grid-template-columns:1fr}.struggle-metrics{grid-template-columns:repeat(2,1fr)}.struggle-header{flex-wrap:wrap}}
+
+/* Blind-Struggle: retire the three long archive checklists from the page.
+   Keep their markup and saved checkbox/title data intact for future restoration. */
+#essay-grid .bar-cycle-workspace > .model-essay-panel,
+#essay-grid .bar-cycle-workspace > .historical-essay-panel,
+#essay-grid .bar-cycle-workspace > .performance-test-panel {
+  display: none !important;
+}
+/* Let the remaining training/archive panels use the available width. */
+#essay-grid .bar-cycle-workspace {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+#essay-grid .bar-cycle-workspace > .bcc-panel {
+  grid-column: 1 / -1;
+}
