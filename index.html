@@ -770,7 +770,26 @@ New user? Follow instructions sent to your email before signing in.
  <div class="struggle-day-tabs" id="struggle-day-tabs"></div>
  <div id="struggle-tasks"></div>
  <div class="struggle-actions"><button type="button" id="struggle-next-day">Complete this training day</button><span id="struggle-status"></span></div>
- <div class="struggle-columns"><div><h3>Drafts and Master Error Log</h3><label>Cold draft<textarea id="struggle-draft" rows="6" placeholder="Write without notes. Autosaved locally."></textarea></label><label>Blind rewrite<textarea id="struggle-rewrite" rows="6" placeholder="Rewrite from the original prompt. Autosaved locally."></textarea></label><label>Master Error Log<textarea id="struggle-errors" rows="6" placeholder="Issue missed | factual trigger | correct rule | why missed | spoken and written retrieval"></textarea></label><label>Actual study hours today <input id="struggle-hours" type="number" min="0" max="24" step="0.25" value="0"></label></div><div><h3>Spaced repetition · dated reviews</h3><p class="struggle-hint">Reviews are due 7 and 21 days after the actual essay start date. Existing due dates do not move when training runs late.</p><div id="struggle-reviews"></div><h3>Upcoming essays and dates</h3><div id="struggle-upcoming"></div><p class="struggle-hint">Original finish target: June 5, 2027. Projected dates adjust when a training day is completed, never simply because midnight passes. Overdue work remains due.</p></div></div>
+ <div class="struggle-columns"><div><h3>Drafts and Essay Error Notes</h3><button type="button" id="mel-from-essay" onclick="window.barosAddErrorFromEssay?.()">Add structured error to Master Log</button><label>Cold draft<textarea id="struggle-draft" rows="6" placeholder="Write without notes. Autosaved locally."></textarea></label><label>Blind rewrite<textarea id="struggle-rewrite" rows="6" placeholder="Rewrite from the original prompt. Autosaved locally."></textarea></label><label>Master Error Log<textarea id="struggle-errors" rows="6" placeholder="Issue missed | factual trigger | correct rule | why missed | spoken and written retrieval"></textarea></label><label>Actual study hours today <input id="struggle-hours" type="number" min="0" max="24" step="0.25" value="0"></label></div><div><h3>Spaced repetition · dated reviews</h3><div id="mel-training-due" class="struggle-hint"></div><p class="struggle-hint">Reviews are due 7 and 21 days after the actual essay start date. Existing due dates do not move when training runs late.</p><div id="struggle-reviews"></div><h3>Upcoming essays and dates</h3><div id="struggle-upcoming"></div><p class="struggle-hint">Original finish target: June 5, 2027. Projected dates adjust when a training day is completed, never simply because midnight passes. Overdue work remains due.</p></div></div>
+</section>
+<section class="bcc-panel mel-panel" id="master-error-log">
+ <div class="mel-header"><div><h2>Master Error Log</h2><p class="mel-hint">Speak the rule, write it from memory, then reveal and verify. Entries link to source essays and have their own spaced-repetition dates.</p></div><button type="button" id="mel-new">+ Add Rule / Concept</button></div>
+ <p id="mel-status" role="status">Loading local copy…</p><p id="mel-summary"></p>
+ <div id="mel-due"></div>
+ <details id="mel-form"><summary>Add or edit a legal concept</summary><form id="mel-entry-form"><div class="mel-form-grid">
+ <label>Subject<select id="mel-subject"><option value="">Select subject</option><option>Civil Procedure</option><option>Real Property</option><option>Professional Responsibility</option><option>Community Property</option><option>Wills</option><option>Trusts</option><option>Constitutional Law</option><option>Contracts</option><option>Torts</option><option>Criminal Law & Procedure</option><option>Evidence</option><option>Business Associations</option><option>Remedies</option><option>Other</option></select></label>
+ <label>Concept / doctrine<input id="mel-concept" required placeholder="Apparent Authority"></label>
+ <label>Definition / rule<textarea id="mel-rule" required></textarea></label>
+ <label>Issue trigger<textarea id="mel-trigger"></textarea></label>
+ <label>Exception / distinction<textarea id="mel-distinction"></textarea></label>
+ <label>My original error<textarea id="mel-originalError"></textarea></label>
+ <label>Correct analysis<textarea id="mel-analysis"></textarea></label>
+ <label>Source essay<input id="mel-source" placeholder="July 2010 · Question 4"></label>
+ </div><button id="mel-save" type="submit">Add concept</button></form></details>
+ <div class="mel-toolbar"><input id="mel-search" type="search" placeholder="Search rules, concepts, triggers, errors…"><select id="mel-filter"><option value="">All subjects</option><option>Civil Procedure</option><option>Real Property</option><option>Professional Responsibility</option><option>Community Property</option><option>Wills</option><option>Trusts</option><option>Constitutional Law</option><option>Contracts</option><option>Torts</option><option>Criminal Law & Procedure</option><option>Evidence</option><option>Business Associations</option><option>Remedies</option><option>Other</option></select></div>
+ <div class="mel-actions"><button type="button" id="mel-export">Back Up Everything · JSON</button><button type="button" id="mel-csv">Export CSV</button><label class="mel-hint">Restore / merge JSON <input id="mel-import" type="file" accept="application/json,.json"></label></div>
+ <p class="mel-hint">Cloud saving requires the supplied Supabase SQL setup. Local storage is a fallback, not a backup. Export JSON regularly and store a copy outside Supabase.</p>
+ <div id="mel-list"></div>
 </section>
 </section>
 <section class="bcc-view" id="stats">
@@ -946,8 +965,10 @@ New user? Follow instructions sent to your email before signing in.
 <footer class="bcc-footer">BarOS v1.1.1</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<link rel="stylesheet" href="master-error-log.css">
 <script src="app.js"></script>
 <script src="blind-struggle.js"></script>
+<script src="master-error-log.js"></script>
 <script src="study-guides.js"></script>
 
 <script>
