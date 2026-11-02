@@ -786,10 +786,10 @@ New user? Follow instructions sent to your email before signing in.
  <label>Correct analysis<textarea id="mel-analysis"></textarea></label>
  <label>Source essay<input id="mel-source" placeholder="July 2010 · Question 4"></label>
  </div><button id="mel-save" type="submit">Add concept</button></form></details>
- <div class="mel-toolbar"><input id="mel-search" type="search" placeholder="Search rules, concepts, triggers, errors…"><select id="mel-filter"><option value="">All subjects</option><option>Civil Procedure</option><option>Real Property</option><option>Professional Responsibility</option><option>Community Property</option><option>Wills</option><option>Trusts</option><option>Constitutional Law</option><option>Contracts</option><option>Torts</option><option>Criminal Law & Procedure</option><option>Evidence</option><option>Business Associations</option><option>Remedies</option><option>Other</option></select></div>
+ <div class="mel-toolbar"><select id="mel-view" aria-label="Choose Master Error Log view"><option value="recent">Recently Added</option><option value="updated">Recently Updated</option><option value="due">Due for Retrieval</option><option value="all">All Concepts</option></select><input id="mel-search" type="search" placeholder="Search rules, concepts, triggers, errors…"><select id="mel-filter"><option value="">All subjects</option><option>Civil Procedure</option><option>Real Property</option><option>Professional Responsibility</option><option>Community Property</option><option>Wills</option><option>Trusts</option><option>Constitutional Law</option><option>Contracts</option><option>Torts</option><option>Criminal Law & Procedure</option><option>Evidence</option><option>Business Associations</option><option>Remedies</option><option>Other</option></select></div>
  <div class="mel-actions"><button type="button" id="mel-export">Back Up Everything · JSON</button><button type="button" id="mel-csv">Export CSV</button><label class="mel-hint">Restore / merge JSON <input id="mel-import" type="file" accept="application/json,.json"></label></div>
  <p class="mel-hint">Cloud saving requires the supplied Supabase SQL setup. Local storage is a fallback, not a backup. Export JSON regularly and store a copy outside Supabase.</p>
- <div id="mel-list"></div>
+ <div id="mel-list"></div><button type="button" id="mel-more" hidden>Show 10 more entries</button>
 </section>
 </section>
 <section class="bcc-view" id="stats">
