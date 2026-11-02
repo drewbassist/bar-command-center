@@ -2340,3 +2340,22 @@ font-family: inherit;cursor:pointer}
 #essay-grid .bar-cycle-workspace > .bcc-panel {
   grid-column: 1 / -1;
 }
+
+/* Blind-Struggle: archives and Basick tracker side by side on desktop. */
+@media (min-width: 1000px) {
+  #essay-grid .bar-cycle-workspace {
+    display:grid !important;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) !important;
+    gap:16px !important;
+    align-items:start;
+  }
+  #essay-grid .bar-cycle-workspace > .bar-essay-archive {grid-column:1 !important;grid-row:1;}
+  #essay-grid .bar-cycle-workspace > .basick-tracker-layout {grid-column:2 !important;grid-row:1;min-width:0;margin:0;}
+  #essay-grid .bar-cycle-workspace .basick-mini-panel {width:100%;max-width:none;margin:0 !important;}
+}
+@media (max-width:999px) {
+  #essay-grid .bar-cycle-workspace {display:grid !important;grid-template-columns:minmax(0,1fr) !important;}
+  #essay-grid .bar-cycle-workspace > .bar-essay-archive,
+  #essay-grid .bar-cycle-workspace > .basick-tracker-layout {grid-column:1 !important;}
+  #essay-grid .bar-cycle-workspace > .basick-tracker-layout {margin:0;}
+}
