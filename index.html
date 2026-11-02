@@ -59,8 +59,7 @@ New user? Follow instructions sent to your email before signing in.
 <button class="bcc-nav-button" data-view="flashcards">Flashcards</button>
 <button class="bcc-nav-button" data-view="reviews">Reviews</button>
 <button class="bcc-nav-button" data-view="study-log">Study Log</button>
-<button class="bcc-nav-button" data-view="essay-grid">Bar Cycle</button>
-<button class="bcc-nav-button" data-view="blind-struggle">Blind-Struggle</button>
+<button class="bcc-nav-button" data-view="essay-grid">Blind-Struggle</button>
 <button class="bcc-nav-button" data-view="stats">Progress</button>
 <button class="bcc-nav-button" onclick="window.location.href='/flashcardsplus/'" type="button">Flashcards+</button>
 <button class="bcc-nav-button" data-view="settings">Settings</button>
@@ -343,7 +342,7 @@ New user? Follow instructions sent to your email before signing in.
 <section class="bcc-view" id="essay-grid">
 
     <div class="bcc-panel bar-cycle-intro">
-        <h2>Bar Cycle</h2>
+        <h2>Blind-Struggle</h2>
         <p class="bcc-help-text">
             Move through one new subject at a time, with +1, +3, and +7 review passes.
             Use the checkboxes only to confirm that you touched the subject.
@@ -763,121 +762,16 @@ New user? Follow instructions sent to your email before signing in.
   <div class="basick-mini-heading"><h2>Basick Essay Tracker</h2><span id="basick-answer-count">0 / 144 answers</span></div>
   <div id="basick-answer-grid" class="basick-mini-scroll"></div>
 </section>
-<section class="bcc-panel basick-rotation-panel" aria-label="Six-week Basick essay rotation tracker">
-  <h2>Six-Week Essay Rotation</h2>
-  <p class="basick-rotation-note">Ten six-week periods · One completion check per period</p>
-  <div id="basick-column-rotation"></div>
+</div>
+<section class="bcc-panel struggle-panel" id="struggle-training">
+ <div class="struggle-header"><div><h2>Today's Training · Blind-Struggle</h2><p>November 2, 2026 start · 72 essays · 3-day completion-gated cycles · 5 hours per training day</p></div><button id="struggle-export" type="button">Export training data</button></div>
+ <div class="struggle-metrics" id="struggle-metrics"></div>
+ <div class="struggle-assignment" id="struggle-assignment"></div>
+ <div class="struggle-day-tabs" id="struggle-day-tabs"></div>
+ <div id="struggle-tasks"></div>
+ <div class="struggle-actions"><button type="button" id="struggle-next-day">Complete this training day</button><span id="struggle-status"></span></div>
+ <div class="struggle-columns"><div><h3>Drafts and Master Error Log</h3><label>Cold draft<textarea id="struggle-draft" rows="6" placeholder="Write without notes. Autosaved locally."></textarea></label><label>Blind rewrite<textarea id="struggle-rewrite" rows="6" placeholder="Rewrite from the original prompt. Autosaved locally."></textarea></label><label>Master Error Log<textarea id="struggle-errors" rows="6" placeholder="Issue missed | factual trigger | correct rule | why missed | spoken and written retrieval"></textarea></label><label>Actual study hours today <input id="struggle-hours" type="number" min="0" max="24" step="0.25" value="0"></label></div><div><h3>Spaced repetition · dated reviews</h3><p class="struggle-hint">Reviews are due 7 and 21 days after the actual essay start date. Existing due dates do not move when training runs late.</p><div id="struggle-reviews"></div><h3>Upcoming essays and dates</h3><div id="struggle-upcoming"></div><p class="struggle-hint">Original finish target: June 5, 2027. Projected dates adjust when a training day is completed, never simply because midnight passes. Overdue work remains due.</p></div></div>
 </section>
-</div>
-<div class="bcc-panel bar-review-cycle-panel">
-
-    <div class="bar-review-cycle-heading">
-        <div>
-            <h2>12-Day Subject Cycle</h2>
-            <p class="bcc-help-text"><strong>Begun Sept 28 2026.</strong></p>
-            <p class="bcc-help-text">
-                Study one new subject each day. Check each subject when you have meaningfully reviewed it.
-                Log the actual work you did in Essays, MCQs, Flashcards, or Study Log.
-            </p>
-        </div>
-
-        <button class="bar-cycle-clear-button" id="bar-cycle-clear" type="button">
-            Clear Checks
-        </button>
-    </div>
-
-    <div class="bar-review-cycle-wrap">
-        <table class="bar-review-cycle-table">
-            <thead>
-                <tr>
-                    <th>New Subject (outline)</th>
-                    <th>+1 Review (essay)</th>
-                    <th>+3 Review (20 MCQ) </th>
-                    <th>+7 Review(All) </th>
-                </tr>
-            </thead>
-                                    <tbody>
-                <tr>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d1-new-criminal"> Criminal Law &amp; Procedure</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d1-r1-torts"> Torts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d1-r3-conlaw"> Constitutional Law</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d1-r7-property"> Real Property</label></td>
-                </tr>
-                <tr>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d2-new-evidence"> Evidence</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d2-r1-criminal"> Criminal Law &amp; Procedure</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d2-r3-contracts"> Contracts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d2-r7-pr"> Professional Responsibility</label></td>
-                </tr>
-                <tr>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d3-new-ba"> Business Associations</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d3-r1-evidence"> Evidence</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d3-r3-torts"> Torts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d3-r7-cp"> Community Property</label></td>
-                </tr>
-                <tr>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d4-new-remedies"> Remedies</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d4-r1-ba"> Business Associations</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d4-r3-criminal"> Criminal Law &amp; Procedure</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d4-r7-wills-trusts"> Wills &amp; Trusts</label></td>
-                </tr>
-                <tr>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d5-new-civpro"> Civil Procedure</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d5-r1-remedies"> Remedies</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d5-r3-evidence"> Evidence</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d5-r7-conlaw"> Constitutional Law</label></td>
-                </tr>
-                <tr>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d6-new-property"> Real Property</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d6-r1-civpro"> Civil Procedure</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d6-r3-ba"> Business Associations</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d6-r7-contracts"> Contracts</label></td>
-                </tr>
-                <tr>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d7-new-pr"> Professional Responsibility</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d7-r1-property"> Real Property</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d7-r3-remedies"> Remedies</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d7-r7-torts"> Torts</label></td>
-                </tr>
-                <tr>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d8-new-cp"> Community Property</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d8-r1-pr"> Professional Responsibility</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d8-r3-civpro"> Civil Procedure</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d8-r7-criminal"> Criminal Law &amp; Procedure</label></td>
-                </tr>
-                <tr>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d9-new-wills-trusts"> Wills &amp; Trusts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d9-r1-cp"> Community Property</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d9-r3-property"> Real Property</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d9-r7-evidence"> Evidence</label></td>
-                </tr>
-                <tr>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d10-new-conlaw"> Constitutional Law</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d10-r1-wills-trusts"> Wills &amp; Trusts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d10-r3-pr"> Professional Responsibility</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d10-r7-ba"> Business Associations</label></td>
-                </tr>
-                <tr>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d11-new-contracts"> Contracts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d11-r1-conlaw"> Constitutional Law</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d11-r3-cp"> Community Property</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d11-r7-remedies"> Remedies</label></td>
-                </tr>
-                <tr>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d12-new-torts"> Torts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d12-r1-contracts"> Contracts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d12-r3-wills-trusts"> Wills &amp; Trusts</label></td>
-                    <td><label><input type="checkbox" data-bar-cycle-check="cycle12-d12-r7-civpro"> Civil Procedure</label></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-</div>
-
-
-
-
 </section>
 <section class="bcc-view" id="stats">
 <div class="bcc-grid">
@@ -1046,28 +940,6 @@ New user? Follow instructions sent to your email before signing in.
 </div>
 </div>
 </section>
-<section class="bcc-view" id="blind-struggle">
-<div class="bcc-panel bs-page">
-<h2>Blind-Struggle · 72-Essay Intensive</h2>
-<p>November 2, 2026 – June 5, 2027 · 3 days per essay · 5 hours per day · Speak, write, verify.</p>
-<div class="bs-stats"><div><strong id="bs-cycles">0 / 72</strong><small>Cycles completed</small></div><div><strong id="bs-hours">0 / 1,080</strong><small>Logged hours / planned</small></div><div><strong id="bs-date">June 5, 2027</strong><small>Planned finish</small></div></div>
-<div class="bs-controls"><label>Essay <select id="bs-essay"></select></label><label>Cycle day <select id="bs-day"><option value="0">Day 1 · Cold Examination</option><option value="1">Day 2 · Reconstruction</option><option value="2">Day 3 · Transfer & Retention</option></select></label></div>
-<div id="bs-assignment" class="bs-assignment"></div>
-<h3 id="bs-day-title"></h3><p id="bs-day-note"></p><div id="bs-tasks"></div>
-<div class="bs-actions"><button type="button" id="bs-prev">Previous day</button><button type="button" id="bs-next">Next day</button></div>
-<h3>Essay workspace</h3><p>Keep the model answers closed during the cold draft and blind rewrite. Your writing is saved locally as you type.</p>
-<label class="bs-label">Cold draft <textarea id="bs-draft" rows="7" placeholder="Write a complete IRAC answer, without notes..."></textarea></label>
-<label class="bs-label">Blind rewrite <textarea id="bs-rewrite" rows="7" placeholder="Reconstruct the answer without consulting your first draft..."></textarea></label>
-<h3>Master Error Log</h3><p>Record the error, factual trigger, correct rule, and why the issue was missed. Speak the corrected rule aloud, then write it from memory.</p>
-<label class="bs-label">Error / trigger / correct rule / reason <textarea id="bs-errors" rows="6" placeholder="Issue missed: …
-Fact trigger: …
-Correct rule: …
-Why I missed it: …"></textarea></label>
-<div class="bs-controls"><label>Cold draft issue accuracy (%) <input id="bs-issue-score" type="number" min="0" max="100" placeholder="0–100"></label><label>Rule accuracy (%) <input id="bs-rule-score" type="number" min="0" max="100" placeholder="0–100"></label><label>Actual hours studied <input id="bs-actual-hours" type="number" min="0" max="24" step="0.25" placeholder="Hours"></label></div>
-<h3>Spaced retrieval queue</h3><p>Recall at 7 and 21 days after the first essay day. Check off only after speaking and writing rules without looking.</p><div id="bs-retrieval"></div>
-<p class="bs-warning">Training data are stored separately in this browser. Export a backup regularly; this page does not modify your Basick A/B checkmarks or essay titles.</p>
-<div class="bs-actions"><button type="button" id="bs-export">Export training backup</button><label class="bs-import">Import training backup <input type="file" id="bs-import" accept="application/json,.json"></label></div>
-</div></section>
 </main>
 </div>
 <div id="model-essay-guide-modal" class="model-essay-guide-modal" hidden role="dialog" aria-modal="true" aria-labelledby="model-essay-guide-title"><div class="model-essay-guide-dialog"><div class="model-essay-guide-toolbar"><strong id="model-essay-guide-title">Essay Study Guide</strong><button type="button" id="model-essay-guide-close" aria-label="Close study guide">Close ×</button></div><iframe id="model-essay-guide-frame" title="Essay study guide" loading="lazy"></iframe><div id="model-essay-guide-empty" hidden><h3>Study guide not yet added</h3><p>This essay slot is ready. Its issue-spotting guide will appear here once we prepare it.</p></div></div></div>
@@ -1075,9 +947,8 @@ Why I missed it: …"></textarea></label>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="app.js"></script>
-<script src="study-guides.js"></script>
-<link rel="stylesheet" href="blind-struggle.css">
 <script src="blind-struggle.js"></script>
+<script src="study-guides.js"></script>
 
 <script>
 (function () {

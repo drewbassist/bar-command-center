@@ -1,41 +1,39 @@
-/* Standalone training records; never mutates the Basick answer/checkmark stores. */
-(function(){
+/* Independent, completion-gated Blind-Struggle training. Does not mutate Basick or archive data. */
+(()=>{
 'use strict';
-const START=new Date(2026,10,2,12), DAY=86400000;
-const plans=[
-{title:'Cold Examination',note:'No notes, outlines, or model answers until the first complete draft is finished.',tasks:[['90 min','Blind essay','Complete IRAC draft entirely cold.'],['90 min','Forensic audit','Compare draft with both model answers A and B.'],['60 min','Master Error Log','Record missed issues, triggers and correct rules.'],['60 min','Closed-book retrieval','Say every corrected rule aloud; write and verify it.']]},
-{title:'Reconstruction',note:'Return to the original fact pattern, not yesterday’s completed answer.',tasks:[['60 min','Cold rule recall','Speak and write the rules without looking.'],['90 min','Doctrinal repair','Repair elements, exceptions, and competing arguments.'],['90 min','Complete blind rewrite','Rewrite full IRAC answer without notes.'],['60 min','Second forensic audit','Check both models; mark persistent errors.']]},
-{title:'Transfer & Retention',note:'Use unfamiliar facts to test transfer, not recognition of the original story.',tasks:[['60 min','Blind issue spotting','Outline a different essay prompt.'],['60 min','Mixed MCQs','Answer, explain and correct each item.'],['60 min','Cumulative rule recall','Speak and write previously missed rules.'],['90 min','Next-subject foundation','Study doctrine without previewing next prompt.'],['30 min','Error Log consolidation','Identify weak rules and retrieval priorities.']]}
+const KEY='bcc_blind_struggle_v2', START='2026-11-02';
+const DAYS=[
+ [['90 min','Blind essay','Write a complete closed-book IRAC answer'],['90 min','Forensic audit A and B','Compare both models; mark missed issues and weak analysis'],['60 min','Master Error Log','Record accurate rules, factual triggers and causes'],['60 min','Speak and write rules','Closed-book oral and written retrieval']],
+ [['60 min','Cold rule recall','Reconstruct rules without yesterday’s notes'],['90 min','Doctrinal repair','Elements, exceptions, distinctions and competing arguments'],['90 min','Blind rewrite','Rewrite from original fact pattern without notes'],['60 min','Second forensic audit','Compare with A and B; identify persistent errors']],
+ [['60 min','Unfamiliar issue outline','Use a different prompt to test transfer'],['60 min','Mixed MCQs','Answer and explain correct and incorrect choices'],['60 min','Cumulative retrieval','Speak and write rules from prior essays'],['90 min','Next-subject foundation','Study law without previewing next fact pattern'],['30 min','Error Log consolidation','Retest weakest rules and schedule recall']]
 ];
-const key='bcc_blind_struggle_v1';let state={};try{state=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch(e){state={}};
-state.essays ||= {};state.retrieval ||= {};
-const $=id=>document.getElementById(id);
-const save=()=>localStorage.setItem(key,JSON.stringify(state));
-const fmt=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-const dateAt=n=>new Date(START.getTime()+n*DAY);
-const schedule=[];
-for(let col=0;col<6;col++)for(let row=0;row<12;row++)schedule.push({row,col,date:BASICK_DATES[row][col],question:BASICK_QUESTIONS[row][col],subject:BASICK_SUBJECTS[row]});
-let current=0,day=0;
-const record=()=>state.essays[current] ||= {tasks:{},draft:'',rewrite:'',errors:'',scores:{},hours:{}};
-function draw(){
-const e=schedule[current],r=record(),p=plans[day];$('bs-essay').value=String(current);$('bs-day').value=String(day);
-$('bs-assignment').textContent=`Essay ${current+1} of 72 · Column ${e.col+1} · ${e.subject} · ${e.date} · Q${e.question} · ${fmt(dateAt(current*3))}–${fmt(dateAt(current*3+2))}`;
-$('bs-day-title').textContent=`Day ${day+1} — ${p.title}`;$('bs-day-note').textContent=p.note;
-$('bs-tasks').replaceChildren();p.tasks.forEach(([duration,name,detail],i)=>{let wrap=document.createElement('label');wrap.className='bs-task';let check=document.createElement('input');check.type='checkbox';check.checked=!!r.tasks[day+'-'+i];check.addEventListener('change',()=>{r.tasks[day+'-'+i]=check.checked;save();stats()});let body=document.createElement('span');let strong=document.createElement('strong');strong.textContent=name;let small=document.createElement('small');small.textContent=detail;body.append(strong,small);let time=document.createElement('span');time.className='bs-duration';time.textContent=duration;wrap.append(check,body,time);$('bs-tasks').append(wrap)});
-for(const [id,field] of [['bs-draft','draft'],['bs-rewrite','rewrite'],['bs-errors','errors']])$(id).value=r[field]||'';
-$('bs-issue-score').value=r.scores.issue??'';$('bs-rule-score').value=r.scores.rule??'';$('bs-actual-hours').value=r.hours[day]??'';
-retrieval();stats();
+const names=['Cold Examination','Reconstruction','Transfer & Retention'];
+const parse=x=>new Date(x+'T12:00:00');
+const iso=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+const add=(x,n)=>{const d=parse(x);d.setDate(d.getDate()+n);return iso(d)};
+const fmt=x=>parse(x).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+const today=()=>iso(new Date());
+const empty=()=>({index:0,day:0,start:START,completed:[],records:{},reviews:{},lastDayCompleted:null});
+let state;try{state={...empty(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){state=empty()}
+const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
+const essays=()=>{const out=[];for(let col=0;col<6;col++)for(let row=0;row<12;row++)out.push({subject:BASICK_SUBJECTS[row],date:BASICK_DATES[row][col],q:BASICK_QUESTIONS[row][col],col:col+1,row});return out};
+const list=essays();
+const record=i=>state.records[i]||(state.records[i]={tasks:{},draft:'',rewrite:'',errors:'',hours:{}});
+const dayTasks=()=>DAYS[state.day]||[];
+const el=id=>document.getElementById(id);
+const text=(tag,value,cls)=>{const n=document.createElement(tag);n.textContent=value;if(cls)n.className=cls;return n};
+const clear=n=>n.replaceChildren();
+function reviewItems(){const r=[];state.completed.forEach(c=>{for(const offset of [7,21]){const key=`${c.index}-${offset}`,due=add(c.start,offset);r.push({key,index:c.index,offset,due,done:state.reviews[key]})}});if(state.index<72 && state.start && state.day>0){const i=state.index;for(const offset of [7,21]){const key=`${i}-${offset}`;r.push({key,index:i,offset,due:add(state.start,offset),done:state.reviews[key]})}}return r.sort((a,b)=>a.due.localeCompare(b.due))}
+function render(){const i=state.index,finished=i>=72,essay=list[Math.min(i,71)],r=record(i);const projected=finished?(state.completed.at(-1)?.end||START):add(state.start,(72-i)*3-state.day-1);const completedHours=Object.values(state.records).reduce((sum,v)=>sum+Object.values(v.hours||{}).reduce((a,b)=>a+(Number(b)||0),0),0);
+ el('struggle-metrics').replaceChildren(...[['Completed essays',`${i} / 72`],['Completed training days',`${i*3+state.day} / 216`],['Logged study hours',`${completedHours.toFixed(1)} / 1,080`],['Projected finish',fmt(projected)]].map(([label,value])=>{const d=text('div','', 'struggle-metric');d.append(text('strong',value),text('span',label));return d}));
+ const assignment=el('struggle-assignment');clear(assignment);assignment.append(text('strong',finished?'All 72 essay cycles completed':`${essay.subject} · ${essay.date} · Question ${essay.q}`),text('small',finished?'All cycles completed':`Essay ${i+1} of 72 · Column ${essay.col} · Day ${state.day+1} of 3 · Started ${fmt(state.start)} · Target finish Jun 5, 2027`));
+ const tabs=el('struggle-day-tabs');clear(tabs);names.forEach((name,n)=>{const b=text('button',`Day ${n+1} · ${name}`);b.type='button';if(n===state.day)b.classList.add('active');b.disabled=finished||n!==state.day;tabs.append(b)});
+ const tasks=el('struggle-tasks');clear(tasks);if(!finished)dayTasks().forEach(([duration,title,description],n)=>{const div=text('div','', 'struggle-task'),input=document.createElement('input');input.type='checkbox';input.checked=!!r.tasks[`${state.day}-${n}`];input.addEventListener('change',()=>{r.tasks[`${state.day}-${n}`]=input.checked;save();render()});const label=document.createElement('label');label.append(text('strong',title),text('div',description,'struggle-hint'));div.append(input,label,text('small',duration));tasks.append(div)});
+ const ready=!finished&&dayTasks().every((_,n)=>r.tasks[`${state.day}-${n}`]);el('struggle-next-day').disabled=!ready||finished;el('struggle-next-day').textContent=state.day===2?'Complete cycle & begin next essay':'Complete this training day';el('struggle-status').textContent=finished?'Program complete':ready?'All tasks checked. Ready to advance.':'Finish each required task before advancing.';
+ for(const [id,key] of [['struggle-draft','draft'],['struggle-rewrite','rewrite'],['struggle-errors','errors']]){const field=el(id);field.disabled=finished;field.value=r[key]||'';field.oninput=()=>{r[key]=field.value;save()}}const hours=el('struggle-hours');hours.disabled=finished;hours.value=r.hours[state.day]||0;hours.onchange=()=>{r.hours[state.day]=Math.max(0,Math.min(24,Number(hours.value)||0));save();render()};
+ const reviews=el('struggle-reviews');clear(reviews);const items=reviewItems().filter(x=>x.due<=today()||(!x.done&&x.due<=add(today(),21))).slice(0,25);if(!items.length)reviews.append(text('p','No scheduled reviews yet.','struggle-hint'));items.forEach(x=>{const d=text('div','',`struggle-review ${x.done?'done':x.due<today()?'overdue':''}`),e=list[x.index];d.append(text('strong',`${fmt(x.due)} · Day ${x.offset} · ${e.subject}`),text('span',`${e.date} Q${e.q} · ${x.done?'Completed '+fmt(x.done):x.due<today()?'OVERDUE':x.due===today()?'DUE TODAY':'Upcoming'}`));if(!x.done){const b=text('button','Mark retrieval complete');b.type='button';b.onclick=()=>{state.reviews[x.key]=today();save();render()};d.append(b)}reviews.append(d)});
+ const upcoming=el('struggle-upcoming');clear(upcoming);for(let k=i;k<Math.min(72,i+7);k++){const e=list[k],offset=k-i,start=add(state.start,offset*3+(offset? -state.day:0));const row=text('div','', 'struggle-upcoming-row');row.append(text('strong',`Essay ${k+1} · ${e.subject}`),text('span',`${e.date} Q${e.q} · ${fmt(start)} (projected)`));upcoming.append(row)}
 }
-function stats(){let completed=0,hours=0;for(let i=0;i<72;i++){const r=state.essays[i];if(!r)continue;if(plans.every((p,d)=>p.tasks.every((_,j)=>r.tasks?.[d+'-'+j])))completed++;hours+=Object.values(r.hours||{}).reduce((a,b)=>a+(Number(b)||0),0)}$('bs-cycles').textContent=completed+' / 72';$('bs-hours').textContent=hours.toFixed(1)+' / 1,080';$('bs-date').textContent=fmt(dateAt(215))}
-function retrieval(){let host=$('bs-retrieval');host.replaceChildren();let now=new Date();now.setHours(12,0,0,0);let count=0;
-for(let i=0;i<72;i++){let r=state.essays[i];if(!r?.tasks?.['0-0'])continue;for(const offset of [7,21]){const due=dateAt(i*3+offset);if(due>now)continue;let k=i+'-'+offset;if(state.retrieval[k])continue;count++;let item=document.createElement('div');item.className='bs-retrieval-item';let label=document.createElement('label'),cb=document.createElement('input');cb.type='checkbox';cb.addEventListener('change',()=>{state.retrieval[k]=cb.checked;save();retrieval()});let text=document.createElement('span');let e=schedule[i];text.textContent=`${fmt(due)} · Day ${offset} · ${e.subject}, ${e.date} Q${e.question} · speak + write rules blind`;label.append(cb,text);item.append(label);host.append(item)}}if(!count)host.textContent='No retrievals due yet.'}
-$('bs-essay').replaceChildren();schedule.forEach((e,i)=>{let o=document.createElement('option');o.value=i;o.textContent=`${i+1}. ${e.subject} · ${e.date} Q${e.question}`;$('bs-essay').append(o)});
-$('bs-essay').addEventListener('change',e=>{current=Number(e.target.value);day=0;draw()});$('bs-day').addEventListener('change',e=>{day=Number(e.target.value);draw()});
-$('bs-prev').addEventListener('click',()=>{if(day>0)day--;else if(current>0){current--;day=2}draw()});$('bs-next').addEventListener('click',()=>{if(day<2)day++;else if(current<71){current++;day=0}draw()});
-for(const [id,field] of [['bs-draft','draft'],['bs-rewrite','rewrite'],['bs-errors','errors']])$(id).addEventListener('input',e=>{record()[field]=e.target.value;save()});
-for(const [id,field] of [['bs-issue-score','issue'],['bs-rule-score','rule']])$(id).addEventListener('input',e=>{record().scores[field]=e.target.value;save()});
-$('bs-actual-hours').addEventListener('input',e=>{record().hours[day]=e.target.value;save();stats()});
-$('bs-export').addEventListener('click',()=>{let blob=new Blob([JSON.stringify({type:'baros-blind-struggle-v1',state},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='baros-blind-struggle-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
-$('bs-import').addEventListener('change',async e=>{let file=e.target.files?.[0];if(!file)return;try{let data=JSON.parse(await file.text());if(data.type!=='baros-blind-struggle-v1'||!data.state?.essays||!data.state?.retrieval)throw Error('Not a valid Blind-Struggle backup');if(!confirm('Replace current Blind-Struggle training records with this backup? Other BarOS data will not be changed.'))return;state=data.state;save();draw()}catch(err){alert('Import failed: '+err.message)}finally{e.target.value=''}});
-draw();
+function advance(){if(state.index>=72)return;const r=record(state.index);if(!dayTasks().every((_,n)=>r.tasks[`${state.day}-${n}`]))return;const actual=today();if(state.day===2){state.completed.push({index:state.index,start:state.start,end:actual});state.index++;state.day=0;state.start=state.index<72?add(actual,1):actual}else{state.day++;}state.lastDayCompleted=actual;save();render()}
+document.addEventListener('DOMContentLoaded',()=>{if(!el('struggle-training'))return;el('struggle-next-day').onclick=advance;el('struggle-export').onclick=()=>{const blob=new Blob([JSON.stringify({exported:today(),blindStruggle:state},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='baros-blind-struggle-'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};render()});
 })();
