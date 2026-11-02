@@ -2359,3 +2359,10 @@ font-family: inherit;cursor:pointer}
   #essay-grid .bar-cycle-workspace > .basick-tracker-layout {grid-column:1 !important;}
   #essay-grid .bar-cycle-workspace > .basick-tracker-layout {margin:0;}
 }
+
+/* Corrected: archive and tracker are siblings in the same grid. */
+@media (min-width:1000px) {
+  #essay-grid .bar-cycle-workspace {grid-template-columns:minmax(0, 2fr) minmax(0, 3fr) !important;}
+  #essay-grid .bar-cycle-workspace > .basick-tracker-layout {width:100%;max-width:100%;}
+  #essay-grid .bar-cycle-workspace .basick-mini-scroll {max-width:100%;overflow-x:auto;}
+}
