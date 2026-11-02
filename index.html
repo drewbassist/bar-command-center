@@ -60,6 +60,7 @@ New user? Follow instructions sent to your email before signing in.
 <button class="bcc-nav-button" data-view="reviews">Reviews</button>
 <button class="bcc-nav-button" data-view="study-log">Study Log</button>
 <button class="bcc-nav-button" data-view="essay-grid">Blind-Struggle</button>
+<button class="bcc-nav-button" data-view="retrieval-lab">Retrieval Lab</button>
 <button class="bcc-nav-button" data-view="stats">Progress</button>
 <button class="bcc-nav-button" onclick="window.location.href='/flashcardsplus/'" type="button">Flashcards+</button>
 <button class="bcc-nav-button" data-view="settings">Settings</button>
@@ -792,6 +793,35 @@ New user? Follow instructions sent to your email before signing in.
  <div id="mel-list"></div><button type="button" id="mel-more" hidden>Show 10 more entries</button>
 </section>
 </section>
+<section class="bcc-view" id="retrieval-lab">
+<div class="bcc-panel retrieval-lab">
+<h2>Blind Retrieval Lab</h2>
+<p class="bcc-help-text">Experimental practice using your Master Error Log. This lab does not change essay progress, rule intervals, review history, or today's training tasks.</p>
+<div class="rl-controls">
+<label>Retrieval method <select id="rl-mode">
+<option value="blind">Blind-before-reveal</option>
+<option value="reverse">Issue-trigger reversal</option>
+<option value="exception">Exception-first recall</option>
+<option value="confidence">Confidence calibration</option>
+<option value="uncued">Uncued cumulative retrieval</option>
+</select></label>
+<label>Subject <select id="rl-subject"><option value="">All subjects</option></select></label>
+<button id="rl-next" type="button">New random concept</button>
+</div>
+<p id="rl-status" role="status"></p>
+<div id="rl-card" hidden>
+<p class="rl-meta" id="rl-meta"></p>
+<h3 id="rl-prompt"></h3>
+<p id="rl-cue"></p>
+<label class="rl-answer-label" for="rl-answer">Write your answer before revealing</label>
+<textarea id="rl-answer" rows="6" placeholder="Identify the doctrine and reconstruct the rule, triggers, exceptions and analysis from memory."></textarea>
+<div id="rl-confidence-wrap" hidden><label>Confidence before reveal <select id="rl-confidence"><option value="">Choose confidence</option><option value="unsure">Unsure</option><option value="moderate">Moderately confident</option><option value="certain">Certain</option></select></label></div>
+<div class="rl-controls"><button id="rl-reveal" type="button" disabled>Reveal reference entry</button><button id="rl-reset" type="button">Try again blind</button></div>
+<div id="rl-reference" hidden></div>
+<p class="bcc-help-text">Judge your answer against your saved entry. The lab does not automatically grade legal accuracy or count this as a scheduled review.</p>
+</div>
+</div>
+</section>
 <section class="bcc-view" id="stats">
 <div class="bcc-grid">
 <div class="bcc-card">
@@ -966,9 +996,11 @@ New user? Follow instructions sent to your email before signing in.
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <link rel="stylesheet" href="master-error-log.css">
+<link rel="stylesheet" href="retrieval-lab.css">
 <script src="app.js"></script>
 <script src="blind-struggle.js"></script>
 <script src="master-error-log.js"></script>
+<script src="retrieval-lab.js"></script>
 <script src="study-guides.js"></script>
 
 <script>
