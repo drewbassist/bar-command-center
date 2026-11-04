@@ -2382,3 +2382,18 @@ font-family: inherit;cursor:pointer}
 .mcq-numbered-row span { min-width: 24px; text-align: right; }
 .mcq-numbered-row input { width: 16px; height: 16px; margin: 0; accent-color: #25835b; cursor: pointer; }
 .mcq-numbered-row:hover { background: rgba(37, 131, 91, .11); }
+
+
+/* MCQ first-attempt 3-star ratings: all nine columns remain on one desktop row. */
+.mcq-numbered-grid { grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 5px; min-width: 0; }
+.mcq-numbered-title { font-size: 11px; padding: 8px 2px; }
+.mcq-numbered-row { justify-content: center; gap: 3px; padding: 3px 1px; min-height: 29px; }
+.mcq-numbered-row > span:first-child { min-width: 17px; font-size: 11px; }
+.mcq-numbered-row input { flex: 0 0 13px; width: 13px; height: 13px; }
+.mcq-rating-stars { display: inline-flex; gap: 0; min-width: 0; white-space: nowrap; }
+.mcq-rating-star { appearance: none; border: 0; background: transparent; padding: 0 1px; color: #c2cad3; font-size: 13px; line-height: 1; cursor: pointer; }
+.mcq-rating-star.is-rated { color: #d49a26; }
+.mcq-rating-star:focus-visible { outline: 2px solid #277cb4; border-radius: 2px; }
+@media (max-width: 950px) {
+  .mcq-numbered-grid { min-width: 900px; }
+}

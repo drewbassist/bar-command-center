@@ -34,6 +34,7 @@ let currentStudyMode = "full";
 let essays = [];
 let mcqs = [];
 let mcqChecklist = {};
+let mcqRatings = {};
 let flashcards = [];
 let flashcardsPlus = loadLocalData('bcc_flashcards_plus', []);
 let lectures = [];
@@ -123,6 +124,7 @@ async function loadData() {
   essays = loadLocalData("bcc_essays", await loadJson("essays.json", []));
   mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
   mcqChecklist = normalizeMcqChecklist(loadLocalData("bcc_mcq_checklist", {}));
+  mcqRatings = normalizeMcqRatings(loadLocalData("bcc_mcq_ratings", {}));
   flashcards = loadLocalData("bcc_flashcards", await loadJson("flashcards.json", []));
   lectures = loadLocalData("bcc_lectures", []);
   reviews = loadLocalData("bcc_reviews", await loadJson("reviews.json", []));
@@ -201,6 +203,7 @@ function saveLocalData() {
   setUserLocalItem("bcc_essays", JSON.stringify(essays));
   setUserLocalItem("bcc_mcqs", JSON.stringify(mcqs));
   setUserLocalItem("bcc_mcq_checklist", JSON.stringify(mcqChecklist));
+  setUserLocalItem("bcc_mcq_ratings", JSON.stringify(mcqRatings));
   setUserLocalItem("bcc_flashcards", JSON.stringify(flashcards));
   setUserLocalItem("bcc_flashcards_plus", JSON.stringify(flashcardsPlus));
   setUserLocalItem("bcc_lectures", JSON.stringify(lectures));
@@ -228,6 +231,7 @@ function getCompleteBarOSData() {
     essays,
     mcqs,
     mcqChecklist,
+    mcqRatings,
     flashcards,
     lectures,
     reviews,
@@ -253,6 +257,7 @@ function applyCompleteBarOSData(data) {
   essays = Array.isArray(data?.essays) ? data.essays : [];
   mcqs = Array.isArray(data?.mcqs) ? data.mcqs : [];
   mcqChecklist = normalizeMcqChecklist(data?.mcqChecklist || mcqChecklist);
+  mcqRatings = normalizeMcqRatings(data?.mcqRatings || mcqRatings);
   flashcards = Array.isArray(data?.flashcards) ? data.flashcards : [];
   lectures = Array.isArray(data?.lectures) ? data.lectures : [];
   reviews = Array.isArray(data?.reviews) ? data.reviews : [];
@@ -1676,6 +1681,7 @@ function importBackup(event) {
       essays = Array.isArray(backup.essays) ? backup.essays : [];
       mcqs = Array.isArray(backup.mcqs) ? backup.mcqs : [];
       mcqChecklist = normalizeMcqChecklist(backup.mcqChecklist || mcqChecklist);
+      mcqRatings = normalizeMcqRatings(backup.mcqRatings || mcqRatings);
       flashcards = Array.isArray(backup.flashcards) ? backup.flashcards : [];
       lectures = Array.isArray(backup.lectures) ? backup.lectures : [];
       reviews = Array.isArray(backup.reviews) ? backup.reviews : [];
@@ -4192,6 +4198,22 @@ function normalizeMcqChecklist(value) {
   }
   return valid;
 }
+function normalizeMcqRatings(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const result = {};
+  for (const col of mcqChecklistColumns) {
+    const ratings = value[col.id];
+    if (!ratings || typeof ratings !== 'object' || Array.isArray(ratings)) continue;
+    result[col.id] = {};
+    for (const [question, rating] of Object.entries(ratings)) {
+      const n = Number(question);
+      if (Number.isInteger(n) && n >= col.start && n <= col.end && [1,2,3].includes(rating)) {
+        result[col.id][n] = rating;
+      }
+    }
+  }
+  return result;
+}
 function renderNumberedMcqChecklist() {
   const root = document.getElementById('mcq-numbered-grid');
   if (!root) return;
@@ -4226,7 +4248,39 @@ function renderNumberedMcqChecklist() {
         updateProgress();
         saveData();
       });
-      label.append(number, checkbox);
+      const stars = document.createElement('span');
+      stars.className = 'mcq-rating-stars';
+      stars.setAttribute('role', 'group');
+      stars.setAttribute('aria-label', `${col.title}, question ${n} rating`);
+      const ratingButtons = [];
+      const refreshRating = () => {
+        const rating = mcqRatings[col.id]?.[n] || 0;
+        ratingButtons.forEach((button, i) => {
+          button.classList.toggle('is-rated', i < rating);
+          button.setAttribute('aria-pressed', String(i + 1 === rating));
+        });
+      };
+      for (let r = 1; r <= 3; r++) {
+        const star = document.createElement('button');
+        star.type = 'button';
+        star.className = 'mcq-rating-star';
+        star.textContent = '★';
+        star.title = ['Incorrect or guessed', 'Correct but uncertain', 'Correct and understood'][r-1];
+        star.setAttribute('aria-label', `${r} of 3 stars: ${star.title}`);
+        star.addEventListener('click', () => {
+          if (!mcqRatings[col.id]) mcqRatings[col.id] = {};
+          // A second click on the selected rating clears it.
+          const next = mcqRatings[col.id][n] === r ? 0 : r;
+          if (next) mcqRatings[col.id][n] = next;
+          else delete mcqRatings[col.id][n];
+          refreshRating();
+          saveData();
+        });
+        ratingButtons.push(star);
+        stars.append(star);
+      }
+      refreshRating();
+      label.append(number, checkbox, stars);
       section.append(label);
     }
     updateProgress();
