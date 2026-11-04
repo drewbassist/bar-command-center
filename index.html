@@ -142,22 +142,10 @@ New user? Follow instructions sent to your email before signing in.
 </div>
 </section>
 <section class="bcc-view" id="mcqs">
-<div class="bcc-panel">
-<h2>Log MCQ Session</h2>
-<form class="bcc-form bcc-entry-form bcc-mcq-form" id="mcq-form">
-<label>Subject<select id="mcq-subject"></select></label>
-<label>Source<select id="mcq-source"></select></label>
-<label>Questions Completed<input id="mcq-count" min="0" type="number"/></label>
-<label>Correct<input id="mcq-correct-count" min="0" type="number"/></label>
-<label>Question Numbers<input id="mcq-question-numbers" type="text" placeholder="e.g. 7–11 or 55–90"/></label>
-<label>Rating<select id="mcq-rating"></select></label>
-<label class="bcc-field-wide">Notes<textarea id="mcq-notes"></textarea></label>
-<button type="submit">Save MCQ Session</button>
-</form>
-</div>
-<div class="bcc-panel">
-<h2>Recent MCQ Sessions</h2>
-<div class="bcc-list-empty" id="mcq-list">No MCQ sessions added yet.</div>
+<div class="bcc-panel mcq-numbered-panel">
+<h2>MCQ Question Tracker</h2>
+<p class="mcq-numbered-help">Check each question when completed. Your selections save automatically to your BarOS account.</p>
+<div class="mcq-numbered-scroll"><div id="mcq-numbered-grid" class="mcq-numbered-grid"></div></div>
 </div>
 </section>
 <section class="bcc-view" id="flashcards">

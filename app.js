@@ -33,6 +33,7 @@ let currentStudyMode = "full";
 
 let essays = [];
 let mcqs = [];
+let mcqChecklist = {};
 let flashcards = [];
 let flashcardsPlus = loadLocalData('bcc_flashcards_plus', []);
 let lectures = [];
@@ -121,6 +122,7 @@ async function loadData() {
 
   essays = loadLocalData("bcc_essays", await loadJson("essays.json", []));
   mcqs = loadLocalData("bcc_mcqs", await loadJson("mcqs.json", []));
+  mcqChecklist = normalizeMcqChecklist(loadLocalData("bcc_mcq_checklist", {}));
   flashcards = loadLocalData("bcc_flashcards", await loadJson("flashcards.json", []));
   lectures = loadLocalData("bcc_lectures", []);
   reviews = loadLocalData("bcc_reviews", await loadJson("reviews.json", []));
@@ -198,6 +200,7 @@ function saveData() {
 function saveLocalData() {
   setUserLocalItem("bcc_essays", JSON.stringify(essays));
   setUserLocalItem("bcc_mcqs", JSON.stringify(mcqs));
+  setUserLocalItem("bcc_mcq_checklist", JSON.stringify(mcqChecklist));
   setUserLocalItem("bcc_flashcards", JSON.stringify(flashcards));
   setUserLocalItem("bcc_flashcards_plus", JSON.stringify(flashcardsPlus));
   setUserLocalItem("bcc_lectures", JSON.stringify(lectures));
@@ -224,6 +227,7 @@ function getCompleteBarOSData() {
     version: 1,
     essays,
     mcqs,
+    mcqChecklist,
     flashcards,
     lectures,
     reviews,
@@ -248,6 +252,7 @@ function getCompleteBarOSData() {
 function applyCompleteBarOSData(data) {
   essays = Array.isArray(data?.essays) ? data.essays : [];
   mcqs = Array.isArray(data?.mcqs) ? data.mcqs : [];
+  mcqChecklist = normalizeMcqChecklist(data?.mcqChecklist || mcqChecklist);
   flashcards = Array.isArray(data?.flashcards) ? data.flashcards : [];
   lectures = Array.isArray(data?.lectures) ? data.lectures : [];
   reviews = Array.isArray(data?.reviews) ? data.reviews : [];
@@ -1663,6 +1668,7 @@ function importBackup(event) {
 
       essays = Array.isArray(backup.essays) ? backup.essays : [];
       mcqs = Array.isArray(backup.mcqs) ? backup.mcqs : [];
+      mcqChecklist = normalizeMcqChecklist(backup.mcqChecklist || mcqChecklist);
       flashcards = Array.isArray(backup.flashcards) ? backup.flashcards : [];
       lectures = Array.isArray(backup.lectures) ? backup.lectures : [];
       reviews = Array.isArray(backup.reviews) ? backup.reviews : [];
@@ -1818,6 +1824,7 @@ function renderEssays() {
 }
 
 function renderMcqs() {
+  renderNumberedMcqChecklist();
   const list = document.getElementById("mcq-list");
   if (!list) return;
 
@@ -4149,3 +4156,79 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
 });
 
+
+
+/* Numbered MCQ checklist. Old session records remain untouched for history and statistics. */
+const mcqChecklistColumns = [
+  { id: 'constitution', title: 'Constitution', start: 1, end: 48 },
+  { id: 'criminal', title: 'Crim & Pro', start: 1, end: 65 },
+  { id: 'evidence', title: 'Evidence', start: 1, end: 58 },
+  { id: 'property', title: 'Real Prop', start: 1, end: 54 },
+  { id: 'torts', title: 'Torts', start: 1, end: 59 },
+  { id: 'mbe1', title: 'MBE 1–50', start: 1, end: 50 },
+  { id: 'mbe2', title: 'MBE 51–100', start: 51, end: 100 },
+  { id: 'mbe3', title: 'MBE 101–150', start: 101, end: 150 },
+  { id: 'mbe4', title: 'MBE 151–200', start: 151, end: 200 }
+];
+function normalizeMcqChecklist(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const valid = {};
+  const definitions = [
+    ['constitution',1,48],['criminal',1,65],['evidence',1,58],
+    ['property',1,54],['torts',1,59],['mbe1',1,50],
+    ['mbe2',51,100],['mbe3',101,150],['mbe4',151,200]
+  ];
+  for (const [id,start,end] of definitions) {
+    const checked = value[id];
+    if (!Array.isArray(checked)) continue;
+    valid[id] = [...new Set(checked.filter(n => Number.isInteger(n) && n >= start && n <= end))];
+  }
+  return valid;
+}
+function renderNumberedMcqChecklist() {
+  const root = document.getElementById('mcq-numbered-grid');
+  if (!root) return;
+  root.replaceChildren();
+  for (const col of mcqChecklistColumns) {
+    const section = document.createElement('div');
+    section.className = 'mcq-numbered-column';
+    const title = document.createElement('div');
+    title.className = 'mcq-numbered-title';
+    const name = document.createElement('strong');
+    name.textContent = col.title;
+    const progress = document.createElement('span');
+    progress.className = 'mcq-numbered-progress';
+    const updateProgress = () => {
+      progress.textContent = `${(mcqChecklist[col.id] || []).length}/${col.end-col.start+1}`;
+    };
+    title.append(name, progress);
+    section.append(title);
+    for (let n = col.start; n <= col.end; n++) {
+      const label = document.createElement('label');
+      label.className = 'mcq-numbered-row';
+      const number = document.createElement('span');
+      number.textContent = String(n);
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = (mcqChecklist[col.id] || []).includes(n);
+      checkbox.setAttribute('aria-label', `${col.title}, question ${n} completed`);
+      checkbox.addEventListener('change', () => {
+        const values = new Set(mcqChecklist[col.id] || []);
+        if (checkbox.checked) values.add(n); else values.delete(n);
+        mcqChecklist[col.id] = [...values].sort((a,b) => a-b);
+        updateProgress();
+        saveData();
+      });
+      label.append(number, checkbox);
+      section.append(label);
+    }
+    updateProgress();
+    root.append(section);
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  // Render after the application's asynchronous initial data load.
+  const root = document.getElementById('mcq-numbered-grid');
+  if (!root) return;
+  renderNumberedMcqChecklist();
+});
