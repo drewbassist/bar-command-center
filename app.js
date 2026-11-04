@@ -541,7 +541,14 @@ function setupNavigation() {
   const buttons = document.querySelectorAll(".bcc-nav-button");
   const views = document.querySelectorAll(".bcc-view");
 
+  // Keep all existing data and pages intact; display only the two study tabs.
+  const visibleViews = new Set(["essay-grid", "mcqs"]);
+  buttons.forEach((button) => {
+    button.style.display = visibleViews.has(button.dataset.view) ? "" : "none";
+  });
+
   window.activateBccView = function (viewId) {
+    if (!visibleViews.has(viewId)) viewId = "essay-grid";
     const targetView = document.getElementById(viewId);
     if (!targetView) return;
 
