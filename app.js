@@ -1,4 +1,4 @@
-const recommendedReviewIntervals = [1, 3, 7, 30];
+const recommendedReviewIntervals = [3, 5, 7, 14, 21];
 let reviewIntervals = [...recommendedReviewIntervals];
 
 const SUPABASE_URL = "https://rudhrifkjhretilqdncy.supabase.co";
@@ -135,6 +135,7 @@ async function loadData() {
   barCycleRotation = normalizeBarCycleRotation(loadLocalData("bcc_bar_cycle_rotation", {}));
   modelEssayTitles = loadLocalData("bcc_model_essay_titles", {});
 
+  migrateLegacyReviewSchedule();
   normalizeReviewMetrics();
 
   currentSession = Number(getUserLocalItem("bcc_current_session") || "1");
@@ -262,6 +263,8 @@ function applyCompleteBarOSData(data) {
   reviewIntervals = normalizeReviewIntervals(
     data?.reviewIntervals || recommendedReviewIntervals
   );
+
+  migrateLegacyReviewSchedule();
 
   customSubjects = normalizeCustomSubjects(data?.customSubjects || []);
   customEssaySources = normalizeCustomSourceList(data?.customEssaySources || []);
@@ -1397,6 +1400,44 @@ function resetForm(form) {
 }
 
 
+// One-time migration of the former default schedule. Keep completed reviews and
+// custom schedules unchanged; anchor pending dates to their original cycle start.
+function migrateLegacyReviewSchedule() {
+  if (reviewIntervals.join(',') !== '1,3,7,30') return;
+  reviewIntervals = [...recommendedReviewIntervals];
+  const cycles = new Map();
+  for (const review of reviews) {
+    const key = review.cycleId || `${review.itemType}:${review.itemId}:${review.cycleNumber || 1}`;
+    if (!cycles.has(key)) cycles.set(key, []);
+    cycles.get(key).push(review);
+  }
+  for (const group of cycles.values()) {
+    const first = group.find(r => r.dueDate && Number.isFinite(Number(r.intervalDays)));
+    if (!first) continue;
+    const start = addDays(first.dueDate, -Number(first.intervalDays));
+    const used = new Set(group.map(r => Number(r.intervalDays)));
+    for (const r of group) {
+      if (r.status === 'completed') continue;
+      if (Number(r.intervalDays) === 1) {
+        r.intervalDays = 3;
+        r.dueDate = addDays(start, 3);
+      } else if (Number(r.intervalDays) === 3) {
+        r.intervalDays = 5;
+        r.dueDate = addDays(start, 5);
+      } else if (Number(r.intervalDays) === 30) {
+        r.intervalDays = 21;
+        r.dueDate = addDays(start, 21);
+      }
+    }
+    if (!used.has(14)) {
+      const sample = group[0];
+      reviews.push({...sample, id: createId('review'), intervalDays: 14,
+        dueDate: addDays(start,14), status:'pending', completedDate:'', reviewNumber: 4});
+    }
+  }
+  // Do not rewrite completed review records or scores.
+}
+
 function normalizeReviewIntervals(value) {
   const source = Array.isArray(value) ? value : recommendedReviewIntervals;
 
@@ -1452,7 +1493,7 @@ function handleReviewFrequencySubmit(event) {
 
   if (!isValid) {
     setReviewFrequencyMessage(
-      "Enter positive whole numbers separated by commas, such as 1, 3, 7, 30.",
+      "Enter positive whole numbers separated by commas, such as 3, 5, 7, 14, 21.",
       true
     );
     return;
@@ -1915,13 +1956,14 @@ function renderReviewGroup(group) {
     const isDue = review.status === "pending" && review.dueDate <= todayString();
 
     if (isCompleted) {
-      return `<div class="bcc-review-chip" title="Reviewed ${formatDate(review.completedDate || review.dueDate)}">✓ D${escapeHtml(review.intervalDays || "")}</div>`;
+      return `<div class="bcc-review-chip" title="Reviewed ${formatDate(review.completedDate || review.dueDate)}${review.recallScore !== undefined ? ` · ${review.recallScore}% first-attempt recall` : ""}">✓ D${escapeHtml(review.intervalDays || "")}</div>`;
     }
 
     return `
       <div class="bcc-review-cell ${isDue ? "due" : ""}">
         <div class="bcc-review-label">Day ${escapeHtml(review.intervalDays || "")}</div>
         <div class="bcc-review-date">${formatDate(review.dueDate)}</div>
+        <div class="bcc-review-date">Record first-attempt score when marking reviewed</div>
         <button class="bcc-small-button" onclick="completeReview('${escapeHtml(review.id)}')">Mark Reviewed</button>
       </div>
     `;
@@ -1968,6 +2010,14 @@ function completeReview(reviewId) {
   const review = reviews.find((item) => item.id === reviewId);
   if (!review || review.status === "completed") return;
 
+  const answer = window.prompt('First-attempt blind recall score (0–100). Leave blank if not scored:');
+  if (answer === null) return;
+  const score = answer.trim();
+  if (score !== '' && (!/^\d{1,3}$/.test(score) || Number(score) > 100)) {
+    window.alert('Enter a whole-number score from 0 to 100, or leave blank.');
+    return;
+  }
+  if (score !== '') review.recallScore = Number(score);
   review.status = "completed";
   review.completedDate = todayString();
 
