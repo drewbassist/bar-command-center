@@ -543,21 +543,11 @@ function formatDateTime(value) {
 }
 
 function setupNavigation() {
-  // Separate the full essay archive, A/B checklists and study guides from Blind-Struggle.
-  // Move the original DOM nodes (not clones), preserving checkbox handlers and saved data.
-  const library = document.getElementById("essay-library-content");
-  if (library) {
-    [".model-essay-panel", ".historical-essay-panel", ".pt-essay-panel", ".bar-essay-archive"].forEach((selector) => {
-      const panel = document.querySelector("#essay-grid " + selector);
-      if (panel) library.appendChild(panel);
-    });
-  }
-
   const buttons = document.querySelectorAll(".bcc-nav-button");
   const views = document.querySelectorAll(".bcc-view");
 
   // Keep all existing data and pages intact; display only the two study tabs.
-  const visibleViews = new Set(["essay-grid", "mcqs", "civil-procedure", "essay-library"]);
+  const visibleViews = new Set(["essay-grid", "mcqs", "civil-procedure"]);
   buttons.forEach((button) => {
     button.style.display = visibleViews.has(button.dataset.view) ? "" : "none";
   });
@@ -3824,6 +3814,10 @@ function renderManualModelEssays() {
 }
 function openChecklistEssayGuide(key, caption) {
     const guidePaths = {
+        'historical-essay-1996-february-q5-a': 'study-guides/february-1996-criminal-law-q5.html',
+        'historical-essay-1996-february-q5-b': 'study-guides/february-1996-criminal-law-q5.html',
+        'essay-model-archive-1996-february-q5-a': 'study-guides/february-1996-criminal-law-q5.html',
+        'essay-model-archive-1996-february-q5-b': 'study-guides/february-1996-criminal-law-q5.html',
         'historical-essay-2007-february-q4-a': 'study-guides/february-2007-wills-q4.html',
         'historical-essay-2007-february-q4-b': 'study-guides/february-2007-wills-q4.html',
         'essay-model-archive-2007-february-q4-a': 'study-guides/february-2007-wills-q4.html',
@@ -3854,11 +3848,6 @@ function openChecklistEssayGuide(key, caption) {
         'historical-essay-2001-july-q4-b': 'study-guides/july-2001-constitutional-law-q4.html',
         'essay-model-archive-2001-july-q4-a': 'study-guides/july-2001-constitutional-law-q4.html',
         'essay-model-archive-2001-july-q4-b': 'study-guides/july-2001-constitutional-law-q4.html'
-        ,
-        'historical-essay-1993-february-q3-a': 'study-guides/february-1993-evidence-q3.html',
-        'historical-essay-1993-february-q3-b': 'study-guides/february-1993-evidence-q3.html',
-        'essay-model-archive-1993-february-q3-a': 'study-guides/february-1993-evidence-q3.html',
-        'essay-model-archive-1993-february-q3-b': 'study-guides/february-1993-evidence-q3.html',
     };
     const modal = document.getElementById('model-essay-guide-modal');
     const frame = document.getElementById('model-essay-guide-frame');
@@ -3873,7 +3862,7 @@ function openChecklistEssayGuide(key, caption) {
     document.getElementById('model-essay-guide-close').focus();
 }
 
-const AVAILABLE_ESSAY_GUIDE_KEYS = new Set(["historical-essay-2007-february-q4-a", "historical-essay-2007-february-q4-b", "essay-model-archive-2007-february-q4-a", "essay-model-archive-2007-february-q4-b", "essay-model-archive-2012-february-q1-a", "essay-model-archive-2012-february-q1-b", "essay-model-archive-2012-february-q2-a", "essay-model-archive-2012-february-q2-b", "essay-model-archive-1987-july-q2-a", "essay-model-archive-1987-july-q2-b", "essay-model-archive-2004-july-q3-a", "essay-model-archive-2004-july-q3-b", "historical-essay-1987-july-q2-a", "historical-essay-1987-july-q2-b", "historical-essay-2004-july-q3-a", "historical-essay-2004-july-q3-b", "essay-model-archive-2011-july-q3-a", "essay-model-archive-2011-july-q3-b", "historical-essay-2011-july-q3-a", "historical-essay-2011-july-q3-b", "historical-essay-2010-july-q4-a", "historical-essay-2010-july-q4-b", "historical-essay-2003-july-q4-a", "historical-essay-2003-july-q4-b", "essay-model-archive-2003-july-q4-a", "essay-model-archive-2003-july-q4-b", "historical-essay-2001-july-q4-a", "historical-essay-2001-july-q4-b", "essay-model-archive-2001-july-q4-a", "essay-model-archive-2001-july-q4-b", "historical-essay-1993-february-q3-a", "historical-essay-1993-february-q3-b", "essay-model-archive-1993-february-q3-a", "essay-model-archive-1993-february-q3-b"]);
+const AVAILABLE_ESSAY_GUIDE_KEYS = new Set(["historical-essay-1996-february-q5-a", "historical-essay-1996-february-q5-b", "essay-model-archive-1996-february-q5-a", "essay-model-archive-1996-february-q5-b", "historical-essay-2007-february-q4-a", "historical-essay-2007-february-q4-b", "essay-model-archive-2007-february-q4-a", "essay-model-archive-2007-february-q4-b", "essay-model-archive-2012-february-q1-a", "essay-model-archive-2012-february-q1-b", "essay-model-archive-2012-february-q2-a", "essay-model-archive-2012-february-q2-b", "essay-model-archive-1987-july-q2-a", "essay-model-archive-1987-july-q2-b", "essay-model-archive-2004-july-q3-a", "essay-model-archive-2004-july-q3-b", "historical-essay-1987-july-q2-a", "historical-essay-1987-july-q2-b", "historical-essay-2004-july-q3-a", "historical-essay-2004-july-q3-b", "essay-model-archive-2011-july-q3-a", "essay-model-archive-2011-july-q3-b", "historical-essay-2011-july-q3-a", "historical-essay-2011-july-q3-b", "historical-essay-2010-july-q4-a", "historical-essay-2010-july-q4-b", "historical-essay-2003-july-q4-a", "historical-essay-2003-july-q4-b", "essay-model-archive-2003-july-q4-a", "essay-model-archive-2003-july-q4-b", "historical-essay-2001-july-q4-a", "historical-essay-2001-july-q4-b", "essay-model-archive-2001-july-q4-a", "essay-model-archive-2001-july-q4-b"]);
 function markEssayGuideAvailable(button, key) {
   if (AVAILABLE_ESSAY_GUIDE_KEYS.has(key)) { button.classList.add("guide-available"); button.title = "Study guide available"; }
 }
