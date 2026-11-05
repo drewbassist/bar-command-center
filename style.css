@@ -2397,3 +2397,18 @@ font-family: inherit;cursor:pointer}
 @media (max-width: 950px) {
   .mcq-numbered-grid { min-width: 900px; }
 }
+
+/* Blind Struggle: persistent D+3/5/7/14/21 essay review grid */
+.struggle-spaced-tracker{margin:14px 0 20px;padding:14px;border:1px solid #d9e3f2;border-radius:8px;background:var(--card-bg,#fff)}
+.struggle-spaced-tracker h3{margin:0 0 6px;font-size:16px}
+.struggle-spaced-scroll{overflow-x:auto}
+.struggle-spaced-table{width:100%;border-collapse:collapse;font-size:12px;min-width:760px}
+.struggle-spaced-table th,.struggle-spaced-table td{text-align:left;vertical-align:middle;padding:10px 7px;border-bottom:1px solid #e5e7eb}
+.struggle-spaced-table td:first-child{min-width:180px}
+.struggle-spaced-table td:first-child strong,.struggle-spaced-table td:first-child small{display:block}
+.struggle-spaced-table td:first-child small{color:#64748b;margin-top:3px}
+.struggle-spaced-check{display:flex;flex-direction:column;gap:3px;align-items:flex-start;cursor:pointer;white-space:nowrap}
+.struggle-spaced-check input{width:17px;height:17px;accent-color:#16803b;cursor:pointer}
+.struggle-spaced-check small{font-size:10px;color:#64748b}
+.struggle-spaced-overdue{background:#fff1e9}
+.struggle-spaced-overdue small{color:#a34113}
