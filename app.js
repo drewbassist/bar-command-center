@@ -543,11 +543,21 @@ function formatDateTime(value) {
 }
 
 function setupNavigation() {
+  // Separate the full essay archive, A/B checklists and study guides from Blind-Struggle.
+  // Move the original DOM nodes (not clones), preserving checkbox handlers and saved data.
+  const library = document.getElementById("essay-library-content");
+  if (library) {
+    [".model-essay-panel", ".historical-essay-panel", ".pt-essay-panel", ".bar-essay-archive"].forEach((selector) => {
+      const panel = document.querySelector("#essay-grid " + selector);
+      if (panel) library.appendChild(panel);
+    });
+  }
+
   const buttons = document.querySelectorAll(".bcc-nav-button");
   const views = document.querySelectorAll(".bcc-view");
 
   // Keep all existing data and pages intact; display only the two study tabs.
-  const visibleViews = new Set(["essay-grid", "mcqs", "civil-procedure", "essays"]);
+  const visibleViews = new Set(["essay-grid", "mcqs", "civil-procedure", "essay-library"]);
   buttons.forEach((button) => {
     button.style.display = visibleViews.has(button.dataset.view) ? "" : "none";
   });
