@@ -547,7 +547,7 @@ function setupNavigation() {
   const views = document.querySelectorAll(".bcc-view");
 
   // Keep all existing data and pages intact; display only the two study tabs.
-  const visibleViews = new Set(["essay-grid", "mcqs"]);
+  const visibleViews = new Set(["essay-grid", "mcqs", "civil-procedure"]);
   buttons.forEach((button) => {
     button.style.display = visibleViews.has(button.dataset.view) ? "" : "none";
   });

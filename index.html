@@ -60,6 +60,7 @@ New user? Follow instructions sent to your email before signing in.
 <button class="bcc-nav-button" data-view="reviews">Reviews</button>
 <button class="bcc-nav-button" data-view="study-log">Study Log</button>
 <button class="bcc-nav-button" data-view="essay-grid">Blind-Struggle</button>
+<button class="bcc-nav-button" data-view="civil-procedure">Civil Procedure</button>
 <button class="bcc-nav-button" data-view="retrieval-lab">Retrieval Lab</button>
 <button class="bcc-nav-button" data-view="stats">Progress</button>
 <button class="bcc-nav-button" onclick="window.location.href='/flashcardsplus/'" type="button">Flashcards+</button>
@@ -148,6 +149,14 @@ New user? Follow instructions sent to your email before signing in.
 <div class="mcq-numbered-scroll"><div id="mcq-numbered-grid" class="mcq-numbered-grid"></div></div>
 </div>
 </section>
+<section class="bcc-view" id="civil-procedure">
+<div class="bcc-panel civ-panel">
+  <div class="civ-header"><div><h2>Civil Procedure Study Center</h2><p>Federal + California · Master outline, essay training, gaps and progress</p></div><button type="button" class="civ-button civ-secondary" id="civ-export">Export progress JSON</button></div>
+  <div class="civ-stats"><div><strong id="civ-stat-modules">0/12</strong><span>Modules mastered</span></div><div><strong id="civ-stat-essays">0</strong><span>Essays completed</span></div><div><strong id="civ-stat-due">0</strong><span>Reviews due</span></div></div>
+  <div class="civ-tabs" role="tablist" aria-label="Civil Procedure study areas"><button type="button" class="civ-subtab active" data-civ-tab="outline">Master outline</button><button type="button" class="civ-subtab" data-civ-tab="essays">Essay index</button><button type="button" class="civ-subtab" data-civ-tab="gaps">Knowledge gaps</button><button type="button" class="civ-subtab" data-civ-tab="training">Training & reviews</button></div>
+  <div id="civ-content"></div>
+  <p class="civ-footnote">Progress is stored in this browser, separately from your existing BarOS data. Export JSON for backup or transfer. The historical issue index is provisional until each PDF and Answers A/B have been audited.</p>
+</div></section>
 <section class="bcc-view" id="flashcards">
 <div class="bcc-panel">
 <h2>Log Flashcard Session</h2>
@@ -999,6 +1008,8 @@ New user? Follow instructions sent to your email before signing in.
 <script src="master-error-log.js"></script>
 <script src="retrieval-lab.js"></script>
 <script src="study-guides.js"></script>
+<link rel="stylesheet" href="civil-procedure.css">
+<script defer src="civil-procedure.js"></script>
 
 <script>
 (function () {
