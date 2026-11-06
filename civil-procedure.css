@@ -4,3 +4,12 @@
 .civ-recommendations{margin:14px 0;padding:13px;border:1px solid rgba(128,128,128,.25);border-radius:9px}.civ-recommendations h4{margin:0 0 10px;font-size:14px}.civ-rec{border-top:1px solid rgba(128,128,128,.18);padding:10px 0}.civ-rec:first-of-type{border-top:0}.civ-rec p{font-size:13px;margin:7px 0}.civ-rec-progress{max-width:220px;flex:1}.civ-rec .civ-pill{font-size:11px}.civ-rec .civ-button{font-size:12px}@media(max-width:650px){.civ-rec-progress{max-width:none;width:100%}}
 
 .civ-daily-plan{border-left:3px solid var(--accent,#6387b5)}.civ-plan-rows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}.civ-plan-rows>div{padding:9px;border-radius:8px;background:rgba(120,130,150,.09)}@media(max-width:680px){.civ-plan-rows{grid-template-columns:1fr}}
+
+/* Isolated Civil Procedure daily doctrine training */
+.civ-daily-task,.civ-daily-review{display:flex;align-items:center;gap:12px;padding:11px 8px;border-bottom:1px solid var(--border,#ddd);font-size:14px}
+.civ-daily-task span,.civ-daily-review span:first-of-type{flex:1}
+.civ-daily-task strong,.civ-daily-review span:last-of-type{font-size:12px;white-space:nowrap;opacity:.75}
+.civ-daily-task input,.civ-daily-review input{width:17px;height:17px;flex:none}
+.civ-history{padding:8px 0;border-bottom:1px solid var(--border,#ddd);font-size:13px}
+.civ-history span:last-child{opacity:.7}
+@media(max-width:650px){.civ-daily-review,.civ-daily-task{flex-wrap:wrap}.civ-daily-review span:last-of-type{margin-left:29px}}
