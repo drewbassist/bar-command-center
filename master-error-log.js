@@ -11,8 +11,23 @@ const uid=()=>typeof currentUser!=='undefined'?currentUser?.id:null;
 const client=()=>typeof supabaseClient!=='undefined'?supabaseClient:null;
 const addDays=(date,n)=>{const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+n);return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')};
 const download=(name,content,type)=>{const blob=new Blob([content],{type}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
-const cloudRow=e=>({id:e.id,user_id:userId,data:e,updated_at:e.updatedAt});
-async function sync(){if(!userId||!client()||!dirty)return;const snapshot=entries.map(x=>({...x}));const {error}=await client().from('baros_error_log').upsert(snapshot.map(cloudRow),{onConflict:'id'});if(error){status('Local copy saved · Supabase sync failed (check SQL setup)');return}dirty=false;status('Saved locally + Supabase · '+new Date().toLocaleTimeString())}
+// Imported records may have empty timestamps; PostgreSQL timestamptz rejects empty strings.
+const validTimestamp=value=>typeof value==='string'&&value.trim()&&!Number.isNaN(Date.parse(value));
+const cloudRow=e=>({id:e.id,user_id:userId,data:e,updated_at:validTimestamp(e.updatedAt)?e.updatedAt:new Date().toISOString()});
+let syncInProgress=false;
+async function sync(){
+ if(!userId||!client()||!dirty||syncInProgress)return;
+ syncInProgress=true;
+ const snapshot=entries.map(x=>({...x}));
+ const snapshotJson=JSON.stringify(snapshot);
+ try{
+  const {error}=await client().from('baros_error_log').upsert(snapshot.map(cloudRow),{onConflict:'id'});
+  if(error){console.error('BarOS Master Error Log Supabase sync:',error);status('Local copy saved · Supabase sync failed: '+(error.message||'unknown error'));return}
+  dirty=JSON.stringify(entries)!==snapshotJson;
+  status(dirty?'Saved to Supabase · newer local changes pending':'Saved locally + Supabase · '+new Date().toLocaleTimeString());
+ }catch(error){console.error('BarOS Master Error Log sync exception:',error);status('Local copy saved · Supabase sync failed: '+(error?.message||String(error)))}
+ finally{syncInProgress=false;if(dirty&&JSON.stringify(entries)!==snapshotJson){clearTimeout(saveTimer);saveTimer=setTimeout(sync,850)}}
+}
 function schedule(){local();clearTimeout(saveTimer);saveTimer=setTimeout(sync,850)}
 async function loadCloud(){const id=uid();if(!id||!client())return;if(id===userId&&loaded)return;userId=id;loaded=true;status('Loading Supabase Error Log…');const {data,error}=await client().from('baros_error_log').select('data').eq('user_id',id).order('updated_at',{ascending:false});if(userId!==id)return;
  if(error){status('Local copy only · Run supplied Supabase SQL to enable cloud sync');entries=readLocal();render();return}
