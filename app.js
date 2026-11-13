@@ -4156,18 +4156,21 @@ function renderBasickTracker() {
         label.append(box,document.createTextNode(a.toUpperCase()));pair.appendChild(label);
       });
       const guidePath=basickGuidePath(date,BASICK_QUESTIONS[si][ei]);
+      // Reserve identical space in every essay cell so all dates, A/B checks,
+      // and guide controls stay aligned across the tracker.
+      const guideSlot=document.createElement("div");
+      guideSlot.style.cssText="height:18px;display:flex;align-items:center;justify-content:center;margin-top:2px";
       if (guidePath) {
         const guide=document.createElement("button");
         guide.type="button";
         guide.textContent="Guide";
         guide.className="guide-available";
         guide.title="Open existing combined Answers A and B study guide";
-        guide.style.cssText="display:block;margin-top:5px;padding:3px 9px;font-size:12px;cursor:pointer";
+        guide.style.cssText="font-size:10px;line-height:13px;padding:0 5px;min-height:15px;cursor:pointer;margin:0";
         guide.addEventListener("click",()=>openBasickGuide(guidePath,`${subject} · ${date} · Q${BASICK_QUESTIONS[si][ei]} · Answers A & B`));
-        cell.append(dateEl,pair,guide);
-      } else {
-        cell.append(dateEl,pair);
+        guideSlot.appendChild(guide);
       }
+      cell.append(dateEl,pair,guideSlot);
       tr.appendChild(cell);
     });
     body.appendChild(tr);
