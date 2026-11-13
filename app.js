@@ -4094,6 +4094,7 @@ const BASICK_GUIDE_PATHS = Object.freeze({
   "1996-february-q5": "study-guides/february-1996-criminal-law-q5.html",
   "1993-february-q3": "study-guides/february-1993-evidence-q3.html",
   "1998-july-q5": "study-guides/july-1998-business-associations-q5.html",
+  "2008-july-q4": "study-guides/july-2008-remedies-q4.html",
   "2010-july-q4": "study-guides/business-associations-2.html",
   "1987-july-q2": "study-guides/civil-procedure-1.html",
   "2004-july-q3": "study-guides/wills-trusts-1.html",
