@@ -4088,6 +4088,40 @@ function refreshBasickLinkedChecks() {
   });
   updateBasickCount();
 }
+// Basick guide links are derived from the essay's actual date/question, not its grid position.
+// Only link to guide files confirmed present in this repository.
+const BASICK_GUIDE_PATHS = Object.freeze({
+  "1996-february-q5": "study-guides/february-1996-criminal-law-q5.html",
+  "1993-february-q3": "study-guides/february-1993-evidence-q3.html",
+  "2010-july-q4": "study-guides/business-associations-2.html",
+  "1987-july-q2": "study-guides/civil-procedure-1.html",
+  "2004-july-q3": "study-guides/wills-trusts-1.html",
+  "2007-february-q4": "study-guides/february-2007-wills-q4.html",
+  "2012-february-q1": "study-guides/february-2012-trusts-q1.html",
+  "2012-february-q2": "study-guides/february-2012-constitutional-law-q2.html",
+  "2011-july-q3": "study-guides/july-2011-contracts-q3.html",
+  "2003-july-q4": "study-guides/july-2003-torts-q4.html",
+  "2001-july-q4": "study-guides/july-2001-constitutional-law-q4.html"
+});
+function basickGuidePath(date, question) {
+  const [month,year]=date.split(" ");
+  return BASICK_GUIDE_PATHS[`${year}-${month==='Feb'?'february':'july'}-q${question}`] || null;
+}
+function openBasickGuide(path, caption) {
+  const modal=document.getElementById('model-essay-guide-modal');
+  const frame=document.getElementById('model-essay-guide-frame');
+  const empty=document.getElementById('model-essay-guide-empty');
+  const title=document.getElementById('model-essay-guide-title');
+  const close=document.getElementById('model-essay-guide-close');
+  if (!modal || !frame || !empty || !title || !close) return;
+  title.textContent=caption;
+  frame.hidden=false;
+  empty.hidden=true;
+  frame.src=path;
+  modal.hidden=false;
+  document.body.classList.add('model-essay-modal-open');
+  close.focus();
+}
 function renderBasickTracker() {
   const root=document.getElementById("basick-answer-grid");
   if (!root) return;
@@ -4121,7 +4155,20 @@ function renderBasickTracker() {
         });
         label.append(box,document.createTextNode(a.toUpperCase()));pair.appendChild(label);
       });
-      cell.append(dateEl,pair);tr.appendChild(cell);
+      const guidePath=basickGuidePath(date,BASICK_QUESTIONS[si][ei]);
+      if (guidePath) {
+        const guide=document.createElement("button");
+        guide.type="button";
+        guide.textContent="Guide";
+        guide.className="guide-available";
+        guide.title="Open existing combined Answers A and B study guide";
+        guide.style.cssText="display:block;margin-top:5px;padding:3px 9px;font-size:12px;cursor:pointer";
+        guide.addEventListener("click",()=>openBasickGuide(guidePath,`${subject} · ${date} · Q${BASICK_QUESTIONS[si][ei]} · Answers A & B`));
+        cell.append(dateEl,pair,guide);
+      } else {
+        cell.append(dateEl,pair);
+      }
+      tr.appendChild(cell);
     });
     body.appendChild(tr);
   });
