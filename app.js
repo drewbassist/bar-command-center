@@ -4093,6 +4093,7 @@ function refreshBasickLinkedChecks() {
 const BASICK_GUIDE_PATHS = Object.freeze({
   "1996-february-q5": "study-guides/february-1996-criminal-law-q5.html",
   "1993-february-q3": "study-guides/february-1993-evidence-q3.html",
+  "1998-july-q5": "study-guides/july-1998-business-associations-q5.html",
   "2010-july-q4": "study-guides/business-associations-2.html",
   "1987-july-q2": "study-guides/civil-procedure-1.html",
   "2004-july-q3": "study-guides/wills-trusts-1.html",
@@ -4136,6 +4137,9 @@ function renderBasickTracker() {
     name.textContent=subject;tr.appendChild(name);
     BASICK_DATES[si].forEach((date,ei)=>{
       const essay=ei+1, cell=document.createElement("td");
+      cell.style.cssText="vertical-align:top;text-align:center;padding-top:5px;padding-bottom:5px";
+      const stack=document.createElement("div");
+      stack.style.cssText="display:grid;grid-template-rows:15px 17px 17px;justify-items:center;align-items:center;min-height:49px";
       const dateEl=document.createElement("div");dateEl.className="basick-mini-date";dateEl.textContent=`${date} · Q${BASICK_QUESTIONS[si][ei]}`;
       const pair=document.createElement("div");pair.className="basick-mini-pair";
       ["a","b"].forEach(a=>{
@@ -4159,7 +4163,7 @@ function renderBasickTracker() {
       // Reserve identical space in every essay cell so all dates, A/B checks,
       // and guide controls stay aligned across the tracker.
       const guideSlot=document.createElement("div");
-      guideSlot.style.cssText="height:18px;display:flex;align-items:center;justify-content:center;margin-top:2px";
+      guideSlot.style.cssText="height:17px;display:flex;align-items:center;justify-content:center;margin:0";
       if (guidePath) {
         const guide=document.createElement("button");
         guide.type="button";
@@ -4170,7 +4174,8 @@ function renderBasickTracker() {
         guide.addEventListener("click",()=>openBasickGuide(guidePath,`${subject} · ${date} · Q${BASICK_QUESTIONS[si][ei]} · Answers A & B`));
         guideSlot.appendChild(guide);
       }
-      cell.append(dateEl,pair,guideSlot);
+      stack.append(dateEl,pair,guideSlot);
+      cell.appendChild(stack);
       tr.appendChild(cell);
     });
     body.appendChild(tr);
