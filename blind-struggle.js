@@ -27,9 +27,7 @@ function reviewItems(){const r=[];state.completed.forEach(c=>{for(const offset o
 // Four-month calendar view over the existing Blind-Struggle review records.
 let calendarShift=0;
 function renderSpacedTracker(){
- const assignment=el('struggle-assignment');if(!assignment)return;
- let panel=el('struggle-spaced-tracker');
- if(!panel){panel=document.createElement('section');panel.id='struggle-spaced-tracker';panel.className='struggle-spaced-tracker';assignment.insertAdjacentElement('afterend',panel)}
+ const panel=el('struggle-spaced-tracker');if(!panel)return;
  clear(panel);
  const heading=text('div','','study-cal-header');
  const intro=document.createElement('div');intro.append(text('h3','Study Calendar · spaced repetition'),text('p','Four months of essay retrieval. Dates are based on Day 1; completion is saved to your existing Blind-Struggle record.','struggle-hint'));
