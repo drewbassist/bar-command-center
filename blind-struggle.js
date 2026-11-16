@@ -24,40 +24,58 @@ const el=id=>document.getElementById(id);
 const text=(tag,value,cls)=>{const n=document.createElement(tag);n.textContent=value;if(cls)n.className=cls;return n};
 const clear=n=>n.replaceChildren();
 function reviewItems(){const r=[];state.completed.forEach(c=>{for(const offset of [3,5,7,14,21]){const key=`${c.index}-${offset}`,due=add(c.start,offset);r.push({key,index:c.index,offset,due,done:state.reviews[key]})}});if(state.index<72 && state.start && state.day>0){const i=state.index;for(const offset of [3,5,7,14,21]){const key=`${i}-${offset}`;r.push({key,index:i,offset,due:add(state.start,offset),done:state.reviews[key]})}}return r.sort((a,b)=>a.due.localeCompare(b.due))}
-// Five dated reviews per started essay; preserve legacy D+7/D+21 completion values.
+// Four-month calendar view over the existing Blind-Struggle review records.
+let calendarShift=0;
 function renderSpacedTracker(){
  const assignment=el('struggle-assignment');if(!assignment)return;
  let panel=el('struggle-spaced-tracker');
  if(!panel){panel=document.createElement('section');panel.id='struggle-spaced-tracker';panel.className='struggle-spaced-tracker';assignment.insertAdjacentElement('afterend',panel)}
  clear(panel);
- panel.append(text('h3','Spaced repetition · essay review checkoffs'),text('p','Dates are calculated from each essay’s Day 1. Check a review after completing blind retrieval; the actual completion date is saved locally.','struggle-hint'));
- const started=new Map();
- state.completed.forEach(c=>{if(Number.isInteger(c.index)&&c.start)started.set(c.index,c.start)});
+ const heading=text('div','','study-cal-header');
+ const intro=document.createElement('div');intro.append(text('h3','Study Calendar · spaced repetition'),text('p','Four months of essay retrieval. Dates are based on Day 1; completion is saved to your existing Blind-Struggle record.','struggle-hint'));
+ const nav=text('div','','study-cal-nav');
+ for(const [label,delta] of [['← Previous',-4],['Today',null],['Next →',4]]){
+  const btn=text('button',label);btn.type='button';btn.onclick=()=>{calendarShift=delta===null?0:calendarShift+delta;renderSpacedTracker()};nav.append(btn);
+ }
+ heading.append(intro,nav);panel.append(heading);
+ const started=new Map();state.completed.forEach(c=>{if(Number.isInteger(c.index)&&c.start)started.set(c.index,c.start)});
  if(state.index<72&&state.start)started.set(state.index,state.start);
- if(!started.size){panel.append(text('p','No essays started yet.','struggle-hint'));return}
- const scroller=text('div','','struggle-spaced-scroll');const table=document.createElement('table');table.className='struggle-spaced-table';
- const head=document.createElement('thead'),hr=document.createElement('tr');
- for(const label of ['Essay / Day 1','D+3','D+5','D+7','D+14','D+21','Progress']){const th=text('th',label);hr.append(th)}head.append(hr);table.append(head);
- const body=document.createElement('tbody');
- [...started.entries()].sort((a,b)=>b[0]-a[0]).forEach(([index,start])=>{
-  const e=list[index];if(!e)return;
-  const tr=document.createElement('tr');const first=document.createElement('td');first.append(text('strong',`${e.subject} · ${e.date} Q${e.q}`),text('small',`Day 1: ${fmt(start)}`));tr.append(first);
-  let count=0;
-  for(const offset of [3,5,7,14,21]){
-   const key=`${index}-${offset}`,due=add(start,offset),completed=state.reviews[key];if(completed)count++;
-   const td=document.createElement('td');if(!completed&&due<today())td.className='struggle-spaced-overdue';
-   const label=document.createElement('label');label.className='struggle-spaced-check';
-   const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=!!completed;checkbox.setAttribute('aria-label',`${e.subject} ${e.date} Q${e.q} day plus ${offset}, due ${fmt(due)}`);
-   checkbox.addEventListener('change',()=>{if(checkbox.checked)state.reviews[key]=today();else delete state.reviews[key];save();render()});
-   label.append(checkbox,text('span',fmt(due)));
-   if(completed)label.append(text('small',`Done ${fmt(completed)}`));
-   else if(due<today())label.append(text('small','Overdue'));
-   else if(due===today())label.append(text('small','Due today'));
-   td.append(label);tr.append(td);
+ const events=new Map();
+ for(const [index,start] of started){const e=list[index];if(!e)continue;
+  for(const offset of [3,5,7,14,21]){const key=`${index}-${offset}`,due=add(start,offset);
+   if(!events.has(due))events.set(due,[]);
+   events.get(due).push({key,index,offset,due,done:state.reviews[key],essay:e});
   }
-  tr.append(text('td',`${count}/5`));body.append(tr);
- });
- table.append(body);scroller.append(table);panel.append(scroller);
+ }
+ const base=parse(today());base.setDate(1);base.setMonth(base.getMonth()+calendarShift);
+ const months=text('div','','study-cal-months');
+ for(let m=0;m<4;m++){
+  const first=new Date(base.getFullYear(),base.getMonth()+m,1,12);
+  const year=first.getFullYear(),month=first.getMonth();
+  const block=text('section','','study-cal-month');block.append(text('h4',first.toLocaleDateString('en-US',{month:'long',year:'numeric'})));
+  const grid=text('div','','study-cal-grid');
+  for(const day of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'])grid.append(text('span',day,'study-cal-weekday'));
+  for(let i=0;i<first.getDay();i++)grid.append(text('div','','study-cal-blank'));
+  const total=new Date(year,month+1,0).getDate();
+  for(let day=1;day<=total;day++){
+   const date=iso(new Date(year,month,day,12));const items=events.get(date)||[];
+   const cell=text('div','','study-cal-day');if(date===today())cell.classList.add('is-today');
+   if(items.some(x=>!x.done&&x.due<today()))cell.classList.add('has-overdue');
+   cell.append(text('strong',String(day),'study-cal-date'));
+   for(const item of items){const label=text('label','','study-cal-event');if(item.done)label.classList.add('is-done');
+    const check=document.createElement('input');check.type='checkbox';check.checked=!!item.done;
+    check.setAttribute('aria-label',`${item.essay.subject} ${item.essay.date} Q${item.essay.q}, D+${item.offset}, ${fmt(date)}`);
+    check.addEventListener('change',()=>{if(check.checked)state.reviews[item.key]=today();else delete state.reviews[item.key];save();render()});
+    const name=text('span',`${item.essay.subject} · ${item.essay.date} Q${item.essay.q} · D+${item.offset}`);
+    label.append(check,name);cell.append(label);
+   }
+   grid.append(cell);
+  }
+  block.append(grid);months.append(block);
+ }
+ panel.append(months);
+ const overdue=[...events.values()].flat().filter(x=>!x.done&&x.due<today()).length;
+ const foot=text('p',`${overdue} overdue review(s) across all started essays. Green = completed; peach = overdue. Unfinished reviews remain on their original dates.`, 'struggle-hint');panel.append(foot);
 }
 function render(){const i=state.index,finished=i>=72,essay=list[Math.min(i,71)],r=record(i);const projected=finished?(state.completed.at(-1)?.end||START):add(state.start,(72-i)*3-state.day-1);const completedHours=Object.values(state.records).reduce((sum,v)=>sum+Object.values(v.hours||{}).reduce((a,b)=>a+(Number(b)||0),0),0);const elapsedDays=Math.max(0,Math.floor((new Date(today()+'T12:00:00')-new Date(START+'T12:00:00'))/86400000)+1);const cumulativePlannedHours=elapsedDays*5;
  el('struggle-metrics').replaceChildren(...[['Completed essays',`${i} / 72`],['Completed training days',`${i*3+state.day} / 216`],['Actual logged essay hours',`${completedHours.toFixed(1)}`],['Cumulative planned study hours · 5/day',`${cumulativePlannedHours.toFixed(1)}`],['Estimated finish*',fmt(projected)]].map(([label,value])=>{const d=text('div','', 'struggle-metric');d.append(text('strong',value),text('span',label));return d}));
