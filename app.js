@@ -3840,6 +3840,10 @@ function openChecklistEssayGuide(key, caption) {
         'historical-essay-2011-july-q3-b': 'study-guides/july-2011-contracts-q3.html',
         'historical-essay-2010-july-q4-a': 'study-guides/business-associations-2.html',
         'historical-essay-2010-july-q4-b': 'study-guides/business-associations-2.html',
+        'historical-essay-2005-july-q2-a': 'study-guides/july-2005-real-property-q2.html',
+        'historical-essay-2005-july-q2-b': 'study-guides/july-2005-real-property-q2.html',
+        'essay-model-archive-2005-july-q2-a': 'study-guides/july-2005-real-property-q2.html',
+        'essay-model-archive-2005-july-q2-b': 'study-guides/july-2005-real-property-q2.html',
         'historical-essay-2003-july-q4-a': 'study-guides/july-2003-torts-q4.html',
         'historical-essay-2003-july-q4-b': 'study-guides/july-2003-torts-q4.html',
         'essay-model-archive-2003-july-q4-a': 'study-guides/july-2003-torts-q4.html',
@@ -3862,7 +3866,7 @@ function openChecklistEssayGuide(key, caption) {
     document.getElementById('model-essay-guide-close').focus();
 }
 
-const AVAILABLE_ESSAY_GUIDE_KEYS = new Set(["historical-essay-1996-february-q5-a", "historical-essay-1996-february-q5-b", "essay-model-archive-1996-february-q5-a", "essay-model-archive-1996-february-q5-b", "historical-essay-2007-february-q4-a", "historical-essay-2007-february-q4-b", "essay-model-archive-2007-february-q4-a", "essay-model-archive-2007-february-q4-b", "essay-model-archive-2012-february-q1-a", "essay-model-archive-2012-february-q1-b", "essay-model-archive-2012-february-q2-a", "essay-model-archive-2012-february-q2-b", "essay-model-archive-1987-july-q2-a", "essay-model-archive-1987-july-q2-b", "essay-model-archive-2004-july-q3-a", "essay-model-archive-2004-july-q3-b", "historical-essay-1987-july-q2-a", "historical-essay-1987-july-q2-b", "historical-essay-2004-july-q3-a", "historical-essay-2004-july-q3-b", "essay-model-archive-2011-july-q3-a", "essay-model-archive-2011-july-q3-b", "historical-essay-2011-july-q3-a", "historical-essay-2011-july-q3-b", "historical-essay-2010-july-q4-a", "historical-essay-2010-july-q4-b", "historical-essay-2003-july-q4-a", "historical-essay-2003-july-q4-b", "essay-model-archive-2003-july-q4-a", "essay-model-archive-2003-july-q4-b", "historical-essay-2001-july-q4-a", "historical-essay-2001-july-q4-b", "essay-model-archive-2001-july-q4-a", "essay-model-archive-2001-july-q4-b"]);
+const AVAILABLE_ESSAY_GUIDE_KEYS = new Set(["historical-essay-1996-february-q5-a", "historical-essay-1996-february-q5-b", "essay-model-archive-1996-february-q5-a", "essay-model-archive-1996-february-q5-b", "historical-essay-2007-february-q4-a", "historical-essay-2007-february-q4-b", "essay-model-archive-2007-february-q4-a", "essay-model-archive-2007-february-q4-b", "essay-model-archive-2012-february-q1-a", "essay-model-archive-2012-february-q1-b", "essay-model-archive-2012-february-q2-a", "essay-model-archive-2012-february-q2-b", "essay-model-archive-1987-july-q2-a", "essay-model-archive-1987-july-q2-b", "essay-model-archive-2004-july-q3-a", "essay-model-archive-2004-july-q3-b", "historical-essay-1987-july-q2-a", "historical-essay-1987-july-q2-b", "historical-essay-2004-july-q3-a", "historical-essay-2004-july-q3-b", "essay-model-archive-2011-july-q3-a", "essay-model-archive-2011-july-q3-b", "historical-essay-2011-july-q3-a", "historical-essay-2011-july-q3-b", "historical-essay-2010-july-q4-a", "historical-essay-2010-july-q4-b", "historical-essay-2005-july-q2-a", "historical-essay-2005-july-q2-b", "essay-model-archive-2005-july-q2-a", "essay-model-archive-2005-july-q2-b", "historical-essay-2003-july-q4-a", "historical-essay-2003-july-q4-b", "essay-model-archive-2003-july-q4-a", "essay-model-archive-2003-july-q4-b", "historical-essay-2001-july-q4-a", "historical-essay-2001-july-q4-b", "essay-model-archive-2001-july-q4-a", "essay-model-archive-2001-july-q4-b"]);
 function markEssayGuideAvailable(button, key) {
   if (AVAILABLE_ESSAY_GUIDE_KEYS.has(key)) { button.classList.add("guide-available"); button.title = "Study guide available"; }
 }
@@ -4102,6 +4106,7 @@ const BASICK_GUIDE_PATHS = Object.freeze({
   "2012-february-q1": "study-guides/february-2012-trusts-q1.html",
   "2012-february-q2": "study-guides/february-2012-constitutional-law-q2.html",
   "2011-july-q3": "study-guides/july-2011-contracts-q3.html",
+  "2005-july-q2": "study-guides/july-2005-real-property-q2.html",
   "2003-july-q4": "study-guides/july-2003-torts-q4.html",
   "2001-july-q4": "study-guides/july-2001-constitutional-law-q4.html"
 });
