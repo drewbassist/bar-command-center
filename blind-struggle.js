@@ -23,14 +23,14 @@ const dayTasks=()=>DAYS[state.day]||[];
 const el=id=>document.getElementById(id);
 const text=(tag,value,cls)=>{const n=document.createElement(tag);n.textContent=value;if(cls)n.className=cls;return n};
 const clear=n=>n.replaceChildren();
-function reviewItems(){const r=[];state.completed.forEach(c=>{for(const offset of [3,5,7,14,21]){const key=`${c.index}-${offset}`,due=add(c.start,offset);r.push({key,index:c.index,offset,due,done:state.reviews[key]})}});if(state.index<72 && state.start && state.day>0){const i=state.index;for(const offset of [3,5,7,14,21]){const key=`${i}-${offset}`;r.push({key,index:i,offset,due:add(state.start,offset),done:state.reviews[key]})}}return r.sort((a,b)=>a.due.localeCompare(b.due))}
+function reviewItems(){const r=[];state.completed.forEach(c=>{for(const offset of [3,5,7,14,21]){const key=`${c.index}-${offset}`,due=add(c.start,2+offset);r.push({key,index:c.index,offset,due,done:state.reviews[key]})}});if(state.index<72 && state.start && state.day>0){const i=state.index;for(const offset of [3,5,7,14,21]){const key=`${i}-${offset}`;r.push({key,index:i,offset,due:add(state.start,2+offset),done:state.reviews[key]})}}return r.sort((a,b)=>a.due.localeCompare(b.due))}
 // Four-month calendar view over the existing Blind-Struggle review records.
 let calendarShift=0;
 function renderSpacedTracker(){
  const panel=el('struggle-spaced-tracker');if(!panel)return;
  clear(panel);
  const heading=text('div','','study-cal-header');
- const intro=document.createElement('div');intro.append(text('h3','Study Calendar · spaced repetition'),text('p','Blind-Struggle, Civil Procedure, and other logged study sessions. Reviews appear D+3, +5, +7, +14, +21; guided work is not blind mastery.','struggle-hint'));
+ const intro=document.createElement('div');intro.append(text('h3','Study Calendar · spaced repetition'),text('p','Blind-Struggle, Civil Procedure, and other logged study sessions. Each essay has three discovery days, followed by retrieval +3, +5, +7, +14, +21 days after Day 3.','struggle-hint'));
  const nav=text('div','','study-cal-nav');
  for(const [label,delta] of [['← Previous',-4],['Today',null],['Next →',4]]){
   const btn=text('button',label);btn.type='button';btn.onclick=()=>{calendarShift=delta===null?0:calendarShift+delta;renderSpacedTracker()};nav.append(btn);
@@ -40,7 +40,11 @@ function renderSpacedTracker(){
  if(state.index<72&&state.start)started.set(state.index,state.start);
  const events=new Map();
  for(const [index,start] of started){const e=list[index];if(!e)continue;
-  for(const offset of [3,5,7,14,21]){const key=`${index}-${offset}`,due=add(start,offset);
+  for(let day=1;day<=3;day++){const date=add(start,day-1);
+   if(!events.has(date))events.set(date,[]);
+   events.get(date).push({key:`${index}-discovery-${day}`,index,discovery:day,due:date,done: index<state.index || (index===state.index && day<=state.day),essay:e});
+  }
+  for(const offset of [3,5,7,14,21]){const key=`${index}-${offset}`,due=add(start,2+offset);
    if(!events.has(due))events.set(due,[]);
    events.get(due).push({key,index,offset,due,done:state.reviews[key],essay:e});
   }
@@ -49,8 +53,6 @@ function renderSpacedTracker(){
  const EXTRA_KEY='baros_calendar_sessions_v1';
  const getExtra=()=>{try{const x=JSON.parse(localStorage.getItem(EXTRA_KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}};
  const extra=getExtra();
- const known={id:'rp-2026-11-16',date:'2026-11-16',subject:'Real Property',title:'Covenants / equitable servitudes · guided session',mode:'guided',reviews:{}};
- if(!extra.some(x=>x.id===known.id)){extra.push(known);localStorage.setItem(EXTRA_KEY,JSON.stringify(extra))}
  const cross=new Map();
  const push=(date,item)=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return;if(!cross.has(date))cross.set(date,[]);cross.get(date).push(item)};
  // Read existing Civil Procedure browser records; do not mark work completed unless recorded.
@@ -59,10 +61,12 @@ function renderSpacedTracker(){
   for(const x of Object.values(civ.daily||{})){if(!x||!x.date)continue;const title=titles[Number(x.topic)]||'Daily doctrine';push(x.date,{label:'Civil Procedure · '+title,kind:'session'});
    for(const n of [3,5,7,14,21])push(add(x.date,n),{label:'Civ Pro · '+title+' · D+'+n,kind:'civ-review',done:!!x.reviews?.[n],date:x.date,topic:x.topic,offset:n});}
   for(const x of civ.sessions||[]){if(!x?.date||!x.name)continue;push(x.date,{label:'Civ Pro essay · '+x.name,kind:'session'});
-   for(const n of [3,5,7,14,21]){const due=add(x.date,n);push(due,{label:'Civ Pro · '+x.name+' · D+'+n,kind:'civ-essay-review',done:!!civ.notes?.['review:'+x.name+':'+due+':'+n],name:x.name,offset:n})}}
+   for(let day=2;day<=3;day++)push(add(x.date,day-1),{label:'Civ Pro essay · '+x.name+' · Day '+day+' Discovery',kind:'session'});
+   for(const n of [3,5,7,14,21]){const due=add(x.date,2+n);push(due,{label:'Civ Pro · '+x.name+' · Day 3 +'+n,kind:'civ-essay-review',done:!!civ.notes?.['review:'+x.name+':'+due+':'+n],name:x.name,offset:n})}}
  }catch(e){console.warn('Calendar could not read Civil Procedure progress',e)}
  for(const x of extra){if(!x.date||!x.subject)continue;push(x.date,{label:x.subject+' · '+(x.title||'Study session')+(x.mode==='guided'?' (guided)':''),kind:'session'});
-  for(const n of [3,5,7,14,21])push(add(x.date,n),{label:x.subject+' · D+'+n,kind:'extra-review',id:x.id,offset:n,done:!!x.reviews?.[n]});}
+  for(let day=2;day<=3;day++)push(add(x.date,day-1),{label:x.subject+' · '+(x.title||'Study session')+' · Day '+day+' Discovery',kind:'session'});
+  for(const n of [3,5,7,14,21])push(add(x.date,2+n),{label:x.subject+' · Day 3 +'+n,kind:'extra-review',id:x.id,offset:n,done:!!x.reviews?.[n]});}
  const controls=text('div','','study-cal-nav');
  const addBtn=text('button','+ Log study session');addBtn.type='button';addBtn.onclick=()=>{
   const date=window.prompt('Study date (YYYY-MM-DD)',today());if(!date)return;if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||Number.isNaN(parse(date).getTime())){window.alert('Enter a valid YYYY-MM-DD date');return}
@@ -87,9 +91,9 @@ function renderSpacedTracker(){
    cell.append(text('strong',String(day),'study-cal-date'));
    for(const item of items){const label=text('label','','study-cal-event');if(item.done)label.classList.add('is-done');
     const check=document.createElement('input');check.type='checkbox';check.checked=!!item.done;
-    check.setAttribute('aria-label',`${item.essay.subject} ${item.essay.date} Q${item.essay.q}, D+${item.offset}, ${fmt(date)}`);
-    check.addEventListener('change',()=>{if(check.checked)state.reviews[item.key]=today();else delete state.reviews[item.key];save();render()});
-    const name=text('span',`${item.essay.subject} · ${item.essay.date} Q${item.essay.q} · D+${item.offset}`);
+    check.setAttribute('aria-label',`${item.essay.subject} ${item.essay.date} Q${item.essay.q}, ${item.discovery?'Day '+item.discovery+' Discovery':'Day 3 +'+item.offset}, ${fmt(date)}`);
+    if(item.discovery){check.disabled=true;check.title='Discovery completion is controlled by the essay training checklist';}else check.addEventListener('change',()=>{if(check.checked)state.reviews[item.key]=today();else delete state.reviews[item.key];save();render()});
+    const name=text('span',`${item.essay.subject} · ${item.essay.date} Q${item.essay.q} · ${item.discovery?'Day '+item.discovery+' Discovery':'Retrieval +'+item.offset}`);
     label.append(check,name);cell.append(label);
    }
    for(const item of cross.get(date)||[]){const label=text('label','','study-cal-event');label.classList.add(item.kind==='session'?'study-cal-session':'study-cal-cross-review');if(item.done)label.classList.add('is-done');
@@ -107,7 +111,7 @@ function renderSpacedTracker(){
   block.append(grid);months.append(block);
  }
  panel.append(months);
- const overdue=[...events.values()].flat().filter(x=>!x.done&&x.due<today()).length;
+ const overdue=[...events.values()].flat().filter(x=>!x.discovery&&!x.done&&x.due<today()).length;
  const foot=text('p',`${overdue} overdue review(s) across all started essays. Green = completed; peach = overdue. Unfinished reviews remain on their original dates.`, 'struggle-hint');panel.append(foot);
 }
 function render(){const i=state.index,finished=i>=72,essay=list[Math.min(i,71)],r=record(i);const projected=finished?(state.completed.at(-1)?.end||START):add(state.start,(72-i)*3-state.day-1);const completedHours=Object.values(state.records).reduce((sum,v)=>sum+Object.values(v.hours||{}).reduce((a,b)=>a+(Number(b)||0),0),0);const elapsedDays=Math.max(0,Math.floor((new Date(today()+'T12:00:00')-new Date(START+'T12:00:00'))/86400000)+1);const cumulativePlannedHours=elapsedDays*5;
@@ -125,7 +129,7 @@ function render(){const i=state.index,finished=i>=72,essay=list[Math.min(i,71)],
    budget.append(text('p',`${due.length} essay review(s) due or overdue · ${ruleCount} Error Log rule(s) due. Unfinished items stay pending.`, 'struggle-hint'));
    const queue=text('div','','struggle-retrieval-queue');
    for(const x of due){const e=list[x.index],row=text('div','','struggle-review');
-    row.append(text('strong',`Day ${x.offset} · ${e.subject} · ${e.date} Q${e.q}`),text('span',`Due ${fmt(x.due)} · retrieve blind before marking complete`));
+    row.append(text('strong',`Day 3 +${x.offset} · ${e.subject} · ${e.date} Q${e.q}`),text('span',`Due ${fmt(x.due)} · retrieve blind before marking complete`));
     const button=text('button','Mark retrieval complete');button.type='button';button.onclick=()=>{state.reviews[x.key]=today();save();render()};row.append(button);queue.append(row)}
    if(!due.length)queue.append(text('p','No essay reviews due. Retrieve current-essay rules and due Error Log rules.','struggle-hint'));
    budget.append(queue);
