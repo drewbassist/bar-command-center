@@ -30,7 +30,7 @@ function renderSpacedTracker(){
  const panel=el('struggle-spaced-tracker');if(!panel)return;
  clear(panel);
  const heading=text('div','','study-cal-header');
- const intro=document.createElement('div');intro.append(text('h3','Study Calendar · spaced repetition'),text('p','Four months of essay retrieval. Dates are based on Day 1; completion is saved to your existing Blind-Struggle record.','struggle-hint'));
+ const intro=document.createElement('div');intro.append(text('h3','Study Calendar · spaced repetition'),text('p','Blind-Struggle, Civil Procedure, and other logged study sessions. Reviews appear D+3, +5, +7, +14, +21; guided work is not blind mastery.','struggle-hint'));
  const nav=text('div','','study-cal-nav');
  for(const [label,delta] of [['← Previous',-4],['Today',null],['Next →',4]]){
   const btn=text('button',label);btn.type='button';btn.onclick=()=>{calendarShift=delta===null?0:calendarShift+delta;renderSpacedTracker()};nav.append(btn);
@@ -45,6 +45,31 @@ function renderSpacedTracker(){
    events.get(due).push({key,index,offset,due,done:state.reviews[key],essay:e});
   }
  }
+ // Cross-track sessions are separate from Blind-Struggle completion records.
+ const EXTRA_KEY='baros_calendar_sessions_v1';
+ const getExtra=()=>{try{const x=JSON.parse(localStorage.getItem(EXTRA_KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}};
+ const extra=getExtra();
+ const known={id:'rp-2026-11-16',date:'2026-11-16',subject:'Real Property',title:'Covenants / equitable servitudes · guided session',mode:'guided',reviews:{}};
+ if(!extra.some(x=>x.id===known.id)){extra.push(known);localStorage.setItem(EXTRA_KEY,JSON.stringify(extra))}
+ const cross=new Map();
+ const push=(date,item)=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return;if(!cross.has(date))cross.set(date,[]);cross.get(date).push(item)};
+ // Read existing Civil Procedure browser records; do not mark work completed unless recorded.
+ try{const civ=JSON.parse(localStorage.getItem('baros_civpro_v1')||'{}');
+  const titles=['Discovery','Pleadings','Service of process','Default judgments','Temporary remedies','Appeals','Preclusion','Venue and transfer','Class actions','Discovery sanctions'];
+  for(const x of Object.values(civ.daily||{})){if(!x||!x.date)continue;const title=titles[Number(x.topic)]||'Daily doctrine';push(x.date,{label:'Civil Procedure · '+title,kind:'session'});
+   for(const n of [3,5,7,14,21])push(add(x.date,n),{label:'Civ Pro · '+title+' · D+'+n,kind:'civ-review',done:!!x.reviews?.[n],date:x.date,topic:x.topic,offset:n});}
+  for(const x of civ.sessions||[]){if(!x?.date||!x.name)continue;push(x.date,{label:'Civ Pro essay · '+x.name,kind:'session'});
+   for(const n of [3,5,7,14,21]){const due=add(x.date,n);push(due,{label:'Civ Pro · '+x.name+' · D+'+n,kind:'civ-essay-review',done:!!civ.notes?.['review:'+x.name+':'+due+':'+n],name:x.name,offset:n})}}
+ }catch(e){console.warn('Calendar could not read Civil Procedure progress',e)}
+ for(const x of extra){if(!x.date||!x.subject)continue;push(x.date,{label:x.subject+' · '+(x.title||'Study session')+(x.mode==='guided'?' (guided)':''),kind:'session'});
+  for(const n of [3,5,7,14,21])push(add(x.date,n),{label:x.subject+' · D+'+n,kind:'extra-review',id:x.id,offset:n,done:!!x.reviews?.[n]});}
+ const controls=text('div','','study-cal-nav');
+ const addBtn=text('button','+ Log study session');addBtn.type='button';addBtn.onclick=()=>{
+  const date=window.prompt('Study date (YYYY-MM-DD)',today());if(!date)return;if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||Number.isNaN(parse(date).getTime())){window.alert('Enter a valid YYYY-MM-DD date');return}
+  const subject=window.prompt('Subject (e.g. Civil Procedure or Real Property)');if(!subject?.trim())return;
+  const title=window.prompt('Topic or essay reference','Guided doctrine session');if(!title?.trim())return;
+  const id='manual-'+Date.now();extra.push({id,date,subject:subject.trim(),title:title.trim(),mode:'logged',reviews:{}});localStorage.setItem(EXTRA_KEY,JSON.stringify(extra));renderSpacedTracker();
+ };controls.append(addBtn);heading.append(controls);
  const base=parse(today());base.setDate(1);base.setMonth(base.getMonth()+calendarShift);
  const months=text('div','','study-cal-months');
  for(let m=0;m<4;m++){
@@ -66,6 +91,16 @@ function renderSpacedTracker(){
     check.addEventListener('change',()=>{if(check.checked)state.reviews[item.key]=today();else delete state.reviews[item.key];save();render()});
     const name=text('span',`${item.essay.subject} · ${item.essay.date} Q${item.essay.q} · D+${item.offset}`);
     label.append(check,name);cell.append(label);
+   }
+   for(const item of cross.get(date)||[]){const label=text('label','','study-cal-event');label.classList.add(item.kind==='session'?'study-cal-session':'study-cal-cross-review');if(item.done)label.classList.add('is-done');
+    if(item.kind==='extra-review'){
+     const check=document.createElement('input');check.type='checkbox';check.checked=!!item.done;check.setAttribute('aria-label',item.label+' '+date);
+     check.onchange=()=>{const all=getExtra(),x=all.find(v=>v.id===item.id);if(!x)return;x.reviews=x.reviews||{};if(check.checked)x.reviews[item.offset]=today();else delete x.reviews[item.offset];localStorage.setItem(EXTRA_KEY,JSON.stringify(all));renderSpacedTracker()};label.append(check);
+    }else if(item.kind==='civ-review'||item.kind==='civ-essay-review'){
+     const check=document.createElement('input');check.type='checkbox';check.checked=!!item.done;check.setAttribute('aria-label',item.label+' '+date);
+     check.onchange=()=>{try{const civ=JSON.parse(localStorage.getItem('baros_civpro_v1')||'{}');if(item.kind==='civ-review'){const x=Object.values(civ.daily||{}).find(v=>v.date===item.date&&String(v.topic)===String(item.topic));if(!x)return;x.reviews=x.reviews||{};if(check.checked)x.reviews[item.offset]=true;else delete x.reviews[item.offset]}else{civ.notes=civ.notes||{};const key='review:'+item.name+':'+date+':'+item.offset;if(check.checked)civ.notes[key]=true;else delete civ.notes[key]}localStorage.setItem('baros_civpro_v1',JSON.stringify(civ));renderSpacedTracker()}catch(e){console.warn('Could not update Civil Procedure review',e)}};label.append(check);
+    }
+    label.append(text('span',item.label));cell.append(label);
    }
    grid.append(cell);
   }
