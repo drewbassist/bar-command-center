@@ -1,0 +1,30 @@
+{
+  "audit_cutoff": "2026-11-16",
+  "records": 99,
+  "subjects": {
+    "Real Property": 5,
+    "Civil Procedure": 16,
+    "Evidence": 19,
+    "Remedies": 17,
+    "Criminal Law & Procedure": 16,
+    "Contracts / Sales": 13,
+    "Business Associations": 13
+  },
+  "verified_discovery_starts": {
+    "Criminal Law & Procedure": "2026-11-02",
+    "Real Property": "2026-11-16"
+  },
+  "note": "Rule-created dates are not evidence of a completed three-day discovery cycle. Existing JSON retained unchanged. Civil Procedure browser localStorage cannot be verified from this export.",
+  "real_property_discovery": [
+    "2026-11-16",
+    "2026-11-17",
+    "2026-11-18"
+  ],
+  "real_property_retrieval": [
+    "2026-11-21",
+    "2026-11-23",
+    "2026-11-25",
+    "2026-12-02",
+    "2026-12-09"
+  ]
+}
