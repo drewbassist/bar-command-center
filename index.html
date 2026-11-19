@@ -356,7 +356,7 @@ New user? Follow instructions sent to your email before signing in.
 <li><strong>Spaced retrieval:</strong> The calendar schedules reviews at <strong>+1, +3, +5, +7, and +14 days</strong>, using previous essays, their guides, and their rules.</li>
 <li><strong>Next essay:</strong> The following day begins a new essay, while previous essays continue through spaced retrieval.</li>
 </ol>
-<p><strong>Note:</strong> This tab documents the intended workflow. It does not by itself change the existing essay schedule, calendar logic, or Essay Tracker.</p>
+<p><strong>Note:</strong> This tab explains the active one-essay-per-day workflow. The separate Essay Tracker remains unchanged.</p>
 </div>
 </section>
 <section class="bcc-view" id="essay-grid">
@@ -781,14 +781,14 @@ New user? Follow instructions sent to your email before signing in.
 </div>
 </div>
 <section class="bcc-panel struggle-panel" id="struggle-training">
- <div class="struggle-header"><div><h2>Today's Training · Blind-Struggle</h2><p>November 2, 2026 start · 72 essays · 3-day completion-gated cycles · 3 hours per training day · Civil Procedure 2 hours · combined cap 5 hours</p></div><button id="struggle-export" type="button">Export training data</button></div>
+ <div class="struggle-header"><div><h2>Today's Training · Blind-Struggle</h2><p>72 essays · one new essay per day · 20 written mini-lessons per essay · +1/+3/+5/+7/+14 retrieval · daily Civil Procedure separate · five-hour combined cap</p></div><button id="struggle-export" type="button">Export training data</button></div>
  <div class="struggle-metrics" id="struggle-metrics"></div>
  <div class="struggle-assignment" id="struggle-assignment"></div>
  <div class="struggle-day-tabs" id="struggle-day-tabs"></div>
  <div id="struggle-tasks"></div>
  <div id="struggle-retrieval-budget" class="struggle-retrieval-budget"></div>
  <div class="struggle-actions"><button type="button" id="struggle-next-day">Complete this training day</button><span id="struggle-status"></span></div>
- <div class="struggle-hours-only"><label>Actual study hours today <input id="struggle-hours" type="number" min="0" max="3" step="0.25" value="0"></label></div>
+ <div class="struggle-hours-only"><label>Actual essay study hours today <input id="struggle-hours" type="number" min="0" max="5" step="0.25" value="0"></label></div>
 <div hidden aria-hidden="true">
 <button type="button" id="mel-from-essay" onclick="window.barosAddErrorFromEssay?.()">Add structured error to Master Log</button>
 <textarea id="struggle-draft" rows="6" placeholder="Write without notes. Autosaved locally."></textarea>
@@ -800,7 +800,7 @@ New user? Follow instructions sent to your email before signing in.
 </div>
 </section>
 <section class="bcc-panel mel-panel" id="master-error-log">
- <div class="mel-header"><div><h2>Master Rules &amp; Log</h2><p class="mel-hint">One doctrine per record. Track actual errors separately from guided practice and untested rules; preserve source essays and retrieval history.</p></div><button type="button" id="mel-new">+ Add Rule / Concept</button></div>
+ <div class="mel-header"><div><h2>Log</h2><p class="mel-hint">One doctrine per record. Track actual errors separately from guided practice and untested rules; preserve source essays and retrieval history.</p></div><button type="button" id="mel-new">+ Add Rule / Concept</button></div>
  <p id="mel-status" role="status">Loading local copy…</p><p id="mel-summary"></p>
  <div class="mel-tabs" role="group" aria-label="Master Rules views"><button type="button" class="mel-tab active" data-mel-tab="library">Library</button><button type="button" class="mel-tab" data-mel-tab="retrieval">Today’s Retrieval</button><button type="button" class="mel-tab" data-mel-tab="performance">Performance</button></div><div id="mel-metrics"></div><div id="mel-due"></div>
  <details id="mel-form"><summary>Add or edit a legal concept</summary><form id="mel-entry-form"><div class="mel-form-grid">
@@ -809,7 +809,7 @@ New user? Follow instructions sent to your email before signing in.
  <label>Definition / rule<textarea id="mel-rule" required></textarea></label>
  <label>Issue trigger<textarea id="mel-trigger"></textarea></label>
  <label>Exception / distinction<textarea id="mel-distinction"></textarea></label>
- <label>My original error<textarea id="mel-originalError"></textarea></label>
+ <label>Original error / correction (if applicable)<textarea id="mel-originalError"></textarea></label>
  <label>Correct analysis<textarea id="mel-analysis"></textarea></label>
  <label>Source essay<input id="mel-source" placeholder="July 2010 · Question 4"></label>
  </div><button id="mel-save" type="submit">Save This!</button></form></details>
