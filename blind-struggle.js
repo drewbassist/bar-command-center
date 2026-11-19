@@ -2,7 +2,7 @@
 (()=>{
 'use strict';
 const KEY='bcc_blind_struggle_v2', START='2026-11-19';
-const RESET_MARKER='bcc_blind_struggle_fresh_start_2026_11_19_v1';
+const RESET_MARKER='bcc_blind_struggle_real_property_start_2026_11_19_v1';
 const TASKS=[
  ['Blind essay','Write the essay closed-book, identifying issues and applying rules.'],
  ['Compare Answers A and B','Audit issues, rules, factual triggers and application against both selected answers.'],
@@ -18,13 +18,14 @@ const iso=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.ge
 const add=(x,n)=>{const d=parse(x);d.setDate(d.getDate()+n);return iso(d)};
 const fmt=x=>parse(x).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 const today=()=>iso(new Date());
-const empty=()=>({index:0,day:0,start:START,completed:[],records:{},reviews:{},lastDayCompleted:null});
+const empty=()=>({index:5,day:0,start:START,completed:[],records:{},reviews:{},lastDayCompleted:null});
 let state;try{state={...empty(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){state=empty()}
-// One-time clean restart of Blind-Struggle only. Archive the previous workflow state
-// locally before clearing it; do not touch Basick, guides, Log, or Civil Procedure data.
+// One-time scheduling reset: start at Column 1 Real Property (index 5).
+// Essays 1-5 are handled manually; do not import them into automated reviews.
+// Preserve a local backup of the previous Blind-Struggle state. Other modules untouched.
 if(!localStorage.getItem(RESET_MARKER)){
  const previous=localStorage.getItem(KEY);
- if(previous!==null)localStorage.setItem('bcc_blind_struggle_pre_restart_2026_11_19',previous);
+ if(previous!==null)localStorage.setItem('bcc_blind_struggle_pre_real_property_2026_11_19',previous);
  state=empty();
  localStorage.setItem(KEY,JSON.stringify(state));
  localStorage.setItem(RESET_MARKER,'1');
@@ -96,7 +97,7 @@ function renderSpacedTracker(){
  const foot=text('p',`${overdue} overdue review(s) across all started essays. Green = completed; peach = overdue. Unfinished reviews remain on their original dates.`, 'struggle-hint');panel.append(foot);
 }
 function render(){const i=state.index,finished=i>=72,essay=list[Math.min(i,71)],r=record(i);const projected=finished?(state.completed.at(-1)?.end||START):add((state.start<today()?today():state.start),72-i-1);const completedHours=Object.values(state.records).reduce((sum,v)=>sum+Object.values(v.hours||{}).reduce((a,b)=>a+(Number(b)||0),0),0);const elapsedDays=Math.max(0,Math.floor((new Date(today()+'T12:00:00')-new Date(START+'T12:00:00'))/86400000)+1);const cumulativePlannedHours=elapsedDays*5;
- el('struggle-metrics').replaceChildren(...[['Completed essays',`${i} / 72`],['Essays advanced',`${i} / 72`],['Actual logged essay hours',`${completedHours.toFixed(1)}`],['Cumulative planned study hours · 5/day',`${cumulativePlannedHours.toFixed(1)}`],['Estimated finish*',fmt(projected)]].map(([label,value])=>{const d=text('div','', 'struggle-metric');d.append(text('strong',value),text('span',label));return d}));
+ el('struggle-metrics').replaceChildren(...[['Completed essays',`${state.completed.length} / 72`],['Essays advanced',`${Math.max(0,i-5)} since restart`],['Actual logged essay hours',`${completedHours.toFixed(1)}`],['Cumulative planned study hours · 5/day',`${cumulativePlannedHours.toFixed(1)}`],['Estimated finish*',fmt(projected)]].map(([label,value])=>{const d=text('div','', 'struggle-metric');d.append(text('strong',value),text('span',label));return d}));
  const assignment=el('struggle-assignment');clear(assignment);assignment.append(text('strong',finished?'All 72 essay cycles completed':`${essay.subject} · ${essay.date} · Question ${essay.q}`),text('small',finished?'All cycles completed':`Essay ${i+1} of 72 · Column ${essay.col} · One essay per training day · Training date ${fmt(state.start<today()?today():state.start)} · finish date is an estimate`));
  renderSpacedTracker();
  const tabs=el('struggle-day-tabs');clear(tabs);tabs.append(text('strong','Single-day essay workflow · seven required steps')); 
