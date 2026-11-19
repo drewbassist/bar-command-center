@@ -1,7 +1,8 @@
 /* Independent, completion-gated Blind-Struggle training. Does not mutate Basick or archive data. */
 (()=>{
 'use strict';
-const KEY='bcc_blind_struggle_v2', START='2026-11-02';
+const KEY='bcc_blind_struggle_v2', START='2026-11-19';
+const RESET_MARKER='bcc_blind_struggle_fresh_start_2026_11_19_v1';
 const TASKS=[
  ['Blind essay','Write the essay closed-book, identifying issues and applying rules.'],
  ['Compare Answers A and B','Audit issues, rules, factual triggers and application against both selected answers.'],
@@ -19,6 +20,15 @@ const fmt=x=>parse(x).toLocaleDateString('en-US',{weekday:'short',month:'short',
 const today=()=>iso(new Date());
 const empty=()=>({index:0,day:0,start:START,completed:[],records:{},reviews:{},lastDayCompleted:null});
 let state;try{state={...empty(),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){state=empty()}
+// One-time clean restart of Blind-Struggle only. Archive the previous workflow state
+// locally before clearing it; do not touch Basick, guides, Log, or Civil Procedure data.
+if(!localStorage.getItem(RESET_MARKER)){
+ const previous=localStorage.getItem(KEY);
+ if(previous!==null)localStorage.setItem('bcc_blind_struggle_pre_restart_2026_11_19',previous);
+ state=empty();
+ localStorage.setItem(KEY,JSON.stringify(state));
+ localStorage.setItem(RESET_MARKER,'1');
+}
 const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
 const essays=()=>{const out=[];for(let col=0;col<6;col++)for(let row=0;row<12;row++)out.push({subject:BASICK_SUBJECTS[row],date:BASICK_DATES[row][col],q:BASICK_QUESTIONS[row][col],col:col+1,row});return out};
 const list=essays();
@@ -46,6 +56,12 @@ function renderSpacedTracker(){
  }
  heading.append(intro,nav);panel.append(heading);
  const events=new Map();
+ for(const c of state.completed){
+  const e=list[c.index],date=c.end||c.trainingDate;
+  if(!e||!date)continue;
+  if(!events.has(date))events.set(date,[]);
+  events.get(date).push({completion:true,essay:e,due:date,done:date});
+ }
  for(const item of reviewItems()){const e=list[item.index];if(!e)continue;if(!events.has(item.due))events.set(item.due,[]);events.get(item.due).push({...item,essay:e})}
  const base=parse(today());base.setDate(1);base.setMonth(base.getMonth()+calendarShift);
  const months=text('div','','study-cal-months');
@@ -62,7 +78,9 @@ function renderSpacedTracker(){
    const cell=text('div','','study-cal-day');if(date===today())cell.classList.add('is-today');
    if(items.some(x=>!x.done&&x.due<today()))cell.classList.add('has-overdue');
    cell.append(text('strong',String(day),'study-cal-date'));
-   for(const item of items){const label=text('label','','study-cal-event');if(item.done)label.classList.add('is-done');
+   for(const item of items){
+    if(item.completion){const badge=text('div',`✓ Completed · ${item.essay.subject} · ${item.essay.date} Q${item.essay.q}`,'study-cal-event is-done');cell.append(badge);continue;}
+    const label=text('label','','study-cal-event');if(item.done)label.classList.add('is-done');
     const check=document.createElement('input');check.type='checkbox';check.checked=!!item.done;
     check.setAttribute('aria-label',`${item.essay.subject} ${item.essay.date} Q${item.essay.q}, D+${item.offset}, ${fmt(date)}`);
     check.addEventListener('change',()=>{if(check.checked)state.reviews[item.key]=today();else delete state.reviews[item.key];save();render()});
@@ -77,12 +95,12 @@ function renderSpacedTracker(){
  const overdue=[...events.values()].flat().filter(x=>!x.done&&x.due<today()).length;
  const foot=text('p',`${overdue} overdue review(s) across all started essays. Green = completed; peach = overdue. Unfinished reviews remain on their original dates.`, 'struggle-hint');panel.append(foot);
 }
-function render(){const i=state.index,finished=i>=72,essay=list[Math.min(i,71)],r=record(i);const projected=finished?(state.completed.at(-1)?.end||START):add(state.start,72-i-1);const completedHours=Object.values(state.records).reduce((sum,v)=>sum+Object.values(v.hours||{}).reduce((a,b)=>a+(Number(b)||0),0),0);const elapsedDays=Math.max(0,Math.floor((new Date(today()+'T12:00:00')-new Date(START+'T12:00:00'))/86400000)+1);const cumulativePlannedHours=elapsedDays*5;
+function render(){const i=state.index,finished=i>=72,essay=list[Math.min(i,71)],r=record(i);const projected=finished?(state.completed.at(-1)?.end||START):add((state.start<today()?today():state.start),72-i-1);const completedHours=Object.values(state.records).reduce((sum,v)=>sum+Object.values(v.hours||{}).reduce((a,b)=>a+(Number(b)||0),0),0);const elapsedDays=Math.max(0,Math.floor((new Date(today()+'T12:00:00')-new Date(START+'T12:00:00'))/86400000)+1);const cumulativePlannedHours=elapsedDays*5;
  el('struggle-metrics').replaceChildren(...[['Completed essays',`${i} / 72`],['Essays advanced',`${i} / 72`],['Actual logged essay hours',`${completedHours.toFixed(1)}`],['Cumulative planned study hours · 5/day',`${cumulativePlannedHours.toFixed(1)}`],['Estimated finish*',fmt(projected)]].map(([label,value])=>{const d=text('div','', 'struggle-metric');d.append(text('strong',value),text('span',label));return d}));
- const assignment=el('struggle-assignment');clear(assignment);assignment.append(text('strong',finished?'All 72 essay cycles completed':`${essay.subject} · ${essay.date} · Question ${essay.q}`),text('small',finished?'All cycles completed':`Essay ${i+1} of 72 · Column ${essay.col} · One essay per training day · Training date ${fmt(state.start)} · finish date is an estimate`));
+ const assignment=el('struggle-assignment');clear(assignment);assignment.append(text('strong',finished?'All 72 essay cycles completed':`${essay.subject} · ${essay.date} · Question ${essay.q}`),text('small',finished?'All cycles completed':`Essay ${i+1} of 72 · Column ${essay.col} · One essay per training day · Training date ${fmt(state.start<today()?today():state.start)} · finish date is an estimate`));
  renderSpacedTracker();
  const tabs=el('struggle-day-tabs');clear(tabs);tabs.append(text('strong','Single-day essay workflow · seven required steps')); 
- const tasks=el('struggle-tasks');clear(tasks);if(!finished)dayTasks().forEach(([title,description],n)=>{const div=text('div','', 'struggle-task'),input=document.createElement('input');input.type='checkbox';input.checked=!!r.tasks[`single-${n}`];input.addEventListener('change',()=>{r.tasks[`single-${n}`]=input.checked;save();render()});const label=document.createElement('label');label.append(text('strong',title),text('div',description,'struggle-hint'));div.append(input,label);tasks.append(div)});
+ const tasks=el('struggle-tasks');clear(tasks);if(!finished)dayTasks().forEach(([title,description],n)=>{const div=text('div','', 'struggle-task'),input=document.createElement('input');input.type='checkbox';input.checked=!!r.tasks[`single-${n}`];input.addEventListener('change',()=>{r.tasks[`single-${n}`]=input.checked;save();if(dayTasks().every((_,k)=>r.tasks[`single-${k}`]))advance();else render()});const label=document.createElement('label');label.append(text('strong',title),text('div',description,'struggle-hint'));div.append(input,label);tasks.append(div)});
  // Retrieval is part of the final 15/30-minute task, not additional time.
  const budget=el('struggle-retrieval-budget');if(budget){clear(budget);
   if(!finished){const due=reviewItems().filter(x=>!x.done&&x.due<=today());
@@ -104,7 +122,7 @@ function render(){const i=state.index,finished=i>=72,essay=list[Math.min(i,71)],
  const ready=!finished&&dayTasks().every((_,n)=>r.tasks[`single-${n}`]);el('struggle-next-day').disabled=!ready||finished;el('struggle-next-day').textContent='Complete essay & begin next essay';el('struggle-status').textContent=finished?'Program complete':ready?'All tasks checked. Ready to advance.':'Finish each required task before advancing.';
  for(const [id,key] of [['struggle-draft','draft'],['struggle-rewrite','rewrite'],['struggle-errors','errors']]){const field=el(id);field.disabled=finished;field.value=r[key]||'';field.oninput=()=>{r[key]=field.value;save()}}const hours=el('struggle-hours');hours.disabled=finished;hours.value=r.hours.single||0;hours.onchange=()=>{r.hours.single=Math.max(0,Math.min(5,Number(hours.value)||0));save();render()};
  const reviews=el('struggle-reviews');clear(reviews);const items=reviewItems().filter(x=>x.due<=today()||(!x.done&&x.due<=add(today(),21)));if(!items.length)reviews.append(text('p','No scheduled reviews yet.','struggle-hint'));items.forEach(x=>{const d=text('div','',`struggle-review ${x.done?'done':x.due<today()?'overdue':''}`),e=list[x.index];d.append(text('strong',`${fmt(x.due)} · Day ${x.offset} · ${e.subject}`),text('span',`${e.date} Q${e.q} · ${x.done?'Completed '+fmt(x.done):x.due<today()?'OVERDUE':x.due===today()?'DUE TODAY':'Upcoming'}`));if(!x.done){const b=text('button','Mark retrieval complete');b.type='button';b.onclick=()=>{state.reviews[x.key]=today();save();render()};d.append(b)}reviews.append(d)});
- const upcoming=el('struggle-upcoming');clear(upcoming);for(let k=i;k<Math.min(72,i+7);k++){const e=list[k],offset=k-i,start=add(state.start,offset);const row=text('div','', 'struggle-upcoming-row');row.append(text('strong',`Essay ${k+1} · ${e.subject}`),text('span',`${e.date} Q${e.q} · ${fmt(start)} (projected)`));upcoming.append(row)}
+ const upcoming=el('struggle-upcoming');clear(upcoming);for(let k=i;k<Math.min(72,i+7);k++){const e=list[k],offset=k-i,start=add(state.start<today()?today():state.start,offset);const row=text('div','', 'struggle-upcoming-row');row.append(text('strong',`Essay ${k+1} · ${e.subject}`),text('span',`${e.date} Q${e.q} · ${fmt(start)} (projected)`));upcoming.append(row)}
 }
 function advance(){if(state.index>=72)return;const r=record(state.index);if(!dayTasks().every((_,n)=>r.tasks[`single-${n}`]))return;
  const actual=today();const trainingDate=actual; // first single-day completion is anchored to its actual completion date, not a legacy Day-1 date
