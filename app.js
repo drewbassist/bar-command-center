@@ -4107,6 +4107,7 @@ const BASICK_GUIDE_PATHS = Object.freeze({
   "2012-february-q2": "study-guides/february-2012-constitutional-law-q2.html",
   "2011-july-q3": "study-guides/july-2011-contracts-q3.html",
   "2005-july-q2": "study-guides/july-2005-real-property-q2.html",
+  "2006-july-q5": "study-guides/july-2006-professional-responsibility-q5.html",
   "2003-july-q4": "study-guides/july-2003-torts-q4.html",
   "2001-july-q4": "study-guides/july-2001-constitutional-law-q4.html"
 });
