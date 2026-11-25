@@ -1856,6 +1856,330 @@
       "due": "",
       "createdAt": "2026-11-16T00:00:00.000Z",
       "updatedAt": "2026-11-16T00:00:00.000Z"
+    },
+    {
+      "id": "155d5d9b-c0f3-504a-8146-a4dd764b0d2d",
+      "due": "",
+      "rule": "Property acquired during marriage while domiciled in California is presumptively CP (§760); premarital property, gifts, inheritances and their rents, issues and profits are SP (§770).",
+      "level": 0,
+      "source": "Community Property · February 2008 Q5 · 2026-11-24",
+      "concept": "Property characterization",
+      "example": "Acquisition during marriage",
+      "history": [],
+      "subject": "Community Property",
+      "trigger": "Acquisition during marriage",
+      "analysis": "Trace source and timing; title alone is not dispositive.",
+      "createdAt": "2026-11-24T00:00:00.000Z",
+      "updatedAt": "2026-11-24T00:00:00.000Z",
+      "encounters": [
+        {
+          "date": "2026-11-24",
+          "mode": "guided",
+          "label": "Session review",
+          "score": 9,
+          "source": "Community Property guided session"
+        }
+      ],
+      "distinction": "Inheritance remains SP despite relocation.",
+      "masteryStatus": "Guided correct",
+      "originalError": "No specific error recorded for this rule."
+    },
+    {
+      "id": "41882563-af9c-544f-9eab-b3c1d06a505d",
+      "due": "",
+      "rule": "QCP includes property acquired while domiciled elsewhere that would have been CP if acquired while domiciled in California, and property acquired in exchange for it (§125).",
+      "level": 0,
+      "source": "Community Property · February 2008 Q5 · 2026-11-24",
+      "concept": "Quasi-community property",
+      "example": "Out-of-state earnings or substituted assets",
+      "history": [],
+      "subject": "Community Property",
+      "trigger": "Out-of-state earnings or substituted assets",
+      "analysis": "Apply hypothetical California characterization and trace exchanges.",
+      "createdAt": "2026-11-24T00:00:00.000Z",
+      "updatedAt": "2026-11-24T00:00:00.000Z",
+      "encounters": [
+        {
+          "date": "2026-11-24",
+          "mode": "guided",
+          "label": "Session review",
+          "score": 6.5,
+          "source": "Community Property guided session"
+        }
+      ],
+      "distinction": "QCP is not automatically ordinary CP upon relocation.",
+      "masteryStatus": "Needs review",
+      "originalError": "Session review priority: QCP is not automatically ordinary CP upon relocation."
+    },
+    {
+      "id": "7b7fc379-fac2-5839-97b8-645039c74c10",
+      "due": "",
+      "rule": "Under §2251, a party who believed in good faith that a void or voidable marriage was valid may be declared a putative spouse. Good faith is subjective; objective circumstances are relevant evidence (Ceja).",
+      "level": 0,
+      "source": "Community Property · February 2008 Q5 · 2026-11-24",
+      "concept": "Putative spouse",
+      "example": "Undisclosed prior undissolved marriage",
+      "history": [],
+      "subject": "Community Property",
+      "trigger": "Undisclosed prior undissolved marriage",
+      "analysis": "Determine actual good faith and when it ended.",
+      "createdAt": "2026-11-24T00:00:00.000Z",
+      "updatedAt": "2026-11-24T00:00:00.000Z",
+      "encounters": [
+        {
+          "date": "2026-11-24",
+          "mode": "guided",
+          "label": "Session review",
+          "score": 7.5,
+          "source": "Community Property guided session"
+        }
+      ],
+      "distinction": "Discovery, not the mere existence of an impediment, ends good-faith belief.",
+      "masteryStatus": "Needs review",
+      "originalError": "Session review priority: Discovery, not the mere existence of an impediment, ends good-faith belief."
+    },
+    {
+      "id": "3873a1a3-8e9b-5291-90f6-bde5addb800d",
+      "due": "",
+      "rule": "Under §2251, property acquired during the union that would have been CP or QCP if the marriage were valid is QMP, divided under Division 7 upon request of either party.",
+      "level": 0,
+      "source": "Community Property · February 2008 Q5 · 2026-11-24",
+      "concept": "Quasi-marital property",
+      "example": "Nullity with at least one good-faith spouse",
+      "history": [],
+      "subject": "Community Property",
+      "trigger": "Nullity with at least one good-faith spouse",
+      "analysis": "Characterize each asset before division; ordinary QMP generally divided equally.",
+      "createdAt": "2026-11-24T00:00:00.000Z",
+      "updatedAt": "2026-11-24T00:00:00.000Z",
+      "encounters": [
+        {
+          "date": "2026-11-24",
+          "mode": "guided",
+          "label": "Session review",
+          "score": 8,
+          "source": "Community Property guided session"
+        }
+      ],
+      "distinction": "Bad faith alone does not automatically forfeit the other party’s statutory division rights.",
+      "masteryStatus": "Needs review",
+      "originalError": "Session review priority: Bad faith alone does not automatically forfeit the other party’s statutory division rights."
+    },
+    {
+      "id": "26e164c9-3138-5372-98c7-3a25a590c680",
+      "due": "",
+      "rule": "A premarital agreement must be in writing and signed by both parties (§1611); enforceability is governed by §1615, including voluntariness and applicable disclosure and procedural safeguards.",
+      "level": 0,
+      "source": "Community Property · February 2008 Q5 · 2026-11-24",
+      "concept": "Premarital agreements",
+      "example": "Agreement before marriage",
+      "history": [],
+      "subject": "Community Property",
+      "trigger": "Agreement before marriage",
+      "analysis": "Distinguish enforceability of premarital agreement from later transmutation.",
+      "createdAt": "2026-11-24T00:00:00.000Z",
+      "updatedAt": "2026-11-24T00:00:00.000Z",
+      "encounters": [
+        {
+          "date": "2026-11-24",
+          "mode": "guided",
+          "label": "Session review",
+          "score": 9,
+          "source": "Community Property guided session"
+        }
+      ],
+      "distinction": "Independent counsel is not universally mandatory for every property provision.",
+      "masteryStatus": "Guided correct",
+      "originalError": "No specific error recorded for this rule."
+    },
+    {
+      "id": "8825182b-bee2-5fe5-be5a-c6c3116c1cca",
+      "due": "",
+      "rule": "For transmutations on or after January 1, 1985, an express declaration in writing made, joined in, consented to or accepted by the adversely affected spouse is required (§852).",
+      "level": 0,
+      "source": "Community Property · February 2008 Q5 · 2026-11-24",
+      "concept": "Transmutation",
+      "example": "Oral promise changing ownership",
+      "history": [],
+      "subject": "Community Property",
+      "trigger": "Oral promise changing ownership",
+      "analysis": "Identify the adversely affected spouse and express change of characterization.",
+      "createdAt": "2026-11-24T00:00:00.000Z",
+      "updatedAt": "2026-11-24T00:00:00.000Z",
+      "encounters": [
+        {
+          "date": "2026-11-24",
+          "mode": "guided",
+          "label": "Session review",
+          "score": 10,
+          "source": "Community Property guided session"
+        }
+      ],
+      "distinction": "Exception for qualifying personal gifts not substantial in value.",
+      "masteryStatus": "Guided correct",
+      "originalError": "No specific error recorded for this rule."
+    },
+    {
+      "id": "d150b77d-62d4-5d71-96c2-e6b962936727",
+      "due": "",
+      "rule": "Sole title does not by itself rebut the CP presumption. Section 803 provides special presumptions for qualifying written acquisitions by a married woman before January 1, 1975.",
+      "level": 0,
+      "source": "Community Property · February 2008 Q5 · 2026-11-24",
+      "concept": "Title and historical presumptions",
+      "example": "Sole-name account or historical deed",
+      "history": [],
+      "subject": "Community Property",
+      "trigger": "Sole-name account or historical deed",
+      "analysis": "Determine acquisition date, source, applicable title presumption and rebuttal evidence.",
+      "createdAt": "2026-11-24T00:00:00.000Z",
+      "updatedAt": "2026-11-24T00:00:00.000Z",
+      "encounters": [
+        {
+          "date": "2026-11-24",
+          "mode": "guided",
+          "label": "Session review",
+          "score": 9,
+          "source": "Community Property guided session"
+        }
+      ],
+      "distinction": "Do not apply historical married-woman presumptions to modern earnings accounts.",
+      "masteryStatus": "Guided correct",
+      "originalError": "No specific error recorded for this rule."
+    },
+    {
+      "id": "577e979b-7911-5d7d-a09d-02e02720e252",
+      "due": "",
+      "rule": "Third-party personal injury damages are CP if the cause of action arose during marriage, subject to §781 exceptions; in a protected putative union they may be QMP (§§780–781,2251).",
+      "level": 0,
+      "source": "Community Property · February 2008 Q5 · 2026-11-24",
+      "concept": "Personal injury characterization",
+      "example": "Accident during union; later settlement",
+      "history": [],
+      "subject": "Community Property",
+      "trigger": "Accident during union; later settlement",
+      "analysis": "Use date cause arose, not payment date; examine separation and spouse-tortfeasor exceptions.",
+      "createdAt": "2026-11-24T00:00:00.000Z",
+      "updatedAt": "2026-11-24T00:00:00.000Z",
+      "encounters": [
+        {
+          "date": "2026-11-24",
+          "mode": "guided",
+          "label": "Session review",
+          "score": 10,
+          "source": "Community Property guided session"
+        }
+      ],
+      "distinction": "Characterization is distinct from allocation at dissolution or nullity.",
+      "masteryStatus": "Guided correct",
+      "originalError": "No specific error recorded for this rule."
+    },
+    {
+      "id": "2f11dac3-6e3a-579f-9617-1dcd397685de",
+      "due": "",
+      "rule": "Under §2603, community estate personal injury damages are assigned to injured spouse unless interests of justice require another allocation; injured spouse receives at least half.",
+      "level": 0,
+      "source": "Community Property · February 2008 Q5 · 2026-11-24",
+      "concept": "Personal injury allocation",
+      "example": "Division of traceable injury proceeds",
+      "history": [],
+      "subject": "Community Property",
+      "trigger": "Division of traceable injury proceeds",
+      "analysis": "Characterize first, then apply special allocation and consider economic circumstances.",
+      "createdAt": "2026-11-24T00:00:00.000Z",
+      "updatedAt": "2026-11-24T00:00:00.000Z",
+      "encounters": [
+        {
+          "date": "2026-11-24",
+          "mode": "guided",
+          "label": "Session review",
+          "score": 8.5,
+          "source": "Community Property guided session"
+        }
+      ],
+      "distinction": "Not automatically SP or invariably 100% awarded.",
+      "masteryStatus": "Needs review",
+      "originalError": "Session review priority: Not automatically SP or invariably 100% awarded."
+    },
+    {
+      "id": "72c7f27e-b0c9-589f-9faf-d965266292b3",
+      "due": "",
+      "rule": "Commingling alone does not destroy SP if adequately traced. Direct tracing requires evidence of available SP and intent to use it; exhaustion tracing relies on proof CP funds were exhausted by family expenses.",
+      "level": 0,
+      "source": "Community Property · February 2008 Q5 · 2026-11-24",
+      "concept": "Tracing and commingling",
+      "example": "Mixed account and disputed purchase",
+      "history": [],
+      "subject": "Community Property",
+      "trigger": "Mixed account and disputed purchase",
+      "analysis": "Party claiming SP must establish tracing; family expenses presumptively paid from available CP.",
+      "createdAt": "2026-11-24T00:00:00.000Z",
+      "updatedAt": "2026-11-24T00:00:00.000Z",
+      "encounters": [
+        {
+          "date": "2026-11-24",
+          "mode": "guided",
+          "label": "Session review",
+          "score": 8.5,
+          "source": "Community Property guided session"
+        }
+      ],
+      "distinction": "Do not infer historical balances from later deposits.",
+      "masteryStatus": "Needs review",
+      "originalError": "Session review priority: Do not infer historical balances from later deposits."
+    },
+    {
+      "id": "11bc6aaa-e83e-59f8-813b-5a53f535020d",
+      "due": "",
+      "rule": "Under §914(b), a spouse whose SP is applied to a debt for which that spouse is personally liable under §914(a) is entitled to reimbursement to extent CP or debtor spouse SP was available but not applied.",
+      "level": 0,
+      "source": "Community Property · February 2008 Q5 · 2026-11-24",
+      "concept": "Medical expenses and reimbursement",
+      "example": "SP used for other spouse’s necessary medical care",
+      "history": [],
+      "subject": "Community Property",
+      "trigger": "SP used for other spouse’s necessary medical care",
+      "analysis": "Determine statutory liability and funds available at payment; apply by analogy where appropriate to QMP.",
+      "createdAt": "2026-11-24T00:00:00.000Z",
+      "updatedAt": "2026-11-24T00:00:00.000Z",
+      "encounters": [
+        {
+          "date": "2026-11-24",
+          "mode": "guided",
+          "label": "Session review",
+          "score": 7.5,
+          "source": "Community Property guided session"
+        }
+      ],
+      "distinction": "Later settlement does not establish earlier availability; distinguish §2640 acquisition reimbursement.",
+      "masteryStatus": "Needs review",
+      "originalError": "Session review priority: Later settlement does not establish earlier availability; distinguish §2640 acquisition reimbursement."
+    },
+    {
+      "id": "bfb10ef4-8773-5e30-9781-e532ec99e926",
+      "due": "",
+      "rule": "Earnings and accumulations after date of separation are SP (§771); date of separation requires complete and final break evidenced by expressed intent and consistent conduct (§70).",
+      "level": 0,
+      "source": "Community Property · February 2008 Q5 · 2026-11-24",
+      "concept": "Post-separation earnings",
+      "example": "Discovery of invalid marriage and immediate separation",
+      "history": [],
+      "subject": "Community Property",
+      "trigger": "Discovery of invalid marriage and immediate separation",
+      "analysis": "Distinguish termination of good faith from statutory separation; classify later earnings outside protected union.",
+      "createdAt": "2026-11-24T00:00:00.000Z",
+      "updatedAt": "2026-11-24T00:00:00.000Z",
+      "encounters": [
+        {
+          "date": "2026-11-24",
+          "mode": "guided",
+          "label": "Session review",
+          "score": 9.5,
+          "source": "Community Property guided session"
+        }
+      ],
+      "distinction": "Do not extend QMP to later earnings merely because nullity decree is pending.",
+      "masteryStatus": "Guided correct",
+      "originalError": "No specific error recorded for this rule."
     }
   ]
 }
