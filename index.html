@@ -53,6 +53,7 @@ New user? Follow instructions sent to your email before signing in.
 </section>
 <div hidden="" id="app-shell">
 <nav class="bcc-nav">
+<button class="bcc-nav-button" data-view="daily-training">Daily Training</button>
 <button class="bcc-nav-button" data-view="dashboard">Today</button>
 <button class="bcc-nav-button" data-view="essay-library">Essay Archive & Guides</button>
 <button class="bcc-nav-button" data-view="mcqs">MCQs</button>
@@ -61,7 +62,6 @@ New user? Follow instructions sent to your email before signing in.
 <button class="bcc-nav-button" data-view="study-log">Study Log</button>
 <button class="bcc-nav-button" data-view="essay-grid">Blind-Struggle</button>
 <button class="bcc-nav-button" data-view="essay-workflow-guide">Essay Workflow Guide</button>
-<button class="bcc-nav-button" data-view="study-calendar">Study Calendar</button>
 <button class="bcc-nav-button" data-view="civil-procedure">Civil Procedure</button>
 <button class="bcc-nav-button" data-view="retrieval-lab">Retrieval Lab</button>
 <button class="bcc-nav-button" data-view="stats">Progress</button>
@@ -819,7 +819,8 @@ New user? Follow instructions sent to your email before signing in.
  <div id="mel-performance" hidden></div><div id="mel-list"></div>
 </section>
 </section>
-<section class="bcc-view" id="study-calendar">
+<section class="bcc-view" id="daily-training"><div id="daily-training-root" class="bcc-panel"></div></section>
+<section class="bcc-view" id="study-calendar" hidden>
 <section class="struggle-spaced-tracker" id="struggle-spaced-tracker" aria-label="Four-month spaced repetition study calendar"></section>
 </section>
 <section class="bcc-view" id="retrieval-lab">
@@ -1029,6 +1030,7 @@ New user? Follow instructions sent to your email before signing in.
 <script src="app.js"></script>
 <script src="blind-struggle.js"></script>
 <script src="master-error-log.js"></script>
+<script src="daily-training.js"></script>
 <script src="retrieval-lab.js"></script>
 <script src="study-guides.js"></script>
 <link rel="stylesheet" href="civil-procedure.css">

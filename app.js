@@ -5,6 +5,7 @@ const SUPABASE_URL = "https://rudhrifkjhretilqdncy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_TGTjuqPmo8AOx_P2OpxnOw_NGT-1Z9l";
 
 let supabaseClient = null;
+let dailyTraining = null;
 let basickAnswers = {};
 let basickColumnRotation = {};
 let currentUser = null;
@@ -134,6 +135,7 @@ async function loadData() {
   );
   studyLog = normalizeStudyLog(loadLocalData("bcc_study_log", createEmptyStudyLog()));
   essayGrid = normalizeEssayGrid(loadLocalData("bcc_essay_grid", {}));
+  dailyTraining = loadLocalData("bcc_daily_training", null);
   basickAnswers = loadLocalData("bcc_basick_answers", {});
   basickColumnRotation = loadLocalData("bcc_basick_column_rotation", {});
   barCycleRotation = normalizeBarCycleRotation(loadLocalData("bcc_bar_cycle_rotation", {}));
@@ -213,6 +215,7 @@ function saveLocalData() {
   setUserLocalItem("bcc_study_mode", currentStudyMode);
   setUserLocalItem("bcc_study_log", JSON.stringify(studyLog));
   setUserLocalItem("bcc_essay_grid", JSON.stringify(essayGrid));
+  setUserLocalItem("bcc_daily_training", JSON.stringify(dailyTraining));
   setUserLocalItem("bcc_basick_answers", JSON.stringify(basickAnswers));
   setUserLocalItem("bcc_basick_column_rotation", JSON.stringify(basickColumnRotation));
   setUserLocalItem("bcc_bar_cycle_rotation", JSON.stringify(barCycleRotation));
@@ -240,6 +243,7 @@ function getCompleteBarOSData() {
     currentStudyMode,
     studyLog,
     essayGrid,
+    dailyTraining,
     basickAnswers,
     basickColumnRotation,
     barCycleRotation,
@@ -266,6 +270,7 @@ function applyCompleteBarOSData(data) {
   currentStudyMode = data?.currentStudyMode || currentStudyMode || "full";
   studyLog = normalizeStudyLog(data?.studyLog);
   essayGrid = normalizeEssayGrid(data?.essayGrid);
+  dailyTraining = data?.dailyTraining || dailyTraining;
   basickAnswers = data?.basickAnswers && typeof data.basickAnswers === "object" ? data.basickAnswers : {};
   basickColumnRotation = data?.basickColumnRotation && typeof data.basickColumnRotation === "object" ? data.basickColumnRotation : {};
   barCycleRotation = normalizeBarCycleRotation(data?.barCycleRotation);
@@ -483,6 +488,7 @@ async function openSignedInApp(user) {
   refreshBarMcqChecklistForCurrentUser();
   await loadCloudData();
   renderAll();
+  window.activateBccView?.("daily-training");
 }
 
 function showSignedInState() {
@@ -547,13 +553,13 @@ function setupNavigation() {
   const views = document.querySelectorAll(".bcc-view");
 
   // Keep all existing data and pages intact; display only the two study tabs.
-  const visibleViews = new Set(["essay-grid", "mcqs", "civil-procedure", "study-calendar", "essay-workflow-guide"]);
+  const visibleViews = new Set(["essay-grid", "mcqs", "civil-procedure", "daily-training", "essay-workflow-guide"]);
   buttons.forEach((button) => {
     button.style.display = visibleViews.has(button.dataset.view) ? "" : "none";
   });
 
   window.activateBccView = function (viewId) {
-    if (!visibleViews.has(viewId)) viewId = "essay-grid";
+    if (!visibleViews.has(viewId)) viewId = "daily-training";
     const targetView = document.getElementById(viewId);
     if (!targetView) return;
 
@@ -566,6 +572,7 @@ function setupNavigation() {
     });
 
     setUserLocalItem("bcc_active_view", viewId);
+    if (viewId === "daily-training") window.renderDailyTraining?.();
   };
 
   buttons.forEach((button) => {
@@ -574,8 +581,7 @@ function setupNavigation() {
     });
   });
 
-  const savedView = getUserLocalItem("bcc_active_view") || "dashboard";
-  window.activateBccView(savedView);
+  window.activateBccView("daily-training");
 }
 
 function setupViewJumpButtons() {
@@ -1640,6 +1646,7 @@ function exportBackup() {
     currentStudyMode,
     studyLog,
     essayGrid,
+    dailyTraining,
     basickAnswers,
     basickColumnRotation,
     barCycleRotation,
@@ -1690,6 +1697,7 @@ function importBackup(event) {
       currentStudyMode = backup.currentStudyMode || currentStudyMode || "full";
       studyLog = normalizeStudyLog(backup.studyLog);
       essayGrid = normalizeEssayGrid(backup.essayGrid);
+      if (backup.dailyTraining) dailyTraining = backup.dailyTraining;
       if (backup.basickAnswers && typeof backup.basickAnswers === "object") basickAnswers = backup.basickAnswers;
       if (backup.basickColumnRotation && typeof backup.basickColumnRotation === "object") basickColumnRotation = backup.basickColumnRotation;
       if (backup.barCycleRotation && typeof backup.barCycleRotation === "object") barCycleRotation = normalizeBarCycleRotation(backup.barCycleRotation);
