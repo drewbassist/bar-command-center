@@ -3856,6 +3856,10 @@ function openChecklistEssayGuide(key, caption) {
         'historical-essay-2003-july-q4-b': 'study-guides/july-2003-torts-q4.html',
         'essay-model-archive-2003-july-q4-a': 'study-guides/july-2003-torts-q4.html',
         'essay-model-archive-2003-july-q4-b': 'study-guides/july-2003-torts-q4.html',
+        'historical-essay-1985-july-q2-a': 'study-guides/july-1985-constitutional-law-q2.html',
+        'historical-essay-1985-july-q2-b': 'study-guides/july-1985-constitutional-law-q2.html',
+        'essay-model-archive-1985-july-q2-a': 'study-guides/july-1985-constitutional-law-q2.html',
+        'essay-model-archive-1985-july-q2-b': 'study-guides/july-1985-constitutional-law-q2.html',
         'historical-essay-2001-july-q4-a': 'study-guides/july-2001-constitutional-law-q4.html',
         'historical-essay-2001-july-q4-b': 'study-guides/july-2001-constitutional-law-q4.html',
         'essay-model-archive-2001-july-q4-a': 'study-guides/july-2001-constitutional-law-q4.html',
@@ -4072,7 +4076,7 @@ document.addEventListener('DOMContentLoaded',()=>{enhanceHistoricalEssayRows();u
 const BASICK_DATES = [["Feb 1996", "Jul 2009", "Feb 2003", "Jul 1993", "Jul 1999", "Jul 1994"], ["Feb 1993", "Jul 2009", "Jul 2005", "Jul 1999", "Feb 2002", "Feb 1998"], ["Jul 1998", "Jul 2010", "Feb 1997", "Feb 2002", "Feb 1999", "Jul 2005"], ["Jul 2008", "Feb 2000", "Feb 2002", "Jul 1986", "Jul 2007", "Feb 1998"], ["Jul 1987", "Feb 1992", "Feb 1994", "Feb 2002", "Jul 1999", "Feb 2004"], ["Jul 2005", "Feb 1994", "Jul 2008", "Jul 2001", "Jul 2007", "Feb 2005"], ["Jul 2006", "Jul 2011", "Jul 1993", "Feb 1990", "Feb 2005", "Feb 2001"], ["Feb 2008", "Feb 2001", "Jul 1990", "Jul 1992", "Feb 1997", "Feb 2000"], ["Jul 2004", "Jul 2000", "Jul 2003", "Feb 2008", "Feb 2010", "Feb 2007"], ["Jul 1985", "Feb 2005", "Feb 2002", "Jul 2006", "Jul 2009", "Jul 2001"], ["Feb 2005", "Feb 1996", "Feb 2006", "Jul 2005", "Feb 2000", "Jul 2011"], ["Jul 1995", "Feb 1987", "Jul 1993", "Jul 2007", "Feb 2009", "Jul 2003"]];
 const BASICK_SUBJECTS = ["Criminal Law & Procedure","Evidence","Business Associations","Remedies","Civil Procedure","Real Property","Professional Responsibility","Community Property","Wills & Trusts","Constitutional Law","Contracts","Torts"];
 // Basick's selected question numbers, in the same subject order as BASICK_DATES.
-const BASICK_QUESTIONS = [[5,6,3,2,1,3],[3,3,4,4,6,3],[5,4,1,3,4,3],[4,2,2,5,5,1],[2,5,6,1,2,6],[2,3,5,2,1,5],[5,4,4,3,4,5],[5,1,3,1,6,1],[3,3,6,4,3,4],[4,1,5,2,4,4],[2,1,5,5,5,3],[3,4,1,2,4,4]];
+const BASICK_QUESTIONS = [[5,6,3,2,1,3],[3,3,4,4,6,3],[5,4,1,3,4,3],[4,2,2,5,5,1],[2,5,6,1,2,6],[2,3,5,2,1,5],[5,4,4,3,4,5],[5,1,3,1,6,1],[3,3,6,4,3,4],[2,1,5,2,4,4],[2,1,5,5,5,3],[3,4,1,2,4,4]];
 function basickLinkedInput(si, essay, answer) {
   const date=BASICK_DATES[si]?.[essay-1];
   const question=BASICK_QUESTIONS[si]?.[essay-1];
@@ -4103,6 +4107,7 @@ function refreshBasickLinkedChecks() {
 // Basick guide links are derived from the essay's actual date/question, not its grid position.
 // Only link to guide files confirmed present in this repository.
 const BASICK_GUIDE_PATHS = Object.freeze({
+  "1985-july-q2": "study-guides/july-1985-constitutional-law-q2.html",
   "1996-february-q5": "study-guides/february-1996-criminal-law-q5.html",
   "1993-february-q3": "study-guides/february-1993-evidence-q3.html",
   "1998-july-q5": "study-guides/july-1998-business-associations-q5.html",
